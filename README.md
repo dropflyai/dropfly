@@ -1,4 +1,8 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DropFly - AI Teams for Every Department
+
+This is the official DropFly website - building AI teams for every department to help businesses scale faster, cut costs, and never miss an opportunity.
+
+Built with [Next.js](https://nextjs.org) and [Clerk](https://clerk.com) for authentication.
 
 ## Getting Started
 
