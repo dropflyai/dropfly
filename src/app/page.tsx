@@ -30,8 +30,8 @@ export default function HomePage() {
                 <Link href="#solutions" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
                   Solutions
                 </Link>
-                <Link href="#pricing" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
-                  Pricing
+                <Link href="#expertise" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
+                  Expertise
                 </Link>
                 <Link href="#about" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
                   About
@@ -230,66 +230,101 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section id="pricing" className="relative py-20 px-4 sm:px-6 lg:px-8">
+      {/* AI Authority Section */}
+      <section id="expertise" className="relative py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl font-bold text-white mb-4">
-              Simple, Transparent Pricing
+          <div className="text-center mb-20">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
+              The Science Behind the Magic
             </h2>
-            <p className="text-xl text-gray-400">
-              Start small, scale as you grow
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              While others talk about AI, we&apos;ve been quietly building the future. Here&apos;s what happens when you combine 
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400"> deep learning expertise</span> with 
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400"> real-world obsession</span>.
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            <div className="bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
-              <h3 className="text-xl font-bold text-white mb-2">Starter</h3>
-              <div className="text-3xl font-bold text-white mb-1">$249</div>
-              <div className="text-gray-400 mb-6">/month</div>
-              <ul className="space-y-3 mb-8">
-                <li className="text-gray-300 text-sm">✓ 1 AI Solution</li>
-                <li className="text-gray-300 text-sm">✓ Basic Support</li>
-                <li className="text-gray-300 text-sm">✓ Monthly Reports</li>
-              </ul>
-              <button className="w-full py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-all">
-                Get Started
-              </button>
-            </div>
 
-            <div className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 backdrop-blur-xl rounded-xl p-8 border border-purple-500/50 relative">
-              <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                <span className="bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-bold px-4 py-1 rounded-full">
-                  POPULAR
-                </span>
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left side - Achievement Cards */}
+            <div className="space-y-6">
+              <div className="bg-gradient-to-br from-blue-900/30 via-purple-900/30 to-indigo-900/30 backdrop-blur-xl rounded-2xl p-8 border border-blue-500/30">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-2xl font-bold text-white">Neural Architecture</h3>
+                  <div className="w-3 h-3 bg-blue-400 rounded-full animate-pulse"></div>
+                </div>
+                <p className="text-gray-300 mb-6">
+                  Our models don&apos;t just process data—they understand context, intent, and nuance like a senior analyst with 20 years of experience.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-400">99.7%</div>
+                    <div className="text-sm text-gray-400">Accuracy Rate</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-400">&lt;100ms</div>
+                    <div className="text-sm text-gray-400">Response Time</div>
+                  </div>
+                </div>
               </div>
-              <h3 className="text-xl font-bold text-white mb-2">Grow</h3>
-              <div className="text-3xl font-bold text-white mb-1">$499</div>
-              <div className="text-gray-400 mb-6">/month</div>
-              <ul className="space-y-3 mb-8">
-                <li className="text-gray-300 text-sm">✓ Up to 3 AI Solutions</li>
-                <li className="text-gray-300 text-sm">✓ Priority Support</li>
-                <li className="text-gray-300 text-sm">✓ Weekly Reports</li>
-                <li className="text-gray-300 text-sm">✓ Custom Integrations</li>
-              </ul>
-              <button className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
-                Get Started
-              </button>
+
+              <div className="bg-gradient-to-br from-purple-900/30 via-pink-900/30 to-rose-900/30 backdrop-blur-xl rounded-2xl p-8 border border-purple-500/30">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-2xl font-bold text-white">Continuous Evolution</h3>
+                  <div className="w-3 h-3 bg-purple-400 rounded-full animate-pulse"></div>
+                </div>
+                <p className="text-gray-300 mb-6">
+                  Every interaction teaches our systems something new. It&apos;s like having an employee who gets exponentially smarter every day.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-400">24/7</div>
+                    <div className="text-sm text-gray-400">Learning Mode</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-400">∞</div>
+                    <div className="text-sm text-gray-400">Scalability</div>
+                  </div>
+                </div>
+              </div>
             </div>
 
-            <div className="bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
-              <h3 className="text-xl font-bold text-white mb-2">PRO</h3>
-              <div className="text-3xl font-bold text-white mb-1">$999+</div>
-              <div className="text-gray-400 mb-6">/month</div>
-              <ul className="space-y-3 mb-8">
-                <li className="text-gray-300 text-sm">✓ 5+ AI Solutions</li>
-                <li className="text-gray-300 text-sm">✓ Dedicated Support</li>
-                <li className="text-gray-300 text-sm">✓ Real-time Analytics</li>
-                <li className="text-gray-300 text-sm">✓ White Label Options</li>
-              </ul>
-              <button className="w-full py-3 border border-white/20 text-white rounded-lg hover:bg-white/10 transition-all">
-                Contact Sales
-              </button>
+            {/* Right side - Philosophy */}
+            <div className="space-y-8">
+              <div className="bg-black/50 backdrop-blur-xl rounded-2xl p-8 border border-white/10">
+                <h3 className="text-3xl font-bold text-white mb-6">Our Philosophy</h3>
+                <div className="space-y-6">
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full mt-3 mr-4 flex-shrink-0"></div>
+                    <div>
+                      <h4 className="text-lg font-semibold text-white mb-2">Intelligence Over Automation</h4>
+                      <p className="text-gray-400 text-sm">Anyone can automate. We build AI that actually thinks.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full mt-3 mr-4 flex-shrink-0"></div>
+                    <div>
+                      <h4 className="text-lg font-semibold text-white mb-2">Context is Everything</h4>
+                      <p className="text-gray-400 text-sm">Our AI doesn&apos;t just follow scripts—it understands your business.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start">
+                    <div className="w-2 h-2 bg-gradient-to-r from-pink-400 to-orange-400 rounded-full mt-3 mr-4 flex-shrink-0"></div>
+                    <div>
+                      <h4 className="text-lg font-semibold text-white mb-2">Humans + AI = Unstoppable</h4>
+                      <p className="text-gray-400 text-sm">We don&apos;t replace humans. We make them superhuman.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Quote */}
+              <div className="bg-gradient-to-br from-gray-900/50 to-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10 relative">
+                <div className="absolute -top-3 -left-3 text-6xl text-blue-400/20 font-serif">&ldquo;</div>
+                <p className="text-lg text-gray-300 italic mb-4 relative z-10">
+                  The best AI is invisible. It just makes everything work better, faster, smarter—like having a genius-level assistant who never sleeps.
+                </p>
+                <div className="text-sm text-gray-400">— The DropFly Manifesto</div>
+              </div>
             </div>
           </div>
         </div>
