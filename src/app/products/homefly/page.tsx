@@ -32,9 +32,9 @@ export default function HomeFlyPage() {
     },
     {
       icon: DollarSign,
-      title: "HOA Payment Processing", 
-      description: "Streamlined dues collection with automated reminders, late fee management, and multiple payment methods.",
-      benefits: ["Stripe integration", "Automated billing", "Payment history tracking"]
+      title: "Rent & Dues Collection", 
+      description: "Streamlined rent collection for apartments and HOA dues processing with automated reminders, late fees, and multiple payment methods.",
+      benefits: ["Apartment rent processing", "HOA dues collection", "Automated late fees"]
     },
     {
       icon: Wrench,
@@ -98,14 +98,14 @@ export default function HomeFlyPage() {
     },
     {
       name: "Michael Chen", 
-      role: "Property Manager, Sunset Ridge Apartments",
-      content: "The maintenance tracking alone has saved us hours of paperwork. Residents love being able to report issues with photos directly from their phones.",
+      role: "Property Manager, Sunset Ridge Apartments (340 units)",
+      content: "The rent collection and maintenance tracking has revolutionized our operations. 95% of residents now pay online and maintenance response time dropped to under 24 hours.",
       rating: 5
     },
     {
       name: "Lisa Rodriguez",
       role: "Resident, Maple Heights HOA",
-      content: "Finally, an app that makes HOA living enjoyable! I actually look forward to checking community updates and connecting with my neighbors.",
+      content: "Finally, an app that makes community living enjoyable! I actually look forward to checking updates and connecting with neighbors. Even paying HOA dues is simple now.",
       rating: 5
     }
   ]
@@ -161,7 +161,7 @@ export default function HomeFlyPage() {
               </h1>
               
               <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl">
-                The "TikTok + Instagram of HOA Management" - where communities take flight through social engagement, payments, and seamless management.
+                The "TikTok + Instagram of Property Management" for HOAs and large apartment buildings - where communities take flight through social engagement, rent/dues collection, and seamless management.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
@@ -197,8 +197,8 @@ export default function HomeFlyPage() {
                   <div className="w-24 h-24 bg-gradient-to-br from-green-600 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Home className="w-12 h-12 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white">Willowbrook Community</h3>
-                  <p className="text-gray-400 text-sm">Live Demo - 247 Active Residents</p>
+                  <h3 className="text-xl font-semibold text-white">Sunset Ridge Apartments</h3>
+                  <p className="text-gray-400 text-sm">Live Demo - 340 Units, 285 Active Residents</p>
                 </div>
                 
                 <div className="space-y-4">
@@ -207,8 +207,8 @@ export default function HomeFlyPage() {
                     <span className="text-green-400 font-semibold">40%</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-300 text-sm">Payment Adoption</span>
-                    <span className="text-teal-400 font-semibold">85%</span>
+                    <span className="text-gray-300 text-sm">Rent Collection Rate</span>
+                    <span className="text-teal-400 font-semibold">95%</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
                     <span className="text-gray-300 text-sm">Response Time</span>
@@ -233,7 +233,7 @@ export default function HomeFlyPage() {
               Everything Your Community Needs
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              From social networking to HOA management, HomeFly combines the best of social media with essential community tools.
+              From social networking to property management, HomeFly combines the best of social media with essential tools for HOAs and apartment buildings.
             </p>
           </div>
           
@@ -267,10 +267,10 @@ export default function HomeFlyPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
-              Complete Community Management Suite
+              Complete Property Management Suite
             </h2>
             <p className="text-xl text-gray-400">
-              Built specifically for modern HOAs and apartment communities
+              Built specifically for modern HOAs and large apartment buildings
             </p>
           </div>
           
