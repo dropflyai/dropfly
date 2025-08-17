@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Mic, TrendingUp, Phone, Bot, Users, Shield, BarChart, Sparkles, Scale, FileText, Gavel } from 'lucide-react'
+import { ArrowRight, Mic, TrendingUp, Phone, Bot, Users, Shield, BarChart, Sparkles, Scale, FileText, Gavel, Home, MessageSquare, Calendar } from 'lucide-react'
 import {
   SignInButton,
   SignUpButton,
@@ -340,6 +340,103 @@ export default function ProductsPage() {
                       </div>
                     </div>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* HomeFly - Social Community Platform */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-gradient-to-br from-green-900/30 via-teal-900/30 to-blue-900/30 backdrop-blur-xl rounded-2xl border border-green-500/30 p-8 md:p-12">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div className="order-2 md:order-1">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 rounded-xl blur-3xl opacity-30"></div>
+                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
+                    <div className="flex items-center justify-center mb-6">
+                      <div className="w-24 h-24 bg-gradient-to-br from-green-600 to-teal-600 rounded-full flex items-center justify-center">
+                        <Home className="w-12 h-12 text-white" />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="bg-green-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-green-300">Database Tables</span>
+                          <span className="text-xs text-green-400">29 Optimized</span>
+                        </div>
+                      </div>
+                      <div className="bg-teal-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-teal-300">Real-time Updates</span>
+                          <span className="text-xs text-teal-400">&lt;500ms</span>
+                        </div>
+                      </div>
+                      <div className="bg-blue-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-blue-300">User Engagement</span>
+                          <span className="text-xs text-blue-400">40% Daily Active</span>
+                        </div>
+                      </div>
+                      <div className="bg-cyan-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-cyan-300">Community Size</span>
+                          <span className="text-xs text-cyan-400">100-500 Residents</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="order-1 md:order-2">
+                <div className="inline-flex items-center mb-4">
+                  <span className="bg-gradient-to-r from-green-600 to-teal-600 text-white text-sm font-bold px-4 py-1 rounded-full">
+                    SOCIAL COMMUNITY
+                  </span>
+                </div>
+                <h2 className="text-4xl font-bold text-white mb-6">
+                  HomeFly
+                </h2>
+                <p className="text-xl text-gray-300 mb-6">
+                  Social-first community management platform that's the "TikTok + Instagram of HOA/Apartment Management" with real-time social feeds and community engagement.
+                </p>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start">
+                    <MessageSquare className="w-6 h-6 text-green-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">Social Community Feed</span>
+                      <p className="text-gray-400 text-sm">Facebook-style social network for HOA residents</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <Calendar className="w-6 h-6 text-teal-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">Event & Meeting Management</span>
+                      <p className="text-gray-400 text-sm">Community calendar with RSVPs and video meetings</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <Users className="w-6 h-6 text-blue-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">HOA Management Tools</span>
+                      <p className="text-gray-400 text-sm">Payments, maintenance, voting, and document management</p>
+                    </div>
+                  </li>
+                </ul>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link 
+                    href="/products/homefly"
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-green-600 to-teal-600 rounded-lg hover:from-green-700 hover:to-teal-700 transition-all"
+                  >
+                    Learn More About HomeFly
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                  <button className="px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center">
+                    View Demo Community
+                  </button>
                 </div>
               </div>
             </div>
