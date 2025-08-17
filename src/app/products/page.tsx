@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Mic, TrendingUp, Phone, Bot, Users, Shield, BarChart, Sparkles } from 'lucide-react'
+import { ArrowRight, Mic, TrendingUp, Phone, Bot, Users, Shield, BarChart, Sparkles, Scale, FileText, Gavel } from 'lucide-react'
 import {
   SignInButton,
   SignUpButton,
@@ -239,6 +239,107 @@ export default function ProductsPage() {
                   >
                     View Features
                   </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* LawFly Pro */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-gradient-to-br from-amber-900/30 via-yellow-900/30 to-orange-900/30 backdrop-blur-xl rounded-2xl border border-amber-500/30 p-8 md:p-12">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center mb-4">
+                  <span className="bg-gradient-to-r from-amber-600 to-orange-600 text-white text-sm font-bold px-4 py-1 rounded-full">
+                    LEGAL AI
+                  </span>
+                </div>
+                <h2 className="text-4xl font-bold text-white mb-6">
+                  LawFly Pro
+                </h2>
+                <p className="text-xl text-gray-300 mb-6">
+                  Enterprise law firm backend system with multi-tenant architecture, attorney-client privilege protection, and complete case management automation. Built for firms handling high-stakes litigation.
+                </p>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start">
+                    <Scale className="w-6 h-6 text-amber-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">Attorney-Client Privilege Protection</span>
+                      <p className="text-gray-400 text-sm">Database-level privilege enforcement with field encryption</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <FileText className="w-6 h-6 text-yellow-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">Electronic Signature System</span>
+                      <p className="text-gray-400 text-sm">Legally binding signatures with tamper-proof audit trails</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <Gavel className="w-6 h-6 text-orange-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">Multi-Tenant Case Management</span>
+                      <p className="text-gray-400 text-sm">Complete isolation between law firms with role-based access</p>
+                    </div>
+                  </li>
+                </ul>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link 
+                    href="/products/lawfly"
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg hover:from-amber-700 hover:to-orange-700 transition-all"
+                  >
+                    Learn More About LawFly Pro
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                  <Link 
+                    href="https://lawflyai.com" 
+                    target="_blank"
+                    className="px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center"
+                  >
+                    Visit Live Site
+                  </Link>
+                </div>
+              </div>
+              
+              <div className="order-2 md:order-1">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl blur-3xl opacity-30"></div>
+                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
+                    <div className="flex items-center justify-center mb-6">
+                      <div className="w-24 h-24 bg-gradient-to-br from-amber-600 to-orange-600 rounded-full flex items-center justify-center">
+                        <Scale className="w-12 h-12 text-white" />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="bg-amber-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-amber-300">Database Tables</span>
+                          <span className="text-xs text-amber-400">25+ Enterprise</span>
+                        </div>
+                      </div>
+                      <div className="bg-yellow-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-yellow-300">Query Performance</span>
+                          <span className="text-xs text-yellow-400">&lt;200ms Avg</span>
+                        </div>
+                      </div>
+                      <div className="bg-orange-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-orange-300">Security Compliance</span>
+                          <span className="text-xs text-orange-400">SOC 2 Type II</span>
+                        </div>
+                      </div>
+                      <div className="bg-red-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-red-300">Uptime SLA</span>
+                          <span className="text-xs text-red-400">99.9%</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
