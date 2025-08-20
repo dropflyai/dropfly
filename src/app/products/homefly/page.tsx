@@ -32,9 +32,9 @@ export default function HomeFlyPage() {
     },
     {
       icon: DollarSign,
-      title: "Rent & Dues Collection", 
-      description: "Streamlined rent collection for apartments and HOA dues processing with automated reminders, late fees, and multiple payment methods.",
-      benefits: ["Apartment rent processing", "HOA dues collection", "Automated late fees"]
+      title: "Dual Payment Processing", 
+      description: "Sophisticated payment system handling both apartment rent collection and HOA dues with role-based access controls and automated processing.",
+      benefits: ["Apartment rent collection", "HOA monthly dues", "Role-based payment access"]
     },
     {
       icon: Wrench,
@@ -44,9 +44,9 @@ export default function HomeFlyPage() {
     },
     {
       icon: Vote,
-      title: "Voting & Governance",
-      description: "Digital voting platform for HOA decisions with anonymous ballots, quorum management, and results tracking.",
-      benefits: ["Anonymous voting", "Quorum tracking", "Results analytics"]
+      title: "HOA Voting & Governance",
+      description: "Secure digital voting platform for HOA decisions with homeowner-only voting rights, anonymous ballots, and comprehensive governance tools.",
+      benefits: ["Homeowner-only voting", "Anonymous ballots", "Governance tracking"]
     }
   ]
 
@@ -93,7 +93,7 @@ export default function HomeFlyPage() {
     {
       name: "Sarah Johnson",
       role: "HOA Board President, Willowbrook Community",
-      content: "HomeFly transformed our community engagement. We went from 20% participation to 80% within the first month. The social feed keeps everyone connected.",
+      content: "The access control system is brilliant! As homeowners, we maintain voting rights and financial oversight while our renters enjoy the social features. HOA governance has never been more secure.",
       rating: 5
     },
     {
@@ -103,9 +103,9 @@ export default function HomeFlyPage() {
       rating: 5
     },
     {
-      name: "Lisa Rodriguez",
-      role: "Resident, Maple Heights HOA",
-      content: "Finally, an app that makes community living enjoyable! I actually look forward to checking updates and connecting with neighbors. Even paying HOA dues is simple now.",
+      name: "David Martinez",
+      role: "Homeowner, Willowbrook HOA",
+      content: "I invited my renter through the secure system - they love the social features and maintenance tools, but can't access voting or financial data. Perfect balance of community and security.",
       rating: 5
     }
   ]
@@ -161,7 +161,7 @@ export default function HomeFlyPage() {
               </h1>
               
               <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl">
-                The "TikTok + Instagram of Property Management" for HOAs and large apartment buildings - where communities take flight through social engagement, rent/dues collection, and seamless management.
+                The "TikTok + Instagram of Property Management" with secure HOA governance and apartment management - featuring homeowner-controlled access, voting rights protection, and dual payment processing.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
@@ -191,32 +191,47 @@ export default function HomeFlyPage() {
               </div>
             </div>
             
-            <div className="relative">
-              <div className="bg-gradient-to-br from-green-900/50 to-teal-900/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
-                <div className="text-center mb-6">
-                  <div className="w-24 h-24 bg-gradient-to-br from-green-600 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <Home className="w-12 h-12 text-white" />
+            <div className="relative space-y-6">
+              {/* HOA Demo */}
+              <div className="bg-gradient-to-br from-blue-900/50 to-purple-900/50 backdrop-blur-xl rounded-xl p-6 border border-blue-500/20">
+                <div className="text-center mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Shield className="w-8 h-8 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white">Sunset Ridge Apartments</h3>
-                  <p className="text-gray-400 text-sm">Live Demo - 340 Units, 285 Active Residents</p>
+                  <h3 className="text-lg font-semibold text-white">Willowbrook HOA</h3>
+                  <p className="text-gray-400 text-xs">124 Homeowners, 38 Renters</p>
                 </div>
                 
-                <div className="space-y-4">
-                  <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-300 text-sm">Daily Active Users</span>
-                    <span className="text-green-400 font-semibold">40%</span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-black/30 rounded-lg">
+                    <span className="text-gray-300 text-xs">HOA Dues Collection</span>
+                    <span className="text-blue-400 font-semibold text-sm">98%</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-300 text-sm">Rent Collection Rate</span>
-                    <span className="text-teal-400 font-semibold">95%</span>
+                  <div className="flex items-center justify-between p-2 bg-black/30 rounded-lg">
+                    <span className="text-gray-300 text-xs">Voting Participation</span>
+                    <span className="text-purple-400 font-semibold text-sm">87%</span>
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-300 text-sm">Response Time</span>
-                    <span className="text-blue-400 font-semibold">&lt;24hrs</span>
+                </div>
+              </div>
+              
+              {/* Apartment Demo */}
+              <div className="bg-gradient-to-br from-green-900/50 to-teal-900/50 backdrop-blur-xl rounded-xl p-6 border border-green-500/20">
+                <div className="text-center mb-4">
+                  <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-teal-600 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <Home className="w-8 h-8 text-white" />
                   </div>
-                  <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-300 text-sm">User Satisfaction</span>
-                    <span className="text-cyan-400 font-semibold">4.8/5</span>
+                  <h3 className="text-lg font-semibold text-white">Sunset Ridge Apartments</h3>
+                  <p className="text-gray-400 text-xs">340 Units, 285 Active Residents</p>
+                </div>
+                
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-black/30 rounded-lg">
+                    <span className="text-gray-300 text-xs">Rent Collection Rate</span>
+                    <span className="text-green-400 font-semibold text-sm">95%</span>
+                  </div>
+                  <div className="flex items-center justify-between p-2 bg-black/30 rounded-lg">
+                    <span className="text-gray-300 text-xs">Response Time</span>
+                    <span className="text-teal-400 font-semibold text-sm">&lt;24hrs</span>
                   </div>
                 </div>
               </div>
@@ -233,7 +248,7 @@ export default function HomeFlyPage() {
               Everything Your Community Needs
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              From social networking to property management, HomeFly combines the best of social media with essential tools for HOAs and apartment buildings.
+              From social networking to secure HOA governance, HomeFly combines social media engagement with role-based access controls and comprehensive property management.
             </p>
           </div>
           
@@ -290,6 +305,75 @@ export default function HomeFlyPage() {
                 </div>
               )
             })}
+          </div>
+        </div>
+      </section>
+
+      {/* HOA Security & Access Control */}
+      <section className="py-20 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-900/10 to-purple-900/10">
+        <div className="max-w-7xl mx-auto">
+          <div className="text-center mb-16">
+            <h2 className="text-4xl font-bold text-white mb-4">
+              Secure HOA Governance & Access Control
+            </h2>
+            <p className="text-xl text-gray-400">
+              Protecting homeowner rights while enabling community engagement
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 gap-8">
+            <div className="bg-gradient-to-br from-blue-900/40 to-purple-900/40 backdrop-blur-xl rounded-xl p-8 border border-blue-500/30">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mb-6">
+                <Shield className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Homeowner Full Access</h3>
+              <p className="text-gray-300 mb-6">Property owners receive complete platform access with voting rights, financial oversight, and the ability to invite renters to restricted accounts.</p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <Vote className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                  <span className="text-gray-300">Full voting rights on HOA matters</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <DollarSign className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                  <span className="text-gray-300">Complete financial access and dues management</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Users className="w-5 h-5 text-blue-400 flex-shrink-0" />
+                  <span className="text-gray-300">Ability to invite and manage renter accounts</span>
+                </div>
+              </div>
+            </div>
+            
+            <div className="bg-gradient-to-br from-green-900/40 to-teal-900/40 backdrop-blur-xl rounded-xl p-8 border border-green-500/30">
+              <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-teal-600 rounded-lg flex items-center justify-center mb-6">
+                <Users className="w-8 h-8 text-white" />
+              </div>
+              <h3 className="text-2xl font-bold text-white mb-4">Renter Restricted Access</h3>
+              <p className="text-gray-300 mb-6">Tenants enjoy full social features and maintenance reporting while respecting homeowner governance rights and financial privacy.</p>
+              <div className="space-y-3">
+                <div className="flex items-center gap-3">
+                  <MessageSquare className="w-5 h-5 text-green-400 flex-shrink-0" />
+                  <span className="text-gray-300">Full social feed and community engagement</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Wrench className="w-5 h-5 text-green-400 flex-shrink-0" />
+                  <span className="text-gray-300">Maintenance requests and issue reporting</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <Settings className="w-5 h-5 text-gray-500 flex-shrink-0" />
+                  <span className="text-gray-400">No voting or financial access (view-only)</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="mt-12 text-center">
+            <div className="bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10 max-w-4xl mx-auto">
+              <h4 className="text-xl font-semibold text-white mb-3">Secure Invitation System</h4>
+              <p className="text-gray-300">
+                Homeowners create accounts and invite their renters with pre-configured restricted access. This ensures HOA governance integrity while maintaining community engagement for all residents.
+              </p>
+            </div>
           </div>
         </div>
       </section>

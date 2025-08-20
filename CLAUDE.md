@@ -77,10 +77,11 @@ The components are designed for an "elite developer" experience with luxury bran
 
 ### New Project Initialization
 
-**CRITICAL**: When user says "let's start a new project", follow this exact sequence:
+**🚨 CRITICAL**: When user says "let's start a new project", follow this EXACT sequence:
 
-0. **FIRST: Apply Enterprise Backend Framework** - Use the initialization prompt from `PROJECT-INITIALIZATION-PROMPTS.md` to ensure enterprise-grade backend from day one
+**🔴 STOP - Do NOT proceed until ALL steps completed in order**
 
+### Phase 1: Requirements Gathering (MANDATORY: Ask ONE AT A TIME)
 1. **Ask Questions (ONE AT A TIME)** until you have complete information:
    - What is the business/client name?
    - What type of business is it? (restaurant, retail, service, etc.)
@@ -91,19 +92,40 @@ The components are designed for an "elite developer" experience with luxury bran
    - Who is their target audience?
    - What is the timeline/priority level?
 
-2. **Complete Backend Framework Implementation** - Database schema, RLS policies, Edge Functions, monitoring, and documentation
+**✅ ONLY proceed to Phase 2 when ALL requirements are documented**
 
-3. **Create Project-Specific CLAUDE.md** in the new project folder with:
-   - Business information and goals
-   - Brand guidelines and color schemes
-   - Feature requirements
-   - Target audience and messaging
-   - Technical specifications
-   - Deployment requirements
+### Phase 2: Enterprise Backend Framework (MANDATORY FIRST)
+2. **Apply Enterprise Backend Framework** - Use initialization prompt from `PROJECT-INITIALIZATION-PROMPTS.md`
+   - Database schema with 15+ tables
+   - Row Level Security on every table
+   - Performance indexes and monitoring
+   - Complete documentation
 
-4. **Create Comprehensive Action Plan** before starting any work
-5. **Create Detailed Todo List** with all tasks broken down
-6. **Create Project Knowledge Base** with all business information
+### Phase 3: Project Setup & Logging Infrastructure
+3. **Create project folder with standard structure**:
+   ```
+   project-name/
+   ├── .logs/          # Session logs (MANDATORY)
+   ├── .docs/          # Documentation
+   ├── .research/      # Web scraping, API responses
+   ├── .assets/        # Downloaded images, logos, media
+   ├── .credentials/   # API keys, deployment tokens (NEVER commit)
+   ├── .troubleshoot/  # Problem solutions and fixes
+   ├── .progress/      # Completed tasks log
+   └── SESSION-MEMORY.md # Current project state
+   ```
+
+4. **🔥 CRITICAL: Start logging IMMEDIATELY**
+   - Create `.logs/YYYY-MM-DD-project-initialization.md`
+   - Log EVERY decision in session logs
+   - Update SESSION-MEMORY.md after EVERY major task
+   - Check ALL existing logs before starting ANY work
+
+5. **Create Project-Specific CLAUDE.md** with complete business context
+6. **Create Comprehensive Action Plan** with detailed steps
+7. **Create Detailed Todo List** with all tasks broken down
+
+**⚠️ NEVER work without logging - if it's not logged, it didn't happen**
 
 ### Project Isolation & Security
 
@@ -116,15 +138,38 @@ The components are designed for an "elite developer" experience with luxury bran
 
 ### Documentation & Logging
 
-**Save Everything - Save Constantly**:
-- Create `.logs/` folder in each project for session logs
-- Create `.docs/` folder for all documentation
-- Create `.research/` folder for business research and web scraping results
-- Create `.assets/` folder for downloaded images, logos, and media
-- Save all API responses, web scraping results, and research in markdown files
+**🔥 MANDATORY LOGGING - Every Session, Every Update, Every Decision**
+
+**CRITICAL RULE: If it's not logged, it didn't happen**
+
+**Before ANY work**:
+- Create session log `.logs/YYYY-MM-DD-session.md`
+- Check ALL existing logs to prevent redundancy:
+  - `.troubleshoot/` → Has this problem been solved before?
+  - `.progress/` → Has this task already been completed?
+  - `.logs/` → What was tried in previous sessions?
+  - `.research/` → Has this information already been gathered?
+
+**During work**:
 - Log every major decision and why it was made
-- Save troubleshooting steps and solutions
-- Never repeat the same research - always check existing files first
+- Log every error encountered and solution attempted
+- Save all API responses, web scraping results, and research in markdown files
+- Update SESSION-MEMORY.md after every major task
+
+**After work**:
+- Complete mandatory session backup checklist
+- Save troubleshooting steps and solutions in `.troubleshoot/`
+- Update `.progress/` with completed tasks
+- **Never repeat the same research** - always check existing files first
+
+**Folder Structure (MANDATORY)**:
+- `.logs/` → Session logs with timestamps
+- `.docs/` → All documentation
+- `.research/` → Business research and web scraping results
+- `.assets/` → Downloaded images, logos, and media
+- `.credentials/` → API keys, deployment tokens (NEVER commit)
+- `.troubleshoot/` → Problem solutions and fixes
+- `.progress/` → Completed tasks log
 
 ### Credentials & Security Management
 
