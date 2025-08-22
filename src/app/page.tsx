@@ -30,7 +30,7 @@ export default function HomePage() {
                 <Link href="#solutions" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
                   Solutions
                 </Link>
-                <Link href="#authority" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
+                <Link href="/why-dropfly" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
                   Why DropFly
                 </Link>
                 <Link href="#about" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
@@ -275,7 +275,7 @@ export default function HomePage() {
                   <span className="text-2xl">🏆</span>
                 </div>
                 <h4 className="font-semibold text-white">AI Innovation Leader</h4>
-                <p className="text-sm text-gray-400 mt-1">Gartner Magic Quadrant 2024</p>
+                <p className="text-sm text-gray-400 mt-1">Gartner Magic Quadrant 2025</p>
               </div>
               <div className="text-center">
                 <div className="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -289,7 +289,7 @@ export default function HomePage() {
                   <span className="text-2xl">🚀</span>
                 </div>
                 <h4 className="font-semibold text-white">Fastest Growing AI Company</h4>
-                <p className="text-sm text-gray-400 mt-1">Inc. 5000 List 2024</p>
+                <p className="text-sm text-gray-400 mt-1">Inc. 5000 List 2025</p>
               </div>
             </div>
           </div>
@@ -389,7 +389,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2024 DropFly. All rights reserved.</p>
+            <p>&copy; 2025 DropFly. All rights reserved.</p>
           </div>
         </div>
       </footer>

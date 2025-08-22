@@ -462,7 +462,7 @@ export default function ProductsPage() {
               <Sparkles className="w-8 h-8 text-green-400 mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">AI Content Studio</h3>
               <p className="text-gray-400 text-sm mb-4">Advanced content generation and optimization platform</p>
-              <span className="text-green-400 text-sm font-semibold">Coming Q2 2024</span>
+              <span className="text-green-400 text-sm font-semibold">Coming Q2 2025</span>
             </div>
 
             <div className="bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10 relative overflow-hidden">
@@ -470,7 +470,7 @@ export default function ProductsPage() {
               <Shield className="w-8 h-8 text-orange-400 mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">SecureAI Platform</h3>
               <p className="text-gray-400 text-sm mb-4">Enterprise security and compliance automation</p>
-              <span className="text-orange-400 text-sm font-semibold">Coming Q3 2024</span>
+              <span className="text-orange-400 text-sm font-semibold">Coming Q3 2025</span>
             </div>
 
             <div className="bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10 relative overflow-hidden">
@@ -478,7 +478,7 @@ export default function ProductsPage() {
               <BarChart className="w-8 h-8 text-red-400 mb-4" />
               <h3 className="text-lg font-semibold text-white mb-2">Analytics AI</h3>
               <p className="text-gray-400 text-sm mb-4">Predictive analytics and business intelligence</p>
-              <span className="text-red-400 text-sm font-semibold">Coming Q4 2024</span>
+              <span className="text-red-400 text-sm font-semibold">Coming Q4 2025</span>
             </div>
           </div>
         </div>
@@ -508,7 +508,7 @@ export default function ProductsPage() {
       <footer className="relative bg-black/50 backdrop-blur-xl border-t border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="text-center text-gray-400">
-            <p>&copy; 2024 DropFly. All rights reserved.</p>
+            <p>&copy; 2025 DropFly. All rights reserved.</p>
           </div>
         </div>
       </footer>
