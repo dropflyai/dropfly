@@ -44,7 +44,7 @@ export default function DashboardPage() {
           Welcome back, {user?.firstName || 'Developer'}
         </h1>
         <p className="text-gray-400 mt-2">
-          Here's what's happening with your AI infrastructure today.
+          Here&apos;s what&apos;s happening with your AI infrastructure today.
         </p>
       </div>
 

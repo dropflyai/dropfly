@@ -8,7 +8,6 @@ import {
   Shield, 
   CreditCard, 
   Key,
-  Globe,
   Save,
   AlertCircle
 } from 'lucide-react'

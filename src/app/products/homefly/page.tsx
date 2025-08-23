@@ -161,7 +161,7 @@ export default function HomeFlyPage() {
               </h1>
               
               <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl">
-                The "TikTok + Instagram of Property Management" with secure HOA governance and apartment management - featuring homeowner-controlled access, voting rights protection, and dual payment processing.
+                The &quot;TikTok + Instagram of Property Management&quot; with secure HOA governance and apartment management - featuring homeowner-controlled access, voting rights protection, and dual payment processing.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
@@ -440,7 +440,7 @@ export default function HomeFlyPage() {
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-6 italic">"{testimonial.content}"</p>
+                <p className="text-gray-300 mb-6 italic">&quot;{testimonial.content}&quot;</p>
                 <div>
                   <p className="text-white font-semibold">{testimonial.name}</p>
                   <p className="text-gray-400 text-sm">{testimonial.role}</p>

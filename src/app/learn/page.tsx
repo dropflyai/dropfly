@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { ArrowRight, CheckCircle, Circle, Lock, Trophy, Zap, Code, FileText, Rocket, Shield, Brain, Target, Award, BookOpen, Play, ChevronRight, User, Users, Crown, Medal } from 'lucide-react'
+import { CheckCircle, Circle, Lock, Trophy, Zap, Code, FileText, Rocket, Play, ChevronRight, User } from 'lucide-react'
 
 interface UserProfile {
   id: string
@@ -79,7 +79,7 @@ export default function LearnPage() {
       // Save to localStorage
       localStorage.setItem('osAppBuilderUsers', JSON.stringify(updatedUsers))
     }
-  }, [completedModules, currentModule, currentUser, users])
+  }, [completedModules, currentModule, currentUser, users, modules])
 
   const createUser = () => {
     if (!newUserName.trim()) return
