@@ -26,7 +26,7 @@ export default function MayaPage() {
     {
       icon: Clock,
       title: "24/7 Availability",
-      description: "Never miss a call again. Maya works around the clock, handling customer inquiries instantly.",
+      description: "Never miss a call again. Maya™ works around the clock, handling customer inquiries instantly.",
       benefits: ["Zero downtime", "Global time zones", "Instant response"]
     },
     {
@@ -74,13 +74,13 @@ export default function MayaPage() {
     {
       name: "Sarah Johnson",
       role: "VP of Operations, TechStart Inc.",
-      content: "Maya has transformed our customer service. We've reduced response times by 90% and customer satisfaction is at an all-time high.",
+      content: "Maya™ has transformed our customer service. We've reduced response times by 90% and customer satisfaction is at an all-time high.",
       rating: 5
     },
     {
       name: "Mike Chen",
       role: "CEO, Local Restaurant Group", 
-      content: "Since implementing Maya, we've increased our phone orders by 150%. It's like having our best employee available 24/7.",
+      content: "Since implementing Maya™, we've increased our phone orders by 150%. It's like having our best employee available 24/7.",
       rating: 5
     },
     {
@@ -99,7 +99,7 @@ export default function MayaPage() {
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-                DropFly
+                DropFly™
               </span>
             </Link>
             <div className="hidden md:flex items-center space-x-8">
@@ -110,7 +110,7 @@ export default function MayaPage() {
                 Solutions
               </Link>
               <Link href="/#authority" className="text-gray-300 hover:text-white transition-colors">
-                Why DropFly
+                Why DropFly™
               </Link>
               <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
                 Get Demo
@@ -135,7 +135,7 @@ export default function MayaPage() {
               
               <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
                 <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
-                  Maya
+                  Maya™
                 </span>
                 <br />
                 <span className="text-white">Voice Agent</span>
@@ -178,7 +178,7 @@ export default function MayaPage() {
                   <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-purple-600 rounded-full flex items-center justify-center mx-auto mb-4">
                     <Phone className="w-12 h-12 text-white" />
                   </div>
-                  <h3 className="text-xl font-semibold text-white">Maya is Live</h3>
+                  <h3 className="text-xl font-semibold text-white">Maya™ is Live</h3>
                   <p className="text-gray-400 text-sm">Handling customer calls right now</p>
                 </div>
                 
@@ -214,7 +214,7 @@ export default function MayaPage() {
               Everything You Need in One Voice Agent
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Maya combines advanced AI with enterprise-grade reliability to deliver conversations that feel completely natural.
+              Maya™ combines advanced AI with enterprise-grade reliability to deliver conversations that feel completely natural.
             </p>
           </div>
           
@@ -251,7 +251,7 @@ export default function MayaPage() {
               Proven Results Across Industries
             </h2>
             <p className="text-xl text-gray-400">
-              See how Maya transforms business operations in real-world scenarios
+              See how Maya™ transforms business operations in real-world scenarios
             </p>
           </div>
           
@@ -283,7 +283,7 @@ export default function MayaPage() {
               Loved by Businesses Worldwide
             </h2>
             <p className="text-xl text-gray-400">
-              See what our customers say about Maya&apos;s impact on their business
+              See what our customers say about Maya™&apos;s impact on their business
             </p>
           </div>
           
@@ -313,7 +313,7 @@ export default function MayaPage() {
             Ready to Transform Your Customer Experience?
           </h2>
           <p className="text-xl text-gray-300 mb-12">
-            Join thousands of businesses using Maya to provide exceptional customer service 24/7
+            Join thousands of businesses using Maya™ to provide exceptional customer service 24/7
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">

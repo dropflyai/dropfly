@@ -89,7 +89,7 @@ export default function LawFlyPage() {
     {
       name: "Carl E. Douglas",
       role: "Founding Partner, Douglass Hicks Law Firm",
-      content: "LawFly Pro has revolutionized our practice management. The privilege protection and enterprise features are exactly what high-stakes litigation requires.",
+      content: "LawFly™ Pro has revolutionized our practice management. The privilege protection and enterprise features are exactly what high-stakes litigation requires.",
       rating: 5
     },
     {
@@ -114,7 +114,7 @@ export default function LawFlyPage() {
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center">
               <span className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
-                DropFly
+                DropFly™
               </span>
             </Link>
             <div className="hidden md:flex items-center space-x-8">
@@ -125,7 +125,7 @@ export default function LawFlyPage() {
                 Solutions
               </Link>
               <Link href="/#authority" className="text-gray-300 hover:text-white transition-colors">
-                Why DropFly
+                Why DropFly™
               </Link>
               <button className="bg-gradient-to-r from-amber-600 to-orange-600 text-white px-6 py-2 rounded-lg hover:from-amber-700 hover:to-orange-700 transition-all">
                 Request Demo
@@ -150,7 +150,7 @@ export default function LawFlyPage() {
               
               <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
                 <span className="bg-gradient-to-r from-amber-400 via-yellow-500 to-orange-500 bg-clip-text text-transparent">
-                  LawFly
+                  LawFly™
                 </span>
                 <br />
                 <span className="text-white">Pro</span>

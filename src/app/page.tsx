@@ -20,7 +20,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">DropFly</h1>
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">DropFly™</h1>
             </div>
             <div className="hidden md:block">
               <div className="ml-10 flex items-baseline space-x-8">
@@ -31,7 +31,7 @@ export default function HomePage() {
                   Solutions
                 </Link>
                 <Link href="/why-dropfly" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
-                  Why DropFly
+                  Why DropFly™
                 </Link>
                 <Link href="#about" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
                   About
@@ -345,7 +345,7 @@ export default function HomePage() {
             Stop Managing. Start Scaling.
           </h2>
           <p className="text-xl text-gray-300 mb-12">
-            Join hundreds of companies using DropFly to supercharge their operations with AI
+            Join hundreds of companies using DropFly™ to supercharge their operations with AI
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
@@ -363,7 +363,7 @@ export default function HomePage() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <div className="grid md:grid-cols-4 gap-8">
             <div className="col-span-2">
-              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent mb-4">DropFly</h3>
+              <h3 className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent mb-4">DropFly™</h3>
               <p className="text-gray-400 mb-6 max-w-md">
                 Building AI teams for every department, so you scale faster, cut costs, and never miss an opportunity.
               </p>
@@ -372,10 +372,10 @@ export default function HomePage() {
               <h4 className="font-semibold text-white mb-4">Products</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/products" className="hover:text-white transition-colors">All Products</Link></li>
-                <li><Link href="/products/maya" className="hover:text-white transition-colors">Maya Voice Agent</Link></li>
+                <li><Link href="/products/maya" className="hover:text-white transition-colors">Maya™ Voice Agent</Link></li>
                 <li><Link href="https://leadflyai.com" target="_blank" className="hover:text-white transition-colors">LeadFly AI</Link></li>
-                <li><Link href="/products/lawfly" className="hover:text-white transition-colors">LawFly Pro</Link></li>
-                <li><Link href="/products/homefly" className="hover:text-white transition-colors">HomeFly</Link></li>
+                <li><Link href="/products/lawfly" className="hover:text-white transition-colors">LawFly™ Pro</Link></li>
+                <li><Link href="/products/homefly" className="hover:text-white transition-colors">HomeFly™</Link></li>
               </ul>
             </div>
             <div>
@@ -389,7 +389,7 @@ export default function HomePage() {
             </div>
           </div>
           <div className="border-t border-white/10 mt-8 pt-8 text-center text-gray-400">
-            <p>&copy; 2025 DropFly. All rights reserved.</p>
+            <p>&copy; 2025 DropFly™. All rights reserved.</p>
           </div>
         </div>
       </footer>
