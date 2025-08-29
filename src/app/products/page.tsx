@@ -86,7 +86,7 @@ export default function ProductsPage() {
             <div className="grid md:grid-cols-2 gap-12 items-center">
               <div>
                 <h2 className="text-4xl font-bold text-white mb-6">
-                  LeadFly AI
+                  LeadFly™ AI
                 </h2>
                 <p className="text-xl text-gray-300 mb-6">
                   Advanced AI-powered lead generation platform that delivers high-quality, conversion-ready prospects through intelligent multi-channel automation.
@@ -119,7 +119,7 @@ export default function ProductsPage() {
                   target="_blank"
                   className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all"
                 >
-                  Visit LeadFly AI
+                  Visit LeadFly™ AI
                   <ArrowRight className="ml-2 w-5 h-5" />
                 </Link>
               </div>
@@ -152,7 +152,7 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      {/* Maya Voice Agent */}
+      {/* Maya AI Assistant */}
       <section id="maya" className="relative py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="bg-gradient-to-br from-blue-900/30 via-indigo-900/30 to-purple-900/30 backdrop-blur-xl rounded-2xl border border-blue-500/30 p-8 md:p-12">
@@ -197,31 +197,31 @@ export default function ProductsPage() {
                   </span>
                 </div>
                 <h2 className="text-4xl font-bold text-white mb-6">
-                  Maya™ Voice Agent
+                  Maya™ AI Assistant
                 </h2>
                 <p className="text-xl text-gray-300 mb-6">
-                  Revolutionary AI voice agent that handles customer interactions with human-like conversation abilities, 24/7 availability, and seamless integration.
+                  Your personal AI assistant that automates everything - phone calls, appointments, emails, data entry, and daily tasks. Never miss an opportunity or fall behind on work again.
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start">
                     <Phone className="w-6 h-6 text-blue-400 mr-3 flex-shrink-0 mt-1" />
                     <div>
-                      <span className="text-white font-semibold">Intelligent Call Handling</span>
-                      <p className="text-gray-400 text-sm">Natural conversations that feel human</p>
+                      <span className="text-white font-semibold">Smart Phone Management</span>
+                      <p className="text-gray-400 text-sm">Handles calls, takes messages, books appointments</p>
                     </div>
                   </li>
                   <li className="flex items-start">
                     <Bot className="w-6 h-6 text-indigo-400 mr-3 flex-shrink-0 mt-1" />
                     <div>
-                      <span className="text-white font-semibold">Self-Learning AI</span>
-                      <p className="text-gray-400 text-sm">Improves with every interaction</p>
+                      <span className="text-white font-semibold">Email & Calendar Automation</span>
+                      <p className="text-gray-400 text-sm">Manages schedules, sends follow-ups, organizes tasks</p>
                     </div>
                   </li>
                   <li className="flex items-start">
                     <Users className="w-6 h-6 text-purple-400 mr-3 flex-shrink-0 mt-1" />
                     <div>
-                      <span className="text-white font-semibold">Unlimited Scalability</span>
-                      <p className="text-gray-400 text-sm">Handle thousands of calls simultaneously</p>
+                      <span className="text-white font-semibold">Data Entry & Organization</span>
+                      <p className="text-gray-400 text-sm">Automates paperwork, updates CRM, maintains records</p>
                     </div>
                   </li>
                 </ul>
@@ -398,7 +398,7 @@ export default function ProductsPage() {
                   </span>
                 </div>
                 <h2 className="text-4xl font-bold text-white mb-6">
-                  HomeFly™
+                  HomeFly™ Pro
                 </h2>
                 <p className="text-xl text-gray-300 mb-6">
                   Social-first community management platform for HOAs and large apartment buildings. The &ldquo;TikTok + Instagram of property management&rdquo; with rent/dues collection and real-time community engagement.
@@ -431,7 +431,7 @@ export default function ProductsPage() {
                     href="/products/homefly"
                     className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-green-600 to-teal-600 rounded-lg hover:from-green-700 hover:to-teal-700 transition-all"
                   >
-                    Learn More About HomeFly™
+                    Learn More About HomeFly™ Pro
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
                   <button className="px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center">

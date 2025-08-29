@@ -372,7 +372,7 @@ export default function HomePage() {
               <h4 className="font-semibold text-white mb-4">Products</h4>
               <ul className="space-y-2 text-gray-400">
                 <li><Link href="/products" className="hover:text-white transition-colors">All Products</Link></li>
-                <li><Link href="/products/maya" className="hover:text-white transition-colors">Maya™ Voice Agent</Link></li>
+                <li><Link href="/products/maya" className="hover:text-white transition-colors">Maya™ AI Assistant</Link></li>
                 <li><Link href="https://leadflyai.com" target="_blank" className="hover:text-white transition-colors">LeadFly AI</Link></li>
                 <li><Link href="/products/lawfly" className="hover:text-white transition-colors">LawFly™ Pro</Link></li>
                 <li><Link href="/products/homefly" className="hover:text-white transition-colors">HomeFly™</Link></li>

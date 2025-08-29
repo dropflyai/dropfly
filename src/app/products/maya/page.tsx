@@ -12,61 +12,64 @@ import {
   Star,
   BarChart3,
   Settings,
-  Headphones
+  Headphones,
+  Mail,
+  Calendar,
+  Database
 } from 'lucide-react'
 
 export default function MayaPage() {
   const features = [
     {
       icon: Brain,
-      title: "Advanced AI Understanding",
-      description: "Natural language processing that understands context, intent, and emotion with 99.7% accuracy.",
-      benefits: ["Handles complex queries", "Multi-language support", "Emotional intelligence"]
+      title: "Intelligent Task Automation",
+      description: "Advanced AI that learns your business processes and automates repetitive tasks with human-level accuracy.",
+      benefits: ["Smart decision making", "Process optimization", "Continuous learning"]
     },
     {
       icon: Clock,
-      title: "24/7 Availability",
-      description: "Never miss a call again. Maya™ works around the clock, handling customer inquiries instantly.",
-      benefits: ["Zero downtime", "Global time zones", "Instant response"]
+      title: "Always-On Assistant",
+      description: "Maya™ never sleeps, never takes breaks, and never misses a deadline. Your most reliable team member.",
+      benefits: ["24/7 operation", "No sick days", "Consistent performance"]
     },
     {
       icon: Settings,
-      title: "Custom Integration",
-      description: "Seamlessly connects with your existing CRM, helpdesk, and business systems.",
-      benefits: ["API-first design", "Real-time sync", "Custom workflows"]
+      title: "Universal Integration",
+      description: "Connects to any system you use - CRM, email, calendar, databases, and custom applications.",
+      benefits: ["500+ integrations", "Real-time sync", "Custom workflows"]
     },
     {
       icon: BarChart3,
-      title: "Analytics & Insights",
-      description: "Detailed reporting on call patterns, customer satisfaction, and performance metrics.",
-      benefits: ["Real-time dashboard", "Custom reports", "Predictive analytics"]
+      title: "Performance Analytics",
+      description: "Track productivity gains, ROI metrics, and optimization opportunities across all automated tasks.",
+      benefits: ["ROI tracking", "Productivity metrics", "Optimization insights"]
     }
   ]
 
   const useCases = [
     {
-      title: "Customer Support",
-      description: "Handle support tickets, troubleshoot issues, and provide instant solutions.",
-      metrics: "87% of issues resolved without human intervention",
-      icon: Headphones
+      title: "Phone & Communication",
+      description: "Handle all phone calls, take messages, schedule appointments, and follow up automatically.",
+      metrics: "90% reduction in missed opportunities",
+      icon: Phone
     },
     {
-      title: "Sales Qualification",
-      description: "Qualify leads, book appointments, and nurture prospects through the sales funnel.",
-      metrics: "3x increase in qualified leads",
-      icon: TrendingUp
+      title: "Email Management",
+      description: "Sort, prioritize, respond to emails automatically and keep your inbox organized.",
+      metrics: "5 hours saved per day on email",
+      icon: Mail
     },
     {
-      title: "Appointment Scheduling",
-      description: "Automate booking, rescheduling, and confirmations across your entire team.",
+      title: "Calendar & Scheduling",
+      description: "Manage calendars, book appointments, send reminders, and coordinate meetings seamlessly.",
       metrics: "95% booking accuracy rate",
-      icon: Clock
+      icon: Calendar
     },
     {
-      title: "Order Processing",
-      description: "Take orders, process payments, and provide order status updates.",
-      metrics: "2.5x faster order processing",
-      icon: CheckCircle
+      title: "Data Entry & CRM",
+      description: "Automatically update databases, manage customer records, and maintain data accuracy.",
+      metrics: "99.8% data accuracy rate",
+      icon: Database
     }
   ]
 
@@ -130,7 +133,7 @@ export default function MayaPage() {
             <div>
               <div className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-blue-600/20 to-purple-600/20 rounded-full border border-white/10 mb-6">
                 <Phone className="w-4 h-4 text-blue-400 mr-2" />
-                <span className="text-sm text-gray-300">AI Voice Agent</span>
+                <span className="text-sm text-gray-300">AI Assistant</span>
               </div>
               
               <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
@@ -138,11 +141,11 @@ export default function MayaPage() {
                   Maya™
                 </span>
                 <br />
-                <span className="text-white">Voice Agent</span>
+                <span className="text-white">AI Assistant</span>
               </h1>
               
               <p className="text-xl md:text-2xl text-gray-300 mb-8 max-w-2xl">
-                The AI voice agent that handles your calls like your best employee. Available 24/7, speaks naturally, and integrates with everything.
+                Your personal AI assistant that never sleeps. Handles phone calls, schedules appointments, manages emails, processes data, and automates your daily tasks - so you can focus on what matters most.
               </p>
               
               <div className="flex flex-col sm:flex-row gap-4">
@@ -179,25 +182,25 @@ export default function MayaPage() {
                     <Phone className="w-12 h-12 text-white" />
                   </div>
                   <h3 className="text-xl font-semibold text-white">Maya™ is Live</h3>
-                  <p className="text-gray-400 text-sm">Handling customer calls right now</p>
+                  <p className="text-gray-400 text-sm">Automating tasks across all businesses</p>
                 </div>
                 
                 <div className="space-y-4">
                   <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-300 text-sm">Active Calls</span>
-                    <span className="text-green-400 font-semibold">127</span>
+                    <span className="text-gray-300 text-sm">Tasks Automated Today</span>
+                    <span className="text-green-400 font-semibold">2,847</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-300 text-sm">Avg Response Time</span>
-                    <span className="text-blue-400 font-semibold">0.8s</span>
+                    <span className="text-gray-300 text-sm">Emails Processed</span>
+                    <span className="text-blue-400 font-semibold">1,204</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-300 text-sm">Customer Satisfaction</span>
-                    <span className="text-purple-400 font-semibold">98.7%</span>
+                    <span className="text-gray-300 text-sm">Appointments Booked</span>
+                    <span className="text-purple-400 font-semibold">389</span>
                   </div>
                   <div className="flex items-center justify-between p-3 bg-black/30 rounded-lg">
-                    <span className="text-gray-300 text-sm">Issues Resolved</span>
-                    <span className="text-pink-400 font-semibold">87%</span>
+                    <span className="text-gray-300 text-sm">Time Saved (Hours)</span>
+                    <span className="text-pink-400 font-semibold">14,623</span>
                   </div>
                 </div>
               </div>
@@ -211,10 +214,10 @@ export default function MayaPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
-              Everything You Need in One Voice Agent
+              Your AI Assistant That Does Everything
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Maya™ combines advanced AI with enterprise-grade reliability to deliver conversations that feel completely natural.
+              Maya™ doesn't just handle one task — she automates your entire workflow. Phone calls, emails, scheduling, data entry, and more.
             </p>
           </div>
           
@@ -248,10 +251,10 @@ export default function MayaPage() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-white mb-4">
-              Proven Results Across Industries
+              Stop Doing These Tasks Yourself
             </h2>
             <p className="text-xl text-gray-400">
-              See how Maya™ transforms business operations in real-world scenarios
+              Maya™ handles the tasks that eat up your day, so you can focus on growing your business
             </p>
           </div>
           
@@ -310,10 +313,10 @@ export default function MayaPage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-blue-900/20 to-purple-900/20">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-            Ready to Transform Your Customer Experience?
+            Stop Wasting Time on Repetitive Tasks
           </h2>
           <p className="text-xl text-gray-300 mb-12">
-            Join thousands of businesses using Maya™ to provide exceptional customer service 24/7
+            Get Maya™ and reclaim hours of your day. Start automating everything today.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button className="px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
