@@ -401,7 +401,7 @@ export default function ProductsPage() {
                   HomeFly
                 </h2>
                 <p className="text-xl text-gray-300 mb-6">
-                  Social-first community management platform for HOAs and large apartment buildings. The "TikTok + Instagram of property management" with rent/dues collection and real-time community engagement.
+                  Social-first community management platform for HOAs and large apartment buildings. The &ldquo;TikTok + Instagram of property management&rdquo; with rent/dues collection and real-time community engagement.
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start">

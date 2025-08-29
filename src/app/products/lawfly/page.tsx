@@ -13,9 +13,6 @@ import {
   ArrowRight,
   PlayCircle,
   Star,
-  BarChart3,
-  Settings,
-  Lock,
   Search,
   Calendar,
   DollarSign
@@ -305,7 +302,7 @@ export default function LawFlyPage() {
               Trusted by Leading Legal Professionals
             </h2>
             <p className="text-xl text-gray-400">
-              Built in partnership with Douglass Hicks Law Firm - O.J. Simpson "Dream Team" legacy
+              Built in partnership with Douglass Hicks Law Firm - O.J. Simpson &ldquo;Dream Team&rdquo; legacy
             </p>
           </div>
           
@@ -317,7 +314,7 @@ export default function LawFlyPage() {
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-6 italic">"{testimonial.content}"</p>
+                <p className="text-gray-300 mb-6 italic">&ldquo;{testimonial.content}&rdquo;</p>
                 <div>
                   <p className="text-white font-semibold">{testimonial.name}</p>
                   <p className="text-gray-400 text-sm">{testimonial.role}</p>

@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Shield, Zap, Users, BarChart, Brain, Rocket, Award, Clock, Globe, CheckCircle, TrendingUp, Lock, Heart } from 'lucide-react'
+import { Shield, Zap, Users, Brain, Rocket, Award, Clock, Globe, CheckCircle, TrendingUp, Lock, Heart } from 'lucide-react'
 import {
   SignInButton,
   SignUpButton,

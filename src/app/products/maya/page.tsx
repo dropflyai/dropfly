@@ -5,18 +5,13 @@ import {
   Phone, 
   Brain, 
   Clock, 
-  Shield, 
-  Zap, 
-  Users, 
-  TrendingUp, 
-  MessageSquare,
+  TrendingUp,
   CheckCircle,
   ArrowRight,
   PlayCircle,
   Star,
   BarChart3,
   Settings,
-  Globe,
   Headphones
 } from 'lucide-react'
 
@@ -288,7 +283,7 @@ export default function MayaPage() {
               Loved by Businesses Worldwide
             </h2>
             <p className="text-xl text-gray-400">
-              See what our customers say about Maya's impact on their business
+              See what our customers say about Maya&apos;s impact on their business
             </p>
           </div>
           
@@ -300,7 +295,7 @@ export default function MayaPage() {
                     <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <p className="text-gray-300 mb-6 italic">"{testimonial.content}"</p>
+                <p className="text-gray-300 mb-6 italic">&ldquo;{testimonial.content}&rdquo;</p>
                 <div>
                   <p className="text-white font-semibold">{testimonial.name}</p>
                   <p className="text-gray-400 text-sm">{testimonial.role}</p>
