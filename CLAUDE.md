@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Architecture Overview
 
-This is a Next.js application built as a luxury app builder with a dark theme and gold accent colors (#f4c900). The project follows a component-based architecture:
+This is the DropFly OS App Builder - a Next.js application built as a luxury app builder with a dark theme and gold accent colors (#f4c900). The project follows a component-based architecture:
 
 **Component System**: Located in `components/ui/`, the project uses a custom UI component library with consistent styling:
 - All components use a dark theme with black/gray backgrounds
@@ -81,6 +81,15 @@ The components are designed for an "elite developer" experience with luxury bran
 
 **🔴 STOP - Do NOT proceed until ALL steps completed in order**
 
+**🚨 ABSOLUTE REQUIREMENT**: Every new project MUST have complete system infrastructure:
+- ✅ All folder structure created (.logs/, .docs/, .troubleshoot/, etc.)
+- ✅ ALL system files copied (save-version.sh, troubleshooting protocols, frameworks)
+- ✅ Project-specific CLAUDE.md created
+- ✅ SESSION-MEMORY.md initialized
+- ✅ Verification checklist completed
+
+**If ANY system file is missing, the project setup is INCOMPLETE and MUST be fixed immediately.**
+
 ### Phase 1: Requirements Gathering (MANDATORY: Ask ONE AT A TIME)
 1. **Ask Questions (ONE AT A TIME)** until you have complete information:
    - What is the business/client name?
@@ -106,26 +115,66 @@ The components are designed for an "elite developer" experience with luxury bran
    ```
    project-name/
    ├── .logs/          # Session logs (MANDATORY)
-   ├── .docs/          # Documentation
+   ├── .docs/          # Documentation + System files (MANDATORY)
    ├── .research/      # Web scraping, API responses
    ├── .assets/        # Downloaded images, logos, media
    ├── .credentials/   # API keys, deployment tokens (NEVER commit)
    ├── .troubleshoot/  # Problem solutions and fixes
    ├── .progress/      # Completed tasks log
-   └── SESSION-MEMORY.md # Current project state
+   ├── versions-archive/ # Version backups (MANDATORY)
+   ├── save-version.sh # Version saving script (MANDATORY)
+   ├── CLAUDE.md       # Project-specific instructions (MANDATORY)
+   └── SESSION-MEMORY.md # Current project state (MANDATORY)
    ```
 
-4. **🔥 CRITICAL: Start logging IMMEDIATELY**
+4. **🔥 CRITICAL: Copy ALL system files to project**
+   ```bash
+   # MANDATORY: Copy these files to EVERY new project
+   cp /Users/rioallen/Documents/DropFly-OS-App-Builder/save-version.sh ./
+   chmod +x save-version.sh
+   cp /Users/rioallen/Documents/DropFly-OS-App-Builder/TROUBLESHOOTING-PROCESS.md ./.docs/
+   cp /Users/rioallen/Documents/DropFly-OS-App-Builder/ENTERPRISE-BACKEND-FRAMEWORK.md ./.docs/
+   cp /Users/rioallen/Documents/DropFly-OS-App-Builder/PROJECT-INITIALIZATION-PROMPTS.md ./.docs/
+   cp /Users/rioallen/Documents/DropFly-OS-App-Builder/QUICK-START-REFERENCE.md ./.docs/
+   cp /Users/rioallen/Documents/DropFly-OS-App-Builder/ENTERPRISE-ENGINEERING-STANDARDS.md ./.docs/
+   ```
+
+5. **🔥 CRITICAL: Start logging IMMEDIATELY**
    - Create `.logs/YYYY-MM-DD-project-initialization.md`
    - Log EVERY decision in session logs
    - Update SESSION-MEMORY.md after EVERY major task
    - Check ALL existing logs before starting ANY work
 
-5. **Create Project-Specific CLAUDE.md** with complete business context
-6. **Create Comprehensive Action Plan** with detailed steps
-7. **Create Detailed Todo List** with all tasks broken down
+6. **Create Project-Specific CLAUDE.md** with complete business context
+7. **Create Comprehensive Action Plan** with detailed steps
+8. **Create Detailed Todo List** with all tasks broken down
 
 **⚠️ NEVER work without logging - if it's not logged, it didn't happen**
+
+### 🚨 MANDATORY SYSTEM FILES - NO EXCEPTIONS
+
+**HARD RULE**: Every single project MUST have ALL system files copied. NO EXCEPTIONS.
+
+**If ANY of these files are missing, STOP and copy them immediately:**
+- ❌ Missing `save-version.sh` → Copy and make executable
+- ❌ Missing `.docs/TROUBLESHOOTING-PROCESS.md` → Copy from DropFly-OS-App-Builder
+- ❌ Missing `.docs/ENTERPRISE-BACKEND-FRAMEWORK.md` → Copy from DropFly-OS-App-Builder
+- ❌ Missing `CLAUDE.md` → Create project-specific version
+- ❌ Missing `SESSION-MEMORY.md` → Create with current state
+- ❌ Missing `versions-archive/` folder → Create directory
+
+**VERIFICATION CHECKLIST - Run before ANY work:**
+```bash
+# Verify all system files exist
+ls save-version.sh || echo "❌ MISSING save-version.sh"
+ls .docs/TROUBLESHOOTING-PROCESS.md || echo "❌ MISSING troubleshooting protocol"
+ls .docs/ENTERPRISE-BACKEND-FRAMEWORK.md || echo "❌ MISSING framework docs"
+ls CLAUDE.md || echo "❌ MISSING project CLAUDE.md"
+ls SESSION-MEMORY.md || echo "❌ MISSING session memory"
+ls -d versions-archive/ || echo "❌ MISSING versions-archive folder"
+```
+
+**If ANY files are missing, the project is NOT properly set up.**
 
 ### Project Isolation & Security
 
@@ -241,7 +290,7 @@ The components are designed for an "elite developer" experience with luxury bran
 
 This CLAUDE.md file serves as persistent memory between Claude Code sessions. Key points:
 
-- **Project Identity**: OS App Builder - luxury app builder for elite developers by Optic Studios
+- **Project Identity**: DropFly OS App Builder - luxury app builder for elite developers by DropFly
 - **Design Language**: Dark theme with gold accents, serif fonts, rounded corners, shadows
 - **Component Patterns**: Functional React components with consistent prop interfaces
 - **Working Dependencies**: All npm commands verified working (install, dev, build, start)
@@ -254,7 +303,7 @@ For enhanced capabilities, configure these MCP servers:
 **Essential for this project:**
 ```bash
 # Filesystem access for component development
-claude mcp add filesystem -- npx @modelcontextprotocol/server-filesystem /Users/rioallen/Documents/OS-App-Builder
+claude mcp add filesystem -- npx @modelcontextprotocol/server-filesystem /Users/rioallen/Documents/DropFly-OS-App-Builder
 
 # Git integration for version control
 claude mcp add git -- npx @modelcontextprotocol/server-git

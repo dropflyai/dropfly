@@ -1,4 +1,6 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DropFly OS App Builder
+
+This is the DropFly OS App Builder - a Next.js project built as a luxury app builder for elite developers.
 
 ## Getting Started
 
