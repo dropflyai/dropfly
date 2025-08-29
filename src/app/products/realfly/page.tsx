@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { 
   Building, 
-  Key, 
   MapPin, 
   DollarSign, 
   Users, 
@@ -14,8 +13,7 @@ import {
   Star,
   BarChart3,
   FileText,
-  Calendar,
-  Phone
+  Calendar
 } from 'lucide-react'
 
 export default function RealFlyPage() {

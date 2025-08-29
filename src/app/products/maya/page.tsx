@@ -5,14 +5,12 @@ import {
   Phone, 
   Brain, 
   Clock, 
-  TrendingUp,
   CheckCircle,
   ArrowRight,
   PlayCircle,
   Star,
   BarChart3,
   Settings,
-  Headphones,
   Mail,
   Calendar,
   Database
@@ -217,7 +215,7 @@ export default function MayaPage() {
               Your AI Assistant That Does Everything
             </h2>
             <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-              Maya™ doesn't just handle one task — she automates your entire workflow. Phone calls, emails, scheduling, data entry, and more.
+              Maya™ doesn&apos;t just handle one task — she automates your entire workflow. Phone calls, emails, scheduling, data entry, and more.
             </p>
           </div>
           
