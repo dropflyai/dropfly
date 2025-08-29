@@ -525,9 +525,12 @@ export default function ProductsPage() {
                 </ul>
                 
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <button className="px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all">
+                  <Link 
+                    href="/products/realfly"
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all"
+                  >
                     Get Early Access
-                  </button>
+                  </Link>
                   <Link 
                     href="/products/realfly"
                     className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all"
