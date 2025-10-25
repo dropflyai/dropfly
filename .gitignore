@@ -50,3 +50,5 @@ shift-project/
 # Temporary files
 .tmp/
 tmp/
+# Large video files
+DropFly-PROJECTS/optic-studios/public/videos/*.mp4
