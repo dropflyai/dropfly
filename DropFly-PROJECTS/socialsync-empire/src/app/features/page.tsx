@@ -133,7 +133,7 @@ export default function FeaturesPage() {
               <Button variant="ghost" size="sm">Pricing</Button>
             </Link>
             <Link href="/signup">
-              <Button variant="primary" size="sm">Start Free Trial</Button>
+              <Button variant="primary" size="sm">Start For Free</Button>
             </Link>
           </div>
         </div>
@@ -290,7 +290,7 @@ export default function FeaturesPage() {
             <Link href="/signup">
               <Button variant="primary" size="lg" className="shadow-lg shadow-[var(--primary-500)]/30">
                 <Rocket className="w-5 h-5 mr-2" />
-                Get Early Access Now
+                Start For Free
               </Button>
             </Link>
             <Link href="/pricing">
@@ -301,7 +301,7 @@ export default function FeaturesPage() {
             </Link>
           </div>
           <p className="text-sm text-[var(--text-tertiary)] mt-6">
-            14-day free trial • No credit card required • Cancel anytime
+            No credit card required • Cancel anytime
           </p>
         </div>
       </section>

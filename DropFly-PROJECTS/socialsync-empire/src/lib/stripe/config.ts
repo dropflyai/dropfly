@@ -67,17 +67,20 @@ export const STRIPE_PLANS = {
   },
   free: {
     name: 'Free',
+    priceId: 'free', // No Stripe price needed for free tier
     monthly: 0,
     annual: 0,
     features: [
-      '3 AI generations/month',
-      '5 video downloads/month',
+      '5 AI video generations/month',
+      '10 video downloads/month',
       '1 social account',
       'Up to 720p quality',
+      'Basic scheduling',
+      'Community support',
     ],
     limits: {
-      aiGenerations: 3,
-      videoDownloads: 5,
+      aiGenerations: 5,
+      videoDownloads: 10,
       socialAccounts: 1,
       maxResolution: '720p',
     },

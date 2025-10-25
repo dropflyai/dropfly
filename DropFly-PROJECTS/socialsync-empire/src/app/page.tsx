@@ -132,7 +132,7 @@ export default function LandingPage() {
                 <Button variant="ghost" size="sm">Log In</Button>
               </Link>
               <Link href="/signup">
-                <Button variant="primary" size="sm">Start Free Trial</Button>
+                <Button variant="primary" size="sm">Start For Free</Button>
               </Link>
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function LandingPage() {
               <Link href="/signup">
                 <Button variant="primary" size="lg">
                   <Rocket className="w-5 h-5 mr-2" />
-                  Get Early Access Now
+                  Start For Free
                 </Button>
               </Link>
               <Button variant="outline" size="lg" onClick={() => setVideoPlaying(true)}>
@@ -402,7 +402,7 @@ export default function LandingPage() {
             </div>
             <div className="flex items-center gap-2">
               <Shield className="w-4 h-4" />
-              14-day money-back guarantee
+              Cancel anytime
             </div>
           </div>
         </div>

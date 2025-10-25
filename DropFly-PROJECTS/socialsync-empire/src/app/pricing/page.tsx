@@ -43,6 +43,7 @@ export default function PricingPage() {
   };
 
   const plans = [
+    { key: 'free', ...STRIPE_PLANS.free },
     { key: 'starter', ...STRIPE_PLANS.starter },
     { key: 'creator', ...STRIPE_PLANS.creator },
     { key: 'agency', ...STRIPE_PLANS.agency },
@@ -67,7 +68,7 @@ export default function PricingPage() {
               <Button variant="ghost" size="sm">Features</Button>
             </Link>
             <Link href="/signup">
-              <Button variant="primary" size="sm">Start Free Trial</Button>
+              <Button variant="primary" size="sm">Start For Free</Button>
             </Link>
           </div>
         </div>
@@ -81,7 +82,7 @@ export default function PricingPage() {
             Choose Your Plan
           </h1>
           <p className="text-xl text-[var(--text-secondary)] mb-8">
-            Start free, upgrade when you're ready
+            Start free, no credit card required
           </p>
 
           {/* Billing Toggle */}
@@ -110,7 +111,7 @@ export default function PricingPage() {
         </div>
 
         {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-7xl mx-auto">
           {plans.map((plan) => {
             const price = billingCycle === 'monthly' ? plan.monthly : Math.floor(plan.annual / 12);
             const isPopular = plan.popular;
@@ -129,6 +130,7 @@ export default function PricingPage() {
 
                 <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">{plan.name}</h3>
                 <p className="text-[var(--text-secondary)] mb-6">
+                  {plan.key === 'free' && 'Get started, no credit card'}
                   {plan.key === 'starter' && 'Perfect for beginners'}
                   {plan.key === 'creator' && 'For serious creators'}
                   {plan.key === 'agency' && 'For teams & agencies'}
@@ -155,19 +157,32 @@ export default function PricingPage() {
                   ))}
                 </ul>
 
-                <Button
-                  variant={isPopular ? 'primary' : 'outline'}
-                  fullWidth
-                  size="lg"
-                  loading={loading === plan.key}
-                  onClick={() => handleSubscribe(plan.key, plan.priceId)}
-                >
-                  {loading === plan.key ? 'Processing...' : 'Start Free Trial'}
-                  <ArrowRight className="w-4 h-4 ml-2" />
-                </Button>
+                {plan.key === 'free' ? (
+                  <Link href="/signup">
+                    <Button
+                      variant="outline"
+                      fullWidth
+                      size="lg"
+                    >
+                      Start For Free
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </Link>
+                ) : (
+                  <Button
+                    variant={isPopular ? 'primary' : 'outline'}
+                    fullWidth
+                    size="lg"
+                    loading={loading === plan.key}
+                    onClick={() => handleSubscribe(plan.key, plan.priceId)}
+                  >
+                    {loading === plan.key ? 'Processing...' : 'Get Started'}
+                    <ArrowRight className="w-4 h-4 ml-2" />
+                  </Button>
+                )}
 
                 <p className="text-xs text-center text-[var(--text-tertiary)] mt-4">
-                  14-day free trial • Cancel anytime
+                  {plan.key === 'free' ? 'No credit card required' : 'Cancel anytime'}
                 </p>
               </Card>
             );
@@ -177,7 +192,7 @@ export default function PricingPage() {
         {/* FAQ or Additional Info */}
         <div className="mt-16 text-center">
           <p className="text-[var(--text-secondary)]">
-            All plans include 14-day free trial. No credit card required.
+            Start free forever. Upgrade only when you need more.
           </p>
           <p className="text-sm text-[var(--text-tertiary)] mt-2">
             Need a custom plan? <a href="mailto:support@socialsync.com" className="text-[var(--primary-500)] hover:underline">Contact us</a>
