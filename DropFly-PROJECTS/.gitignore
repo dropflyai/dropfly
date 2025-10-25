@@ -1,0 +1,80 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Environment variables
+.env
+.env.local
+.env.production
+.env.staging
+*.env
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime data
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# Coverage directory used by tools like istanbul
+coverage/
+*.lcov
+
+# Cache directories
+.cache/
+.parcel-cache/
+.next/cache/
+
+# Temporary files
+tmp/
+temp/
+
+# Archives (but allow the archives folder structure)
+*.zip
+*.tar.gz
+*.rar
+!archives/.gitkeep
+
+# Secrets and keys
+*.pem
+*.key
+secrets.json
+
+# Local development
+.local/
+local/
+
+# Backup files
+*.bak
+*.backup
+
+# Database files
+*.db
+*.sqlite
+*.sqlite3
+
+# Docker
+Dockerfile.local
+docker-compose.override.yml

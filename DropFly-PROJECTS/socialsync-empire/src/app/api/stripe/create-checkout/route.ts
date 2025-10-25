@@ -1,51 +1,108 @@
 import { NextRequest, NextResponse } from 'next/server';
-import Stripe from 'stripe';
 import { createClient } from '@/lib/supabase/server';
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: '2024-12-18.acacia',
-});
+import {
+  createSubscriptionCheckoutSession,
+  createTokenPurchaseCheckoutSession,
+  TIER_PRICING,
+} from '@/lib/stripe/stripe-service';
 
 export async function POST(request: NextRequest) {
   try {
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
 
-    if (!user) {
+    // Get authenticated user
+    const {
+      data: { user },
+      error: authError,
+    } = await supabase.auth.getUser();
+
+    if (authError || !user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
     const body = await request.json();
-    const { priceId, planName, billingCycle } = body;
+    const { type, tier, tokenAmount, priceId, planName } = body;
 
-    if (!priceId) {
-      return NextResponse.json({ error: 'Price ID required' }, { status: 400 });
+    // Get user email
+    const userEmail = user.email!;
+
+    // Build success and cancel URLs
+    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const successUrl = `${origin}/dashboard/billing/success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${origin}/dashboard/billing/canceled`;
+
+    let session;
+
+    // Support both new and legacy checkout flows
+    if (type === 'subscription' || planName) {
+      const subscriptionTier = tier || planName;
+
+      // Validate tier
+      if (!subscriptionTier || !TIER_PRICING[subscriptionTier as keyof typeof TIER_PRICING]) {
+        return NextResponse.json(
+          { error: 'Invalid subscription tier' },
+          { status: 400 }
+        );
+      }
+
+      if (subscriptionTier === 'free') {
+        return NextResponse.json(
+          { error: 'Free tier does not require checkout' },
+          { status: 400 }
+        );
+      }
+
+      // Create subscription checkout session
+      session = await createSubscriptionCheckoutSession({
+        userId: user.id,
+        userEmail,
+        tier: subscriptionTier as 'starter' | 'creator' | 'pro' | 'agency' | 'enterprise',
+        successUrl,
+        cancelUrl,
+      });
+    } else if (type === 'token_purchase') {
+      // Validate token amount
+      if (!tokenAmount || tokenAmount < 100) {
+        return NextResponse.json(
+          { error: 'Minimum purchase is 100 tokens' },
+          { status: 400 }
+        );
+      }
+
+      if (tokenAmount > 100000) {
+        return NextResponse.json(
+          { error: 'Maximum purchase is 100,000 tokens' },
+          { status: 400 }
+        );
+      }
+
+      // Create token purchase checkout session
+      session = await createTokenPurchaseCheckoutSession({
+        userId: user.id,
+        userEmail,
+        tokenAmount,
+        successUrl,
+        cancelUrl,
+      });
+    } else {
+      return NextResponse.json(
+        { error: 'Invalid checkout type. Must be "subscription" or "token_purchase"' },
+        { status: 400 }
+      );
     }
 
-    // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      customer_email: user.email,
-      line_items: [
-        {
-          price: priceId,
-          quantity: 1,
-        },
-      ],
-      mode: 'subscription',
-      success_url: `${request.headers.get('origin')}/dashboard?success=true&session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${request.headers.get('origin')}/pricing?canceled=true`,
-      metadata: {
-        userId: user.id,
-        planName,
-        billingCycle,
-      },
+    return NextResponse.json({
+      sessionId: session.id,
+      url: session.url,
     });
+  } catch (error) {
+    const err = error as Error;
+    console.error('Stripe checkout error:', err);
 
-    return NextResponse.json({ sessionId: session.id, url: session.url });
-  } catch (error: any) {
-    console.error('Stripe checkout error:', error);
     return NextResponse.json(
-      { error: error.message || 'Failed to create checkout session' },
+      {
+        error: err.message || 'Failed to create checkout session',
+      },
       { status: 500 }
     );
   }

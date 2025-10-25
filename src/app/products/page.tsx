@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowRight, Mic, TrendingUp, Phone, Bot, Users, Shield, BarChart, Sparkles, Scale, FileText, Gavel, Home, MessageSquare, Calendar, Building, Key, MapPin, DollarSign } from 'lucide-react'
+import { ArrowRight, Mic, TrendingUp, Phone, Bot, Users, Shield, BarChart, Sparkles, Scale, FileText, Gavel, Home, MessageSquare, Calendar, Building, Key, MapPin, DollarSign, Code, Gamepad2, Trophy, BookOpen } from 'lucide-react'
 import {
   SignInButton,
   SignUpButton,
@@ -239,6 +239,113 @@ export default function ProductsPage() {
                   >
                     View Features
                   </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CodeFly - Gamified Coding Education */}
+      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <div className="bg-gradient-to-br from-violet-900/30 via-cyan-900/30 to-emerald-900/30 backdrop-blur-xl rounded-2xl border border-violet-500/30 p-8 md:p-12">
+            <div className="grid md:grid-cols-2 gap-12 items-center">
+              <div>
+                <div className="inline-flex items-center mb-4">
+                  <span className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white text-sm font-bold px-4 py-1 rounded-full">
+                    EDUCATION AI
+                  </span>
+                </div>
+                <h2 className="text-4xl font-bold text-white mb-6">
+                  CodeFly™ Pro
+                </h2>
+                <p className="text-xl text-gray-300 mb-6">
+                  Gamified AI-powered coding education platform that transforms learning into an epic adventure. Complete with XP systems, AI tutoring, and Black Cipher spy-themed curriculum that makes students actually excited about coding.
+                </p>
+                <ul className="space-y-4 mb-8">
+                  <li className="flex items-start">
+                    <Gamepad2 className="w-6 h-6 text-violet-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">Full Gamification System</span>
+                      <p className="text-gray-400 text-sm">XP, badges, leaderboards, and team competitions with Black Cipher adventure</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <Bot className="w-6 h-6 text-cyan-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">Coach Nova AI Tutor</span>
+                      <p className="text-gray-400 text-sm">Intelligent, teacher-controlled AI assistance with curriculum alignment</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <BookOpen className="w-6 h-6 text-emerald-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">Complete 18-Week Curriculum</span>
+                      <p className="text-gray-400 text-sm">CPALMS-aligned with automated grading and standards tracking</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <Trophy className="w-6 h-6 text-amber-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">Proven Results</span>
+                      <p className="text-gray-400 text-sm">87% completion rate vs 42% industry average with 4.8/5 satisfaction</p>
+                    </div>
+                  </li>
+                </ul>
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Link 
+                    href="/products/codefly"
+                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-violet-600 to-cyan-600 rounded-lg hover:from-violet-700 hover:to-cyan-700 transition-all"
+                  >
+                    Explore CodeFly™ Pro
+                    <ArrowRight className="ml-2 w-5 h-5" />
+                  </Link>
+                  <Link 
+                    href="/products/codefly"
+                    className="px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center"
+                  >
+                    View Demo
+                  </Link>
+                </div>
+              </div>
+              
+              <div className="order-2 md:order-1">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-cyan-600 rounded-xl blur-3xl opacity-30"></div>
+                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
+                    <div className="flex items-center justify-center mb-6">
+                      <div className="w-24 h-24 bg-gradient-to-br from-violet-600 to-cyan-600 rounded-full flex items-center justify-center">
+                        <Code className="w-12 h-12 text-white" />
+                      </div>
+                    </div>
+                    <div className="space-y-4">
+                      <div className="bg-violet-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-violet-300">Student Completion Rate</span>
+                          <span className="text-xs text-violet-400">87%</span>
+                        </div>
+                      </div>
+                      <div className="bg-cyan-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-cyan-300">AI Tutor Accuracy</span>
+                          <span className="text-xs text-cyan-400">95.7%</span>
+                        </div>
+                      </div>
+                      <div className="bg-emerald-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-emerald-300">Standards Coverage</span>
+                          <span className="text-xs text-emerald-400">100% CPALMS</span>
+                        </div>
+                      </div>
+                      <div className="bg-amber-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-amber-300">Teacher Satisfaction</span>
+                          <span className="text-xs text-amber-400">4.8/5 Stars</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>

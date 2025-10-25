@@ -1,0 +1,8 @@
+{
+  "version": "awaiting-first-deployment",
+  "deployed_at": null,
+  "git_commit": null,
+  "vercel_url": null,
+  "status": "NOT_DEPLOYED",
+  "note": "Will be updated after first production deployment"
+}

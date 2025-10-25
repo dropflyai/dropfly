@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+npm-debug.log
+yarn-error.log
+
+# Testing
+.coverage
+*.log
+
+# Next.js
+.next
+out
+build
+
+# Environment
+.env
+.env.local
+.env*.local
+
+# IDEs
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Large files
+*.mp4
+*.mov
+*.avi
+*.mkv
+public/videos/**
+
+# Misc
+.turbo
+.vercel

@@ -1,0 +1,94 @@
+{
+  "clients": [
+    {
+      "id": "client-1",
+      "name": "Smith Corporation",
+      "matters": [
+        {
+          "id": "matter-1",
+          "name": "Smith v. Jones Litigation",
+          "keywords": ["smith", "jones", "litigation", "motion", "discovery"]
+        },
+        {
+          "id": "matter-2",
+          "name": "Smith Corp Contract Review",
+          "keywords": ["smith", "contract", "agreement", "review", "vendor"]
+        }
+      ]
+    },
+    {
+      "id": "client-2",
+      "name": "Acme Technologies Inc",
+      "matters": [
+        {
+          "id": "matter-3",
+          "name": "Acme Patent Application",
+          "keywords": ["acme", "patent", "invention", "uspto", "filing"]
+        },
+        {
+          "id": "matter-4",
+          "name": "Acme Employment Dispute",
+          "keywords": ["acme", "employment", "termination", "severance", "hr"]
+        }
+      ]
+    },
+    {
+      "id": "client-3",
+      "name": "Johnson Consulting LLC",
+      "matters": [
+        {
+          "id": "matter-5",
+          "name": "Digital Transformation Project",
+          "keywords": ["johnson", "digital", "transformation", "strategy", "roadmap"]
+        }
+      ]
+    },
+    {
+      "id": "client-4",
+      "name": "Green Energy Partners",
+      "matters": [
+        {
+          "id": "matter-6",
+          "name": "Regulatory Compliance Review",
+          "keywords": ["green", "energy", "compliance", "regulation", "epa"]
+        },
+        {
+          "id": "matter-7",
+          "name": "Merger & Acquisition Due Diligence",
+          "keywords": ["green", "energy", "merger", "acquisition", "due diligence", "m&a"]
+        }
+      ]
+    },
+    {
+      "id": "internal",
+      "name": "Internal/Administrative",
+      "matters": [
+        {
+          "id": "matter-internal-1",
+          "name": "Business Development",
+          "keywords": ["marketing", "proposal", "pitch", "networking"]
+        },
+        {
+          "id": "matter-internal-2",
+          "name": "Administrative Tasks",
+          "keywords": ["admin", "expense", "timesheet", "calendar"]
+        }
+      ]
+    }
+  ],
+  "activityTypes": [
+    "Legal Research",
+    "Document Drafting",
+    "Document Review",
+    "Client Communication",
+    "Email Correspondence",
+    "Court Appearance",
+    "Deposition",
+    "Meeting/Conference",
+    "Case Strategy",
+    "Administrative",
+    "Business Development",
+    "Travel",
+    "File Management"
+  ]
+}

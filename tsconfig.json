@@ -23,5 +23,5 @@
     }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
-  "exclude": ["node_modules", "hoa-community-app", "homefly-projects", "shift-project"]
+  "exclude": ["node_modules", "hoa-community-app", "homefly-projects", "shift-project", "cozypaws", "douglass-hicks-law", "DropFly-PROJECTS", "OS-App-Builder", "vapi-nail-salon-agent"]
 }

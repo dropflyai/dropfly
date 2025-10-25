@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Stripe from 'stripe';
 import { createClient } from '@supabase/supabase-js';
+import { tokenService } from '@/lib/tokens/token-service';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2024-12-18.acacia',
@@ -32,19 +33,77 @@ export async function POST(request: NextRequest) {
     case 'checkout.session.completed': {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.userId;
-      const planName = session.metadata?.planName;
+      const type = session.metadata?.type;
 
-      if (userId && planName) {
-        // Update user subscription in database
-        await supabase
-          .from('users')
-          .update({
-            subscription_tier: planName,
-            subscription_status: 'active',
-            stripe_customer_id: session.customer as string,
-            stripe_subscription_id: session.subscription as string,
-          })
-          .eq('id', userId);
+      if (!userId) break;
+
+      // Handle subscription checkout
+      if (type === 'subscription') {
+        const tier = session.metadata?.tier;
+
+        if (tier) {
+          // Update user subscription in database
+          await supabase
+            .from('users')
+            .update({
+              subscription_tier: tier,
+              subscription_status: 'active',
+              stripe_customer_id: session.customer as string,
+              stripe_subscription_id: session.subscription as string,
+              subscription_expires_at: null, // Clear expiration for active subscription
+            })
+            .eq('id', userId);
+
+          // Update profile tier
+          await supabase
+            .from('profiles')
+            .update({
+              subscription_tier: tier,
+            })
+            .eq('id', userId);
+
+          console.log(`✅ Subscription activated for user ${userId}: ${tier}`);
+        }
+      }
+      // Handle token purchase
+      else if (type === 'token_purchase') {
+        const tokenAmount = parseInt(session.metadata?.tokenAmount || '0', 10);
+
+        if (tokenAmount > 0) {
+          // Add tokens to user's balance
+          const result = await tokenService.addTokens({
+            userId,
+            operation: 'token_purchase',
+            amount: tokenAmount,
+            description: `Purchased ${tokenAmount.toLocaleString()} tokens via Stripe`,
+            metadata: {
+              stripe_session_id: session.id,
+              stripe_payment_intent: session.payment_intent,
+              amount_paid: session.amount_total,
+            },
+          });
+
+          if (result.success) {
+            console.log(`✅ ${tokenAmount} tokens added to user ${userId}`);
+          } else {
+            console.error(`❌ Failed to add tokens to user ${userId}:`, result.error);
+          }
+        }
+      }
+      // Legacy support for old checkout flow
+      else {
+        const planName = session.metadata?.planName;
+        if (planName) {
+          await supabase
+            .from('users')
+            .update({
+              subscription_tier: planName,
+              subscription_status: 'active',
+              stripe_customer_id: session.customer as string,
+              stripe_subscription_id: session.subscription as string,
+            })
+            .eq('id', userId);
+        }
       }
       break;
     }
