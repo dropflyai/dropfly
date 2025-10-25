@@ -6,41 +6,9 @@ import { Check, Sparkles, ArrowRight } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { STRIPE_PLANS } from '@/lib/stripe/config';
-import { getStripe } from '@/lib/stripe/client';
 
 export default function PricingPage() {
   const [billingCycle, setBillingCycle] = useState<'monthly' | 'annual'>('monthly');
-  const [loading, setLoading] = useState<string | null>(null);
-
-  const handleSubscribe = async (planKey: string, priceId: string) => {
-    setLoading(planKey);
-
-    try {
-      const response = await fetch('/api/stripe/create-checkout', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          priceId,
-          planName: planKey,
-          billingCycle,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create checkout');
-      }
-
-      // Redirect to Stripe Checkout
-      const stripe = await getStripe();
-      await stripe?.redirectToCheckout({ sessionId: data.sessionId });
-    } catch (error: any) {
-      alert(error.message || 'Something went wrong');
-    } finally {
-      setLoading(null);
-    }
-  };
 
   const plans = [
     { key: 'free', ...STRIPE_PLANS.free },
@@ -157,29 +125,16 @@ export default function PricingPage() {
                   ))}
                 </ul>
 
-                {plan.key === 'free' ? (
-                  <Link href="/signup">
-                    <Button
-                      variant="outline"
-                      fullWidth
-                      size="lg"
-                    >
-                      Start For Free
-                      <ArrowRight className="w-4 h-4 ml-2" />
-                    </Button>
-                  </Link>
-                ) : (
+                <Link href={`/signup?plan=${plan.key}`}>
                   <Button
                     variant={isPopular ? 'primary' : 'outline'}
                     fullWidth
                     size="lg"
-                    loading={loading === plan.key}
-                    onClick={() => handleSubscribe(plan.key, plan.priceId)}
                   >
-                    {loading === plan.key ? 'Processing...' : 'Get Started'}
+                    {plan.key === 'free' ? 'Start For Free' : 'Get Started'}
                     <ArrowRight className="w-4 h-4 ml-2" />
                   </Button>
-                )}
+                </Link>
 
                 <p className="text-xs text-center text-[var(--text-tertiary)] mt-4">
                   {plan.key === 'free' ? 'No credit card required' : 'Cancel anytime'}
