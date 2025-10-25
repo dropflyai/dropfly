@@ -35,8 +35,10 @@ export async function updateSession(request: NextRequest) {
                      request.nextUrl.pathname.startsWith('/signup')
   const isLandingPage = request.nextUrl.pathname === '/'
   const isAuthCallback = request.nextUrl.pathname.startsWith('/auth/callback')
+  const isPublicPage = request.nextUrl.pathname.startsWith('/pricing') ||
+                       request.nextUrl.pathname.startsWith('/features')
 
-  if (!user && !isAuthPage && !isLandingPage && !isAuthCallback) {
+  if (!user && !isAuthPage && !isLandingPage && !isAuthCallback && !isPublicPage) {
     // Redirect to login if not authenticated
     const url = request.nextUrl.clone()
     url.pathname = '/login'

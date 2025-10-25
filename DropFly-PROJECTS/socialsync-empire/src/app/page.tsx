@@ -14,6 +14,7 @@ import Button from '@/components/ui/Button';
 
 export default function LandingPage() {
   const [videoPlaying, setVideoPlaying] = useState(false);
+  const [selectedFeature, setSelectedFeature] = useState<'generate' | 'schedule' | 'grow' | null>(null);
 
   const features = [
     {
@@ -119,14 +120,11 @@ export default function LandingPage() {
               <span className="text-xl font-bold text-[var(--text-primary)]">SocialSync</span>
             </div>
             <div className="hidden md:flex items-center gap-8">
-              <Link href="#features" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+              <Link href="/features" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                 Features
               </Link>
               <Link href="/pricing" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
                 Pricing
-              </Link>
-              <Link href="#who-its-for" className="text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
-                Who It's For
               </Link>
             </div>
             <div className="flex items-center gap-4">
@@ -204,17 +202,21 @@ export default function LandingPage() {
               <div className="aspect-video bg-gradient-to-br from-[var(--primary-500)]/20 to-[var(--secondary-500)]/20 flex items-center justify-center relative">
                 <div className="absolute inset-0 grid grid-cols-3 gap-6 p-8">
                   {[
-                    { icon: Video, label: 'Generate', desc: 'AI Videos' },
-                    { icon: Calendar, label: 'Schedule', desc: 'Auto-Post' },
-                    { icon: TrendingUp, label: 'Grow', desc: 'Analytics' }
+                    { icon: Video, label: 'Generate', desc: 'AI Videos', key: 'generate' as const },
+                    { icon: Calendar, label: 'Schedule', desc: 'Auto-Post', key: 'schedule' as const },
+                    { icon: TrendingUp, label: 'Grow', desc: 'Analytics', key: 'grow' as const }
                   ].map((item, i) => (
-                    <div key={i} className="bg-[var(--bg-primary)] rounded-xl p-8 flex flex-col items-center justify-center gap-4 hover:scale-105 transition-transform shadow-lg">
-                      <item.icon className="w-16 h-16 text-[var(--primary-500)]" />
+                    <button
+                      key={i}
+                      onClick={() => setSelectedFeature(item.key)}
+                      className="bg-[var(--bg-primary)] rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:scale-105 transition-transform shadow-lg cursor-pointer hover:border-2 hover:border-[var(--primary-500)]"
+                    >
+                      <item.icon className="w-10 h-10 text-[var(--primary-500)]" />
                       <div className="text-center">
-                        <div className="text-lg font-bold text-[var(--text-primary)] mb-1">{item.label}</div>
+                        <div className="text-sm font-bold text-[var(--text-primary)]">{item.label}</div>
                         <div className="text-xs text-[var(--text-tertiary)]">{item.desc}</div>
                       </div>
-                    </div>
+                    </button>
                   ))}
                 </div>
               </div>
@@ -450,6 +452,180 @@ export default function LandingPage() {
           </div>
         </div>
       </footer>
+
+      {/* Feature Modal */}
+      {selectedFeature && (
+        <div
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-6"
+          onClick={() => setSelectedFeature(null)}
+        >
+          <Card
+            variant="elevated"
+            padding="xl"
+            className="max-w-2xl w-full max-h-[80vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {selectedFeature === 'generate' && (
+              <>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Video className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-[var(--text-primary)]">Generate AI Videos</h2>
+                    <p className="text-[var(--text-secondary)]">From text to stunning visuals in seconds</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">What You Can Do:</h3>
+                    <ul className="space-y-3">
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Text-to-Video AI:</strong> Simply describe your idea and watch it come to life with cutting-edge AI models (Hailuo, Runway, Luma)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Multiple Formats:</strong> Generate videos in 9:16 (TikTok/Reels), 16:9 (YouTube), or 1:1 (Instagram)
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Professional Quality:</strong> HD exports with customizable styles, themes, and brand watermarks
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Lightning Fast:</strong> Generate complete videos in under 60 seconds
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <Link href="/signup">
+                  <Button variant="primary" size="lg" fullWidth>
+                    <Rocket className="w-5 h-5 mr-2" />
+                    Start Creating Videos
+                  </Button>
+                </Link>
+              </>
+            )}
+
+            {selectedFeature === 'schedule' && (
+              <>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
+                    <Calendar className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-[var(--text-primary)]">Schedule & Auto-Post</h2>
+                    <p className="text-[var(--text-secondary)]">Publish everywhere from one dashboard</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">What You Can Do:</h3>
+                    <ul className="space-y-3">
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Multi-Platform Support:</strong> Post to Instagram, TikTok, YouTube, Facebook, and LinkedIn simultaneously
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Smart Scheduling:</strong> AI suggests optimal posting times for maximum engagement
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Content Calendar:</strong> Visualize your entire posting schedule at a glance
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Bulk Upload:</strong> Schedule weeks of content in minutes with our bulk upload feature
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <Link href="/signup">
+                  <Button variant="primary" size="lg" fullWidth>
+                    <Rocket className="w-5 h-5 mr-2" />
+                    Start Scheduling
+                  </Button>
+                </Link>
+              </>
+            )}
+
+            {selectedFeature === 'grow' && (
+              <>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center">
+                    <TrendingUp className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-[var(--text-primary)]">Grow with Analytics</h2>
+                    <p className="text-[var(--text-secondary)]">Data-driven insights for explosive growth</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">What You Can Do:</h3>
+                    <ul className="space-y-3">
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Real-Time Metrics:</strong> Track engagement, views, likes, shares, and comments across all platforms
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Follower Growth:</strong> Monitor your audience growth and identify your best-performing content
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>AI Insights:</strong> Get personalized recommendations on what content to create next
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Competitor Analysis:</strong> See how you stack up against competitors in your niche
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <Link href="/signup">
+                  <Button variant="primary" size="lg" fullWidth>
+                    <Rocket className="w-5 h-5 mr-2" />
+                    Start Analyzing
+                  </Button>
+                </Link>
+              </>
+            )}
+          </Card>
+        </div>
+      )}
     </div>
   );
 }
