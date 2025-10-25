@@ -17,11 +17,32 @@ const FAL_AI_BASE_URL = 'https://fal.run';
 
 // Map our engine IDs to fal.ai model IDs
 const FAL_MODEL_MAP: Record<string, string> = {
-  'hailuo-02': 'fal-ai/minimax-video',
-  'runway-gen4-turbo': 'fal-ai/runway-gen3',
-  'kling-2.1': 'fal-ai/kling-video',
-  'luma-ray3': 'fal-ai/luma-ray',
+  // OpenAI Sora
+  'sora-2': 'fal-ai/sora',
+  'sora-2-pro': 'fal-ai/sora-pro',
+  // Google Veo
+  'veo-3.1': 'fal-ai/veo3',
+  'veo-3.1-fast': 'fal-ai/veo3-fast',
+  // Runway
+  'runway-gen3-alpha': 'fal-ai/runway-gen3',
+  'runway-gen4-turbo': 'fal-ai/runway-gen3-turbo',
+  // Kling AI
+  'kling-2.1': 'fal-ai/kling-video/v1',
+  'kling-2.5-turbo': 'fal-ai/kling-video/v1.5/standard/text-to-video',
+  'kling-2.5-turbo-pro': 'fal-ai/kling-video/v1.5/pro/text-to-video',
+  // Chinese Models
+  'hunyuan-video': 'fal-ai/hunyuan-video',
+  'vidu-q2': 'fal-ai/vidu/video-to-video',
+  'seedance-1.0-pro': 'fal-ai/seedance-video',
+  'pixverse-v4.5': 'fal-ai/pixverse/v4.5',
+  // Other Premium
+  'ltx-2-pro': 'fal-ai/ltx-video/pro',
+  'hailuo-02': 'fal-ai/minimax-video/hailuo',
+  'wan-2.2': 'fal-ai/wan-video',
   'pika-2.2': 'fal-ai/pika',
+  'luma-ray3': 'fal-ai/luma-dream-machine',
+  'mochi-1': 'fal-ai/mochi-v1',
+  'fabric-1.0': 'fal-ai/fabric',
 };
 
 export interface FalVideoRequest {
@@ -38,6 +59,11 @@ export interface FalVideoResponse {
     file_size: number;
     width: number;
     height: number;
+  };
+  audio?: {
+    url: string;
+    content_type: string;
+    file_size: number;
   };
   timings: {
     inference: number;
@@ -97,6 +123,7 @@ export class FalAIClient {
           num_frames: (request.duration || 5) * 24, // Convert seconds to frames (24fps)
           aspect_ratio: request.aspectRatio || '16:9',
           num_inference_steps: 30,
+          enable_audio: request.includeAudio !== false, // Enable audio by default
         }),
       });
 
@@ -120,10 +147,11 @@ export class FalAIClient {
         metadata: {
           resolution: `${data.video.width}x${data.video.height}`,
           aspectRatio: request.aspectRatio,
-          hasAudio: false,
+          hasAudio: !!data.audio,
+          audioUrl: data.audio?.url,
           generatedAt: new Date().toISOString(),
           processingTime,
-          fileSize: data.video.fileSize,
+          fileSize: data.video.file_size,
           provider: 'fal.ai',
         },
       };
@@ -176,23 +204,65 @@ export class FalAIClient {
 
   private getEngineName(engine: VideoEngine): string {
     const names: Record<string, string> = {
-      'hailuo-02': 'Hailuo 02',
+      // OpenAI Sora
+      'sora-2': 'Sora 2',
+      'sora-2-pro': 'Sora 2 Pro',
+      // Google Veo
+      'veo-3.1': 'Veo 3.1',
+      'veo-3.1-fast': 'Veo 3.1 Fast',
+      // Runway
+      'runway-gen3-alpha': 'Runway Gen-3 Alpha',
       'runway-gen4-turbo': 'Runway Gen-4 Turbo',
+      // Kling AI
       'kling-2.1': 'Kling 2.1',
-      'luma-ray3': 'Luma Ray 3',
+      'kling-2.5-turbo': 'Kling 2.5 Turbo',
+      'kling-2.5-turbo-pro': 'Kling 2.5 Turbo Pro',
+      // Chinese Models
+      'hunyuan-video': 'Hunyuan Video',
+      'vidu-q2': 'Vidu Q2',
+      'seedance-1.0-pro': 'Seedance 1.0 Pro',
+      'pixverse-v4.5': 'PixVerse v4.5',
+      // Other Premium
+      'ltx-2-pro': 'LTX-2 Pro',
+      'hailuo-02': 'Hailuo 02',
+      'wan-2.2': 'WAN 2.2',
       'pika-2.2': 'Pika 2.2',
+      'luma-ray3': 'Luma Ray 3',
+      'mochi-1': 'Mochi 1',
+      'fabric-1.0': 'Fabric 1.0',
     };
     return names[engine] || engine;
   }
 
   private estimateCost(engine: VideoEngine, duration: number): number {
-    // Cost per second for each engine
+    // Cost per second for each engine (updated 2025)
     const costs: Record<string, number> = {
-      'hailuo-02': 0.028,
+      // OpenAI Sora (premium)
+      'sora-2': 0.12,
+      'sora-2-pro': 0.20,
+      // Google Veo (premium)
+      'veo-3.1': 0.15,
+      'veo-3.1-fast': 0.10,
+      // Runway (high quality)
+      'runway-gen3-alpha': 0.08,
       'runway-gen4-turbo': 0.05,
+      // Kling AI (Chinese, high quality)
       'kling-2.1': 0.19,
-      'luma-ray3': 0.12,
+      'kling-2.5-turbo': 0.15,
+      'kling-2.5-turbo-pro': 0.22,
+      // Chinese Models (competitive pricing)
+      'hunyuan-video': 0.06, // Open source, low cost
+      'vidu-q2': 0.05,
+      'seedance-1.0-pro': 0.04, // Budget-friendly
+      'pixverse-v4.5': 0.07,
+      // Other Premium
+      'ltx-2-pro': 0.10,
+      'hailuo-02': 0.028,
+      'wan-2.2': 0.09,
       'pika-2.2': 0.08,
+      'luma-ray3': 0.12,
+      'mochi-1': 0.06,
+      'fabric-1.0': 0.07,
     };
 
     const pricePerSecond = costs[engine] || 0.05;
