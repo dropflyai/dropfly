@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { VideoEngineConfig } from '@/types/video-engine';
 import Card from './ui/Card';
-import { Check, Zap, Award, Sparkles } from 'lucide-react';
+import { Check, Zap, Award, Sparkles, Crown, TrendingUp, Package, Code } from 'lucide-react';
 
 interface VideoEngineSelectorProps {
   engines: Record<string, VideoEngineConfig>;
@@ -12,12 +12,23 @@ interface VideoEngineSelectorProps {
   userTier: string;
 }
 
+type Category = 'all' | 'premium' | 'value' | 'fast' | 'opensource';
+
+const CATEGORIES = {
+  all: { label: 'All Engines', icon: Sparkles, engines: [] as string[] },
+  premium: { label: 'Premium', icon: Crown, engines: ['sora-2', 'sora-2-pro', 'veo-3.1', 'veo-3.1-fast', 'ltx-2-pro', 'runway-gen3-alpha', 'kling-2.5-turbo-pro'] },
+  value: { label: 'Best Value', icon: TrendingUp, engines: ['hunyuan-video', 'vidu-q2', 'seedance-1.0-pro', 'pixverse-v4.5', 'hailuo-02'] },
+  fast: { label: 'High-Speed', icon: Zap, engines: ['runway-gen4-turbo', 'kling-2.5-turbo', 'pika-2.2', 'wan-2.2', 'mochi-1', 'fabric-1.0'] },
+  opensource: { label: 'Open Source', icon: Code, engines: ['cogvideox-5b', 'cogvideox-i2v'] },
+};
+
 export default function VideoEngineSelector({
   engines,
   selectedEngine,
   onSelectEngine,
   userTier,
 }: VideoEngineSelectorProps) {
+  const [activeCategory, setActiveCategory] = useState<Category>('all');
   const engineList = Object.values(engines);
 
   if (engineList.length === 0) {
@@ -30,6 +41,11 @@ export default function VideoEngineSelector({
     );
   }
 
+  // Filter engines by category
+  const filteredEngines = activeCategory === 'all'
+    ? engineList
+    : engineList.filter(engine => CATEGORIES[activeCategory].engines.includes(engine.id));
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -37,12 +53,41 @@ export default function VideoEngineSelector({
           🎬 Choose AI Video Engine
         </h3>
         <div className="text-xs px-3 py-1 bg-[var(--primary-500)]/10 text-[var(--primary-500)] rounded-full font-medium">
-          {userTier.toUpperCase()} TIER
+          {userTier.toUpperCase()} TIER • {filteredEngines.length} engines
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {engineList.map((engine) => {
+      {/* Category Tabs */}
+      <div className="flex flex-wrap gap-2">
+        {(Object.keys(CATEGORIES) as Category[]).map((category) => {
+          const CategoryIcon = CATEGORIES[category].icon;
+          const isActive = activeCategory === category;
+          const count = category === 'all' ? engineList.length : CATEGORIES[category].engines.length;
+
+          return (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`
+                flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all
+                ${isActive
+                  ? 'bg-gradient-to-r from-[var(--primary-500)] to-[var(--secondary-500)] text-white shadow-lg'
+                  : 'bg-[var(--bg-secondary)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)]'
+                }
+              `}
+            >
+              <CategoryIcon className="w-4 h-4" />
+              {CATEGORIES[category].label}
+              <span className={`text-xs px-1.5 py-0.5 rounded-full ${isActive ? 'bg-white/20' : 'bg-[var(--bg-tertiary)]'}`}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+        {filteredEngines.map((engine) => {
           const isSelected = selectedEngine === engine.id;
           const speedColors = {
             'ultra-fast': 'text-green-500',

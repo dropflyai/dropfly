@@ -20,20 +20,11 @@ export const TOKEN_COSTS: TokenCost[] = [
       const dollarCost = engineConfig.pricePerSecond * duration;
       const tokens = Math.ceil(dollarCost * 100);
 
-      // Tiered markup for healthy margins + profitability
-      let markup: number;
-      if (dollarCost < 0.50) {
-        // Cheap engines (Hailuo, etc): 100% markup
-        markup = 2.0;
-      } else if (dollarCost < 2.00) {
-        // Mid-tier engines (Runway, Kling): 60% markup
-        markup = 1.6;
-      } else {
-        // Premium engines (Veo, Sora): 40% markup
-        markup = 1.4;
-      }
+      // 70% profit margin on all engines
+      // To achieve 70% margin: Price = Cost / (1 - 0.70) = Cost * 3.33
+      const PROFIT_MARGIN_MULTIPLIER = 3.33;
 
-      return Math.ceil(tokens * markup);
+      return Math.ceil(tokens * PROFIT_MARGIN_MULTIPLIER);
     },
   },
 
