@@ -196,30 +196,35 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* Hero Visual */}
-          <div className="relative">
-            <Card variant="glass" padding="none" className="overflow-hidden">
-              <div className="aspect-video bg-gradient-to-br from-[var(--primary-500)]/20 to-[var(--secondary-500)]/20 flex items-center justify-center relative">
-                <div className="absolute inset-0 grid grid-cols-3 gap-4 p-12 place-items-center">
-                  {[
-                    { icon: Video, label: 'Generate', desc: 'AI Videos', key: 'generate' as const },
-                    { icon: Calendar, label: 'Schedule', desc: 'Auto-Post', key: 'schedule' as const },
-                    { icon: TrendingUp, label: 'Grow', desc: 'Analytics', key: 'grow' as const }
-                  ].map((item, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setSelectedFeature(item.key)}
-                      className="bg-[var(--bg-primary)] rounded-lg p-4 flex flex-col items-center justify-center gap-2 hover:scale-110 transition-transform shadow-md cursor-pointer hover:border hover:border-[var(--primary-500)] w-24 h-24"
-                    >
-                      <item.icon className="w-8 h-8 text-[var(--primary-500)]" />
-                      <div className="text-center">
-                        <div className="text-xs font-bold text-[var(--text-primary)]">{item.label}</div>
-                      </div>
-                    </button>
-                  ))}
+          {/* Feature Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              { icon: Video, label: 'Generate', desc: 'AI-powered video creation', key: 'generate' as const },
+              { icon: Calendar, label: 'Schedule', desc: 'Multi-platform posting', key: 'schedule' as const },
+              { icon: TrendingUp, label: 'Grow', desc: 'Analytics & insights', key: 'grow' as const }
+            ].map((item, i) => (
+              <Card
+                key={i}
+                variant="glass"
+                padding="lg"
+                className="cursor-pointer hover:scale-105 transition-transform hover:border-[var(--primary-500)]"
+                onClick={() => setSelectedFeature(item.key)}
+              >
+                <div className="flex flex-col items-center text-center gap-4">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-[var(--primary-500)] to-[var(--secondary-500)] flex items-center justify-center">
+                    <item.icon className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold text-[var(--text-primary)] mb-2">
+                      {item.label}
+                    </h3>
+                    <p className="text-sm text-[var(--text-secondary)]">
+                      {item.desc}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            ))}
           </div>
         </div>
       </section>
