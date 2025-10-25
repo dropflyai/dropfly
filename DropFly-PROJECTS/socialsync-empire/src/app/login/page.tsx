@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
-import { Sparkles, Mail, Lock, Chrome } from 'lucide-react';
+import { Sparkles, Mail, Lock } from 'lucide-react';
 import Link from 'next/link';
 
 export default function LoginPage() {
@@ -32,21 +32,6 @@ export default function LoginPage() {
     } else {
       router.push('/home');
       router.refresh();
-    }
-  };
-
-  const handleGoogleLogin = async () => {
-    setLoading(true);
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-
-    if (error) {
-      setError(error.message);
-      setLoading(false);
     }
   };
 
@@ -123,29 +108,6 @@ export default function LoginPage() {
               {loading ? 'Logging in...' : 'Log In'}
             </Button>
           </form>
-
-          <div className="relative my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-[var(--bg-tertiary)]"></div>
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-[var(--bg-primary)] text-[var(--text-tertiary)]">
-                Or continue with
-              </span>
-            </div>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-            fullWidth
-            size="lg"
-            onClick={handleGoogleLogin}
-            disabled={loading}
-          >
-            <Chrome className="w-5 h-5 mr-2" />
-            Google
-          </Button>
 
           <div className="mt-6 text-center">
             <p className="text-sm text-[var(--text-secondary)]">
