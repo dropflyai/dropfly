@@ -180,28 +180,33 @@ export default function FeaturesPage() {
       {/* Main Features */}
       <section className="py-12 px-6">
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {mainFeatures.map((feature, i) => (
-              <Card key={i} variant="glass" padding="xl" className="hover:border-[var(--primary-500)]/30 transition-all">
-                <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${feature.color} flex items-center justify-center mb-6`}>
-                  <feature.icon className="w-7 h-7 text-white" />
+              <Card key={i} variant="glass" padding="lg" className="hover:scale-105 transition-transform">
+                <div className={`w-12 h-12 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center mb-4`}>
+                  <feature.icon className="w-6 h-6 text-white" />
                 </div>
 
-                <h3 className="text-2xl font-bold text-[var(--text-primary)] mb-3">
+                <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
                   {feature.title}
                 </h3>
 
-                <p className="text-[var(--text-secondary)] mb-6">
+                <p className="text-[var(--text-secondary)] mb-4 text-sm">
                   {feature.description}
                 </p>
 
-                <ul className="space-y-3">
-                  {feature.details.map((detail, j) => (
-                    <li key={j} className="flex items-start gap-3">
-                      <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
-                      <span className="text-sm text-[var(--text-secondary)]">{detail}</span>
+                <ul className="space-y-2">
+                  {feature.details.slice(0, 3).map((detail, j) => (
+                    <li key={j} className="flex items-start gap-2">
+                      <Check className="w-4 h-4 text-green-500 flex-shrink-0 mt-0.5" />
+                      <span className="text-xs text-[var(--text-secondary)]">{detail}</span>
                     </li>
                   ))}
+                  {feature.details.length > 3 && (
+                    <li className="text-xs text-[var(--primary-500)] font-medium pt-1">
+                      +{feature.details.length - 3} more features
+                    </li>
+                  )}
                 </ul>
               </Card>
             ))}
@@ -241,7 +246,7 @@ export default function FeaturesPage() {
 
       {/* How It Works */}
       <section className="py-20 px-6">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-7xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-[var(--text-primary)] mb-4">
               How SocialSync Works
@@ -251,42 +256,42 @@ export default function FeaturesPage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <Card variant="glass" padding="lg" className="text-center hover:scale-105 transition-transform">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4 text-white text-xl font-bold">
                 1
               </div>
-              <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
                 Generate Content
               </h3>
-              <p className="text-[var(--text-secondary)]">
+              <p className="text-sm text-[var(--text-secondary)]">
                 Describe your video idea or let AI suggest trending topics. Get scripts, captions, and hashtags instantly.
               </p>
-            </div>
+            </Card>
 
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+            <Card variant="glass" padding="lg" className="text-center hover:scale-105 transition-transform">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center mx-auto mb-4 text-white text-xl font-bold">
                 2
               </div>
-              <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
                 Schedule & Post
               </h3>
-              <p className="text-[var(--text-secondary)]">
+              <p className="text-sm text-[var(--text-secondary)]">
                 Choose your platforms, set your schedule, or publish immediately. SocialSync handles the rest.
               </p>
-            </div>
+            </Card>
 
-            <div className="text-center">
-              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-4 text-white text-2xl font-bold">
+            <Card variant="glass" padding="lg" className="text-center hover:scale-105 transition-transform">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-green-500 to-emerald-500 flex items-center justify-center mx-auto mb-4 text-white text-xl font-bold">
                 3
               </div>
-              <h3 className="text-xl font-bold text-[var(--text-primary)] mb-3">
+              <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">
                 Analyze & Grow
               </h3>
-              <p className="text-[var(--text-secondary)]">
+              <p className="text-sm text-[var(--text-secondary)]">
                 Track performance, understand what works, and optimize your strategy with AI-powered insights.
               </p>
-            </div>
+            </Card>
           </div>
         </div>
       </section>

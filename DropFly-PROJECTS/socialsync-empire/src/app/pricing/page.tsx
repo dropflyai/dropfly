@@ -144,6 +144,58 @@ export default function PricingPage() {
           })}
         </div>
 
+        {/* CTA Section */}
+        <section className="mt-20 py-20 px-6 bg-gradient-to-br from-[var(--primary-500)]/10 to-[var(--secondary-500)]/10 border-2 border-[var(--primary-500)]/20 rounded-2xl">
+          <div className="max-w-4xl mx-auto text-center">
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-[var(--warning)]/20 border border-[var(--warning)]/40 rounded-full mb-6">
+              <Sparkles className="w-4 h-4 text-[var(--warning)]" />
+              <span className="text-sm font-bold text-[var(--warning)]">
+                Early Access - Limited Spots Available
+              </span>
+            </div>
+
+            <h2 className="text-4xl md:text-5xl font-bold text-[var(--text-primary)] mb-6">
+              Ready to Transform Your Social Media?
+            </h2>
+
+            <p className="text-xl text-[var(--text-secondary)] mb-8">
+              Join early adopters who are already creating viral content with SocialSync.
+              <br />
+              <strong className="text-[var(--text-primary)]">Start free - no credit card required.</strong>
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-6">
+              <Link href="/signup">
+                <Button variant="primary" size="lg" className="shadow-lg shadow-[var(--primary-500)]/30">
+                  <Sparkles className="w-5 h-5 mr-2" />
+                  Start For Free
+                </Button>
+              </Link>
+              <Link href="/features">
+                <Button variant="outline" size="lg">
+                  See All Features
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </Link>
+            </div>
+
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-[var(--text-tertiary)]">
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-500" />
+                No credit card required
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-500" />
+                Cancel anytime
+              </div>
+              <div className="flex items-center gap-2">
+                <Check className="w-4 h-4 text-green-500" />
+                Free forever plan
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* FAQ or Additional Info */}
         <div className="mt-16 text-center">
           <p className="text-[var(--text-secondary)]">
