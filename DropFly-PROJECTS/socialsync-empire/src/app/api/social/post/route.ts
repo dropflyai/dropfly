@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { ayrshare } from '@/lib/ayrshare/client';
+import { getAyrshareClient } from '@/lib/ayrshare/client';
 
 export async function POST(request: NextRequest) {
   try {
@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Post to social media via Ayrshare
+    const ayrshare = getAyrshareClient();
     const result = await ayrshare.post({
       post: content,
       platforms,

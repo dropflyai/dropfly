@@ -1,4 +1,4 @@
-import { Sparkles, Video, Calendar, TrendingUp, Eye, Heart, Download, Zap, Award, Film, Coins } from 'lucide-react';
+import { Sparkles, Video, Calendar, TrendingUp, Eye, Heart, Download, Zap, Award, Film, Coins, Wand2, Package } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase/server';
@@ -248,7 +248,7 @@ export default async function HomePage() {
       {/* Quick Actions */}
       <section>
         <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">Quick Actions</h2>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <Link href="/create">
             <Card variant="glass" padding="lg" clickable hover>
               <div className="flex items-center gap-4">
@@ -260,6 +260,34 @@ export default async function HomePage() {
                   <p className="text-sm text-[var(--text-tertiary)]">
                     {availableEngines.length} engines available
                   </p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+
+          <Link href="/tools/image-generator">
+            <Card variant="glass" padding="lg" clickable hover>
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg">
+                  <Wand2 className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[var(--text-primary)]">AI Image Generator</h3>
+                  <p className="text-sm text-[var(--text-tertiary)]">Text-to-image creation</p>
+                </div>
+              </div>
+            </Card>
+          </Link>
+
+          <Link href="/tools/product-studio">
+            <Card variant="glass" padding="lg" clickable hover>
+              <div className="flex items-center gap-4">
+                <div className="p-3 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg">
+                  <Package className="w-6 h-6 text-white" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-[var(--text-primary)]">Product Studio</h3>
+                  <p className="text-sm text-[var(--text-tertiary)]">Lifestyle product scenes</p>
                 </div>
               </div>
             </Card>

@@ -5,16 +5,19 @@ import Stripe from 'stripe';
  * Handles subscriptions and one-time token purchases
  */
 
-const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+// Lazy-load Stripe client to avoid build-time execution
+export function getStripeClient(): Stripe {
+  const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 
-if (!STRIPE_SECRET_KEY) {
-  throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
+  if (!STRIPE_SECRET_KEY) {
+    throw new Error('STRIPE_SECRET_KEY is not set in environment variables');
+  }
+
+  return new Stripe(STRIPE_SECRET_KEY, {
+    apiVersion: '2024-12-18.acacia',
+    typescript: true,
+  });
 }
-
-export const stripe = new Stripe(STRIPE_SECRET_KEY, {
-  apiVersion: '2024-12-18.acacia',
-  typescript: true,
-});
 
 // Stripe Price IDs for each subscription tier
 // You'll need to create these in Stripe Dashboard and update here
@@ -66,7 +69,7 @@ export async function createSubscriptionCheckoutSession(
     throw new Error(`Stripe price ID not configured for tier: ${tier}`);
   }
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripeClient().checkout.sessions.create({
     customer_email: userEmail,
     client_reference_id: userId,
     mode: 'subscription',
@@ -108,7 +111,7 @@ export async function createTokenPurchaseCheckoutSession(
   const priceInCents = tokenAmount * 1; // 1 token = $0.01
   const dollarAmount = priceInCents / 100;
 
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripeClient().checkout.sessions.create({
     customer_email: userEmail,
     client_reference_id: userId,
     mode: 'payment',
@@ -148,7 +151,7 @@ export async function getOrCreateCustomer(
   name?: string
 ): Promise<Stripe.Customer> {
   // Search for existing customer by email
-  const existingCustomers = await stripe.customers.list({
+  const existingCustomers = await getStripeClient().customers.list({
     email,
     limit: 1,
   });
@@ -158,7 +161,7 @@ export async function getOrCreateCustomer(
   }
 
   // Create new customer
-  return await stripe.customers.create({
+  return await getStripeClient().customers.create({
     email,
     name,
     metadata: {
@@ -173,7 +176,7 @@ export async function getOrCreateCustomer(
 export async function cancelSubscription(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
-  return await stripe.subscriptions.update(subscriptionId, {
+  return await getStripeClient().subscriptions.update(subscriptionId, {
     cancel_at_period_end: true,
   });
 }
@@ -184,7 +187,7 @@ export async function cancelSubscription(
 export async function cancelSubscriptionImmediately(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
-  return await stripe.subscriptions.cancel(subscriptionId);
+  return await getStripeClient().subscriptions.cancel(subscriptionId);
 }
 
 /**
@@ -193,7 +196,7 @@ export async function cancelSubscriptionImmediately(
 export async function resumeSubscription(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
-  return await stripe.subscriptions.update(subscriptionId, {
+  return await getStripeClient().subscriptions.update(subscriptionId, {
     cancel_at_period_end: false,
   });
 }
@@ -204,7 +207,7 @@ export async function resumeSubscription(
 export async function getSubscription(
   subscriptionId: string
 ): Promise<Stripe.Subscription> {
-  return await stripe.subscriptions.retrieve(subscriptionId);
+  return await getStripeClient().subscriptions.retrieve(subscriptionId);
 }
 
 /**
@@ -214,7 +217,7 @@ export async function createBillingPortalSession(
   customerId: string,
   returnUrl: string
 ): Promise<Stripe.BillingPortal.Session> {
-  return await stripe.billingPortal.sessions.create({
+  return await getStripeClient().billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
   });
@@ -228,5 +231,5 @@ export function verifyWebhookSignature(
   signature: string,
   secret: string
 ): Stripe.Event {
-  return stripe.webhooks.constructEvent(payload, signature, secret);
+  return getStripeClient().webhooks.constructEvent(payload, signature, secret);
 }

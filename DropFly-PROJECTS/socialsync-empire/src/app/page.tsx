@@ -14,7 +14,7 @@ import Button from '@/components/ui/Button';
 
 export default function LandingPage() {
   const [videoPlaying, setVideoPlaying] = useState(false);
-  const [selectedFeature, setSelectedFeature] = useState<'generate' | 'schedule' | 'grow' | null>(null);
+  const [selectedFeature, setSelectedFeature] = useState<'generate' | 'schedule' | 'grow' | 'create' | null>(null);
 
   const features = [
     {
@@ -197,8 +197,9 @@ export default function LandingPage() {
           </div>
 
           {/* Feature Cards */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
+              { icon: Wand2, label: 'Create', desc: 'AI images & product scenes', key: 'create' as const },
               { icon: Video, label: 'Generate', desc: 'AI-powered video creation', key: 'generate' as const },
               { icon: Calendar, label: 'Schedule', desc: 'Multi-platform posting', key: 'schedule' as const },
               { icon: TrendingUp, label: 'Grow', desc: 'Analytics & insights', key: 'grow' as const }
@@ -468,10 +469,63 @@ export default function LandingPage() {
             className="max-w-2xl w-full max-h-[80vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {selectedFeature === 'generate' && (
+            {selectedFeature === 'create' && (
               <>
                 <div className="flex items-center gap-4 mb-6">
                   <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                    <Wand2 className="w-8 h-8 text-white" />
+                  </div>
+                  <div>
+                    <h2 className="text-3xl font-bold text-[var(--text-primary)]">Create AI Images</h2>
+                    <p className="text-[var(--text-secondary)]">Professional images and product scenes with AI</p>
+                  </div>
+                </div>
+
+                <div className="space-y-4 mb-6">
+                  <div>
+                    <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-2">What You Can Do:</h3>
+                    <ul className="space-y-3">
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Text-to-Image AI:</strong> Generate stunning images from text using Flux Pro, SDXL, and other cutting-edge models
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Product Photography:</strong> Place your products in lifestyle scenes - luxury bedrooms, modern kitchens, outdoor patios
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Multiple Aspect Ratios:</strong> Create images in any format - square, landscape, portrait, Instagram, and more
+                        </span>
+                      </li>
+                      <li className="flex items-start gap-3">
+                        <Check className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                        <span className="text-[var(--text-secondary)]">
+                          <strong>Professional Quality:</strong> Commercial-grade photorealistic images perfect for e-commerce and marketing
+                        </span>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+
+                <Link href="/signup">
+                  <Button variant="primary" size="lg" fullWidth>
+                    <Rocket className="w-5 h-5 mr-2" />
+                    Start Creating Images
+                  </Button>
+                </Link>
+              </>
+            )}
+
+            {selectedFeature === 'generate' && (
+              <>
+                <div className="flex items-center gap-4 mb-6">
+                  <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-500 flex items-center justify-center">
                     <Video className="w-8 h-8 text-white" />
                   </div>
                   <div>

@@ -3,9 +3,12 @@ import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import { STRIPE_PLANS } from '@/lib/stripe/config';
 
-const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy-load OpenAI client to avoid build-time execution
+function getOpenAIClient() {
+  return new OpenAI({
+    apiKey: process.env.OPENAI_API_KEY,
+  });
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -132,6 +135,7 @@ Make it clear, actionable, and beginner-friendly. Number each step.`,
     const selectedPrompt = prompts[creatorMode] || prompts.ugc;
 
     // Call OpenAI API
+    const openai = getOpenAIClient();
     const completion = await openai.chat.completions.create({
       model: 'gpt-4',
       messages: [

@@ -115,4 +115,7 @@ export class AyrshareClient {
   }
 }
 
-export const ayrshare = new AyrshareClient();
+// Lazy-load Ayrshare client to avoid build-time execution
+export function getAyrshareClient(): AyrshareClient {
+  return new AyrshareClient();
+}
