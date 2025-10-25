@@ -136,36 +136,27 @@ export const TOKEN_PACKAGES: TokenPackage[] = [
 
 // Monthly token allocation by subscription tier
 // NO ROLLOVER - Use it or lose it. Drives upgrades.
+// Optimized 4-Tier System: Free → Starter → PRO (sweet spot) → Enterprise
 export const SUBSCRIPTION_TOKEN_ALLOCATIONS: SubscriptionTokenAllocation[] = [
   {
     tier: 'free',
-    monthlyTokens: 300, // ~3 videos with Hailuo 02
-    dailyLimit: 15, // 50% more than daily average to allow flexibility
+    monthlyTokens: 300,     // ~3-6 budget videos (teaser tier)
+    dailyLimit: 15,         // Strict limit to drive upgrades
   },
   {
     tier: 'starter',
-    monthlyTokens: 1800, // ~15 videos with Runway
-    dailyLimit: 90, // ~1-2 videos per day
-  },
-  {
-    tier: 'creator',
-    monthlyTokens: 3600, // ~20 videos with Kling 2.1
-    dailyLimit: 180, // ~2-3 videos per day
+    monthlyTokens: 2000,    // ~20-40 videos with mid-tier engines
+    dailyLimit: 100,        // ~2-3 videos per day
   },
   {
     tier: 'pro',
-    monthlyTokens: 6000, // ~25 videos with mix of engines
-    dailyLimit: 300, // ~3-5 videos per day
-  },
-  {
-    tier: 'agency',
-    monthlyTokens: 12000, // ~40 videos with premium engines
-    dailyLimit: 600, // ~6-10 videos per day
+    monthlyTokens: 6000,    // ~60-120 videos (all engines unlocked!)
+    dailyLimit: 300,        // ~5-10 videos per day
   },
   {
     tier: 'enterprise',
-    monthlyTokens: 20000, // ~40+ premium videos
-    dailyLimit: 1000, // ~10-15 videos per day
+    monthlyTokens: 20000,   // ~200+ videos or 40+ premium Sora videos
+    dailyLimit: 1000,       // ~20-30 videos per day
   },
 ];
 
