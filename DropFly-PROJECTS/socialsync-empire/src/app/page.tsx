@@ -200,7 +200,7 @@ export default function LandingPage() {
           <div className="relative">
             <Card variant="glass" padding="none" className="overflow-hidden">
               <div className="aspect-video bg-gradient-to-br from-[var(--primary-500)]/20 to-[var(--secondary-500)]/20 flex items-center justify-center relative">
-                <div className="absolute inset-0 grid grid-cols-3 gap-4 p-12">
+                <div className="absolute inset-0 grid grid-cols-3 gap-3 p-16">
                   {[
                     { icon: Video, label: 'Generate', desc: 'AI Videos', key: 'generate' as const },
                     { icon: Calendar, label: 'Schedule', desc: 'Auto-Post', key: 'schedule' as const },
@@ -209,12 +209,11 @@ export default function LandingPage() {
                     <button
                       key={i}
                       onClick={() => setSelectedFeature(item.key)}
-                      className="bg-[var(--bg-primary)] rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 hover:scale-105 transition-transform shadow-md cursor-pointer hover:border-2 hover:border-[var(--primary-500)]"
+                      className="bg-[var(--bg-primary)] rounded-md p-1.5 flex flex-col items-center justify-center gap-0.5 hover:scale-110 transition-transform shadow-sm cursor-pointer hover:border hover:border-[var(--primary-500)]"
                     >
-                      <item.icon className="w-8 h-8 text-[var(--primary-500)]" />
+                      <item.icon className="w-4 h-4 text-[var(--primary-500)]" />
                       <div className="text-center">
-                        <div className="text-xs font-bold text-[var(--text-primary)]">{item.label}</div>
-                        <div className="text-[10px] text-[var(--text-tertiary)]">{item.desc}</div>
+                        <div className="text-[10px] font-bold text-[var(--text-primary)]">{item.label}</div>
                       </div>
                     </button>
                   ))}
