@@ -200,7 +200,7 @@ export default function LandingPage() {
           <div className="relative">
             <Card variant="glass" padding="none" className="overflow-hidden">
               <div className="aspect-video bg-gradient-to-br from-[var(--primary-500)]/20 to-[var(--secondary-500)]/20 flex items-center justify-center relative">
-                <div className="absolute inset-0 grid grid-cols-3 gap-6 p-8">
+                <div className="absolute inset-0 grid grid-cols-3 gap-4 p-12">
                   {[
                     { icon: Video, label: 'Generate', desc: 'AI Videos', key: 'generate' as const },
                     { icon: Calendar, label: 'Schedule', desc: 'Auto-Post', key: 'schedule' as const },
@@ -209,12 +209,12 @@ export default function LandingPage() {
                     <button
                       key={i}
                       onClick={() => setSelectedFeature(item.key)}
-                      className="bg-[var(--bg-primary)] rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:scale-105 transition-transform shadow-lg cursor-pointer hover:border-2 hover:border-[var(--primary-500)]"
+                      className="bg-[var(--bg-primary)] rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 hover:scale-105 transition-transform shadow-md cursor-pointer hover:border-2 hover:border-[var(--primary-500)]"
                     >
-                      <item.icon className="w-10 h-10 text-[var(--primary-500)]" />
+                      <item.icon className="w-8 h-8 text-[var(--primary-500)]" />
                       <div className="text-center">
-                        <div className="text-sm font-bold text-[var(--text-primary)]">{item.label}</div>
-                        <div className="text-xs text-[var(--text-tertiary)]">{item.desc}</div>
+                        <div className="text-xs font-bold text-[var(--text-primary)]">{item.label}</div>
+                        <div className="text-[10px] text-[var(--text-tertiary)]">{item.desc}</div>
                       </div>
                     </button>
                   ))}
@@ -426,9 +426,8 @@ export default function LandingPage() {
             <div>
               <h4 className="font-semibold text-[var(--text-primary)] mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
-                <li><Link href="#features">Features</Link></li>
+                <li><Link href="/features">Features</Link></li>
                 <li><Link href="/pricing">Pricing</Link></li>
-                <li><Link href="#who-its-for">Use Cases</Link></li>
               </ul>
             </div>
             <div>

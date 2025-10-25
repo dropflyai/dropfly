@@ -49,18 +49,33 @@ export default function PricingPage() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-primary)] py-20 px-6">
-      <div className="max-w-7xl mx-auto">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
+      {/* Navigation */}
+      <nav className="border-b border-[var(--border-primary)] bg-[var(--bg-primary)]/80 backdrop-blur-sm sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2">
+            <div className="p-2 bg-gradient-to-br from-[var(--primary-500)] to-[var(--secondary-500)] rounded-lg">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <span className="text-xl font-bold text-[var(--text-primary)]">SocialSync</span>
+          </Link>
+          <div className="flex items-center gap-4">
+            <Link href="/">
+              <Button variant="ghost" size="sm">Home</Button>
+            </Link>
+            <Link href="/features">
+              <Button variant="ghost" size="sm">Features</Button>
+            </Link>
+            <Link href="/signup">
+              <Button variant="primary" size="sm">Start Free Trial</Button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto py-20 px-6">
         {/* Header */}
         <div className="text-center mb-12">
-          <Link href="/" className="inline-block mb-8">
-            <div className="flex items-center gap-2">
-              <div className="p-2 bg-gradient-to-br from-[var(--primary-500)] to-[var(--secondary-500)] rounded-lg">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <span className="text-xl font-bold text-[var(--text-primary)]">SocialSync</span>
-            </div>
-          </Link>
 
           <h1 className="text-4xl font-bold text-[var(--text-primary)] mb-4">
             Choose Your Plan
@@ -169,6 +184,50 @@ export default function PricingPage() {
           </p>
         </div>
       </div>
+
+      {/* Footer */}
+      <footer className="py-12 px-6 bg-[var(--bg-secondary)] border-t border-[var(--border)]">
+        <div className="max-w-7xl mx-auto">
+          <div className="grid md:grid-cols-4 gap-8 mb-8">
+            <div>
+              <div className="flex items-center gap-2 mb-4">
+                <div className="p-2 bg-gradient-to-br from-[var(--primary-500)] to-[var(--secondary-500)] rounded-lg">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <span className="font-bold text-[var(--text-primary)]">SocialSync</span>
+              </div>
+              <p className="text-sm text-[var(--text-secondary)]">
+                AI-powered social media management for modern creators.
+              </p>
+            </div>
+            <div>
+              <h4 className="font-semibold text-[var(--text-primary)] mb-4">Product</h4>
+              <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
+                <li><Link href="/features">Features</Link></li>
+                <li><Link href="/pricing">Pricing</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-[var(--text-primary)] mb-4">Company</h4>
+              <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
+                <li><Link href="/about">About</Link></li>
+                <li><Link href="/blog">Blog</Link></li>
+                <li><Link href="/contact">Contact</Link></li>
+              </ul>
+            </div>
+            <div>
+              <h4 className="font-semibold text-[var(--text-primary)] mb-4">Legal</h4>
+              <ul className="space-y-2 text-sm text-[var(--text-secondary)]">
+                <li><Link href="/privacy">Privacy</Link></li>
+                <li><Link href="/terms">Terms</Link></li>
+              </ul>
+            </div>
+          </div>
+          <div className="pt-8 border-t border-[var(--border)] text-center text-sm text-[var(--text-tertiary)]">
+            © 2025 SocialSync. All rights reserved.
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
