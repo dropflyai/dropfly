@@ -1,0 +1,415 @@
+{
+  "company": {
+    "name": "Your AI Automation Company",
+    "location": "Inglewood / View Park / Los Angeles",
+    "tagline": "AI automation specialists from South LA bringing real solutions to small businesses and communities"
+  },
+  "brandVoice": {
+    "core": "Professional Expert + Friendly Teacher + Urban Authenticity",
+    "essence": "Your neighbor who got smart about AI and wants to put you on game",
+    "principles": [
+      "Real talk, no fluff, practical advice that actually helps businesses",
+      "Speak directly to small businesses and real people, not corporations",
+      "Use real-world examples and hypothetical scenarios",
+      "Mix street-smart business advice with tech knowledge",
+      "Keep it 100 - if something's overhyped, say it",
+      "Make AI feel accessible, not intimidating",
+      "Reference real LA/local business scenarios when possible"
+    ]
+  },
+  "products": [
+    {
+      "name": "Maya - Voice AI Receptionist",
+      "description": "24/7 AI receptionist for nail salons, spas, beauty businesses, and service companies. Book appointments, answer calls, sync with Google Calendar.",
+      "targetAudience": "Nail salons, spas, beauty businesses, service providers",
+      "keyFeatures": [
+        "Natural voice conversation booking",
+        "24/7 call answering (never miss a call)",
+        "Google Calendar automatic sync",
+        "Email confirmations via Gmail",
+        "Appointment lifecycle (book, check, reschedule, cancel)",
+        "Admin dashboard with real-time insights",
+        "5-minute setup, one-click deploy"
+      ],
+      "pricing": "SaaS subscription model",
+      "contentFocus": "Time savings, revenue capture, missed call prevention, after-hours bookings",
+      "contentExamples": [
+        "What happens when clients call your salon at midnight?",
+        "How Maya saves nail salons $2K+/month in missed bookings",
+        "Before/After: Stop losing sleep over the phone"
+      ],
+      "useCases": [
+        "Salon owner too busy to answer phone during service",
+        "After-hours booking requests",
+        "Double-booking prevention",
+        "Automatic appointment reminders"
+      ]
+    },
+    {
+      "name": "CodeFly - AI Coding Education Platform",
+      "description": "Revolutionary AI-powered coding education for schools. AI tutor (Coach Nova) + Python/web curriculum + Moodle integration. $200/student/semester.",
+      "targetAudience": "School administrators, principals, tech coordinators, teachers (K-12)",
+      "keyFeatures": [
+        "AI Tutor 'Coach Nova' - 24/7 personalized help",
+        "18-week Year 1 curriculum (Python + Web Development)",
+        "Zero setup - browser-based coding environment",
+        "Seamless Moodle LMS integration",
+        "Automated testing and grading",
+        "Live analytics and progress tracking",
+        "Complete teacher training included"
+      ],
+      "pricing": "$200/student/semester - Complete 120-student program: $111K (2-year curriculum, setup, training)",
+      "contentFocus": "Education equity, AI tutoring revolution, teacher support, student confidence building",
+      "contentExamples": [
+        "Why every South LA student deserves AI coding education",
+        "Coach Nova vs traditional tutoring: Side-by-side",
+        "From zero coding experience to confident programmer in 18 weeks"
+      ],
+      "useCases": [
+        "Schools without dedicated CS teachers",
+        "Students needing 24/7 homework help",
+        "Districts with outdated curriculum",
+        "Mixed skill-level classrooms"
+      ]
+    },
+    {
+      "name": "HOA Management App",
+      "description": "Modern HOA/condo management platform with mobile app. Dues payment, maintenance requests, digital voting, resident portal. iOS app + web dashboard.",
+      "targetAudience": "HOA board presidents, property managers, condo associations, community managers",
+      "keyFeatures": [
+        "Resident portal (pay dues, submit requests, vote)",
+        "Board member dashboard (approvals, financial oversight)",
+        "Admin panel (full system administration)",
+        "iOS mobile app (native iPhone experience)",
+        "Payment system ready (Stripe/PayPal integration)",
+        "Document management and sharing",
+        "Digital community voting",
+        "Multi-community support"
+      ],
+      "pricing": "Per-community licensing",
+      "contentFocus": "Time savings, payment automation, resident satisfaction, professional management",
+      "contentExamples": [
+        "Still collecting HOA dues by check? There's a better way",
+        "How one LA condo cut maintenance chaos by 80%",
+        "Board president: 'I can finally manage our HOA from my phone'"
+      ],
+      "useCases": [
+        "Board members tracking late payments manually",
+        "Residents unable to participate in voting",
+        "Maintenance request tracking chaos",
+        "Multi-property managers juggling spreadsheets"
+      ]
+    },
+    {
+      "name": "FitFly - AI Fitness App",
+      "description": "AI-powered fitness app with personalized workout generation, nutrition tracking, VOD library, and social features. $19.99/mo Core, $29.99/mo Pro.",
+      "targetAudience": "Fitness enthusiasts 25-45, gym members, people wanting accountability and personalization",
+      "keyFeatures": [
+        "AI-generated personalized workouts",
+        "Nutrition logging with barcode scanner",
+        "VOD video library (classes and demos)",
+        "Workout tracking (sets, reps, weight, progress)",
+        "Social feed (likes, comments, community)",
+        "Leaderboards and challenges",
+        "14-day free trial (auto-applied)",
+        "Meal prep marketplace (Pro tier)"
+      ],
+      "pricing": "Free 14-day trial → $19.99/mo (Core) or $29.99/mo (Pro)",
+      "contentFocus": "Personalization vs generic plans, affordability vs personal trainer, community support",
+      "contentExamples": [
+        "Why AI workouts beat cookie-cutter programs",
+        "30-day transformation: Sarah's FitFly journey",
+        "$19.99/mo vs $200/session personal trainer"
+      ],
+      "useCases": [
+        "Gym members bored with generic workout plans",
+        "People who can't afford personal trainers",
+        "Fitness enthusiasts needing accountability",
+        "Users wanting nutrition + workouts in one app"
+      ]
+    },
+    {
+      "name": "AI Content Creator Platform",
+      "description": "Full content automation: RSS feeds → AI generation → media creation → multi-platform publishing. Built with Next.js, n8n workflows, and Airtable.",
+      "targetAudience": "Small business owners, solopreneurs, content creators, local marketing teams",
+      "keyFeatures": [
+        "Automated RSS content aggregation",
+        "AI-powered post generation (Claude Sonnet)",
+        "Multi-AI media generation (Flux Pro, Recraft V3, Ideogram, Runway)",
+        "Review dashboard (approve/reject workflow)",
+        "Multi-platform publishing (Instagram, Facebook, LinkedIn via Ayrshare)",
+        "Brand voice configuration system",
+        "Visual brand identity matching",
+        "n8n workflow automation"
+      ],
+      "pricing": "SaaS subscription",
+      "contentFocus": "Time savings, consistency, brand authenticity, automation magic",
+      "contentExamples": [
+        "From RSS feed to published post in 5 minutes",
+        "How AI generates brand-perfect images for your content",
+        "LA consultant went from 2 posts/week to 15 with automation"
+      ],
+      "useCases": [
+        "Business owners with no time for social media",
+        "Solopreneurs doing everything themselves",
+        "Local businesses needing consistent posting",
+        "Marketers tired of writer's block"
+      ]
+    }
+  ],
+  "targetAudience": [
+    {
+      "segment": "Small Business Owners",
+      "needs": ["efficiency", "cost savings", "customer service", "growth"],
+      "painPoints": ["missing calls", "limited budget", "no time for marketing", "manual processes"]
+    },
+    {
+      "segment": "Property Managers",
+      "needs": ["tenant management", "maintenance tracking", "communication", "automation"],
+      "painPoints": ["juggling multiple properties", "late-night maintenance calls", "rent collection", "paperwork"]
+    },
+    {
+      "segment": "Educational Institutions",
+      "needs": ["AI literacy", "modern curriculum", "student engagement", "accessible learning"],
+      "painPoints": ["outdated materials", "lack of AI knowledge", "budget constraints", "diverse skill levels"]
+    },
+    {
+      "segment": "Local Entrepreneurs",
+      "needs": ["growth tools", "marketing help", "time savings", "competitive edge"],
+      "painPoints": ["can't afford agencies", "doing everything themselves", "overwhelmed by tech", "competition"]
+    }
+  ],
+  "contentPillars": [
+    {
+      "name": "Educational Tutorials",
+      "percentage": 40,
+      "examples": [
+        "How to set up your first voice agent in 10 minutes",
+        "3 AI tools every small business needs",
+        "Automate your appointment booking - free tutorial"
+      ]
+    },
+    {
+      "name": "Hypothetical Case Studies",
+      "percentage": 30,
+      "examples": [
+        "What Maya could do for your nail salon",
+        "How an AI voice agent saves a restaurant $3K/month",
+        "Apartment manager manages 50 units solo with AI"
+      ]
+    },
+    {
+      "name": "Tool Reviews & Industry Insights",
+      "percentage": 20,
+      "examples": [
+        "ChatGPT vs Claude - which one for your business?",
+        "AI tools that are actually worth the hype",
+        "Why small businesses are sleeping on automation"
+      ]
+    },
+    {
+      "name": "Quick Wins & Real Talk",
+      "percentage": 10,
+      "examples": [
+        "3 AI prompts that work better than expensive tools",
+        "Stop paying for services AI can do for free",
+        "The AI myth that's costing you money"
+      ]
+    }
+  ],
+  "toneOptions": [
+    {
+      "name": "Educational",
+      "description": "Teaching mode - breaking down complex topics",
+      "example": "Let me show you how this actually works..."
+    },
+    {
+      "name": "Motivational",
+      "description": "Inspiring action - pushing businesses forward",
+      "example": "You can do this. Here's how we help..."
+    },
+    {
+      "name": "Straight Talk",
+      "description": "Real talk - no sugar coating",
+      "example": "Most AI tools are trash. Here's what actually works..."
+    }
+  ],
+  "doExamples": [
+    "Speak directly to real people and small businesses",
+    "Use conversational, accessible language",
+    "Share practical, actionable advice",
+    "Reference local LA/South LA business scenarios",
+    "Be honest about what works and what doesn't",
+    "Make AI feel accessible, not intimidating",
+    "Use hypothetical examples since we're building clientele",
+    "Keep it 100 - call out overhyped tech"
+  ],
+  "dontExamples": [
+    "Use corporate jargon or buzzwords",
+    "Talk down to people who don't know tech",
+    "Overpromise or exaggerate AI capabilities",
+    "Be corny trying to sound 'urban'",
+    "Ignore the reality of small business constraints",
+    "Gatekeep information - share freely"
+  ],
+  "exampleTransformations": [
+    {
+      "bad": "5 Ways Machine Learning Can Transform Your Enterprise",
+      "good": "Your Business Is Losing Money While You Sleep - Here's How AI Fixes That"
+    },
+    {
+      "bad": "Implementing Conversational AI Agents",
+      "good": "Stop Missing Calls. Maya Answers Even When You're Closed."
+    },
+    {
+      "bad": "The Future of Automated Marketing",
+      "good": "Small Budget? No Problem. How We Generate Content for $10/month"
+    },
+    {
+      "bad": "Leverage machine learning algorithms to optimize your customer acquisition funnel",
+      "good": "Stop chasing leads. Let AI find customers while you run your business."
+    }
+  ],
+  "hashtagStrategy": {
+    "aiTech": ["#AIAutomation", "#SmallBusinessAI", "#TechForBusiness", "#AITools"],
+    "industry": ["#SmallBusiness", "#Entrepreneur", "#StartupLife", "#BusinessGrowth"],
+    "local": ["#LABusiness", "#InglewoodBusiness", "#SouthLA", "#ViewPark"],
+    "product": ["#VoiceAgents", "#AIReceptionist", "#BusinessAutomation", "#PropTech"],
+    "community": ["#BlackTech", "#MinorityBusiness", "#CommunityFirst", "#LocalBusiness"]
+  },
+  "contentFormats": {
+    "carousel": {
+      "description": "Step-by-step/Lists format",
+      "bestFor": [
+        "Tutorials and how-tos",
+        "Tool comparisons",
+        "Before/after scenarios",
+        "Myth-busting lists",
+        "Feature breakdowns"
+      ]
+    },
+    "reel": {
+      "description": "Stories/Demos format",
+      "bestFor": [
+        "Product demos",
+        "Day-in-the-life scenarios",
+        "Quick tips and hacks",
+        "Customer success stories",
+        "Behind-the-scenes"
+      ]
+    }
+  },
+  "brandPersonality": [
+    "Knowledgeable - We know our stuff about AI and business",
+    "Approachable - Easy to talk to, no judgment",
+    "Real - Authentic, not trying too hard",
+    "Helpful - Genuinely want to see people win",
+    "Local - Proud of our LA/South LA roots",
+    "Innovative - Always learning, always building",
+    "Community-Focused - Rising together"
+  ],
+  "contentToAvoid": [
+    {
+      "category": "Overly Technical Deep-Dives",
+      "reason": "Hard to visualize, boring images, loses audience",
+      "examples": [
+        "Understanding Neural Network Architecture Layers",
+        "Deep Dive into API Authentication Protocols",
+        "Machine Learning Algorithm Mathematics Explained"
+      ],
+      "betterAlternative": "Simplify to practical outcomes - focus on WHAT it does, not HOW it works internally"
+    },
+    {
+      "category": "Generic Motivational Quotes",
+      "reason": "Looks like every other account, no personality, no value",
+      "examples": [
+        "Hustle Hard Every Day",
+        "Dreams Don't Work Unless You Do",
+        "Success is a Journey Not a Destination"
+      ],
+      "betterAlternative": "Specific actionable advice with your voice - tie motivation to actual business results"
+    },
+    {
+      "category": "Controversial Political Topics",
+      "reason": "Divides audience, distracts from products, creates conflict",
+      "examples": [
+        "Political commentary",
+        "Hot-button social issues unrelated to business",
+        "Divisive cultural debates"
+      ],
+      "betterAlternative": "Focus on business automation, AI tools, local entrepreneurship success"
+    },
+    {
+      "category": "Content Requiring Exact Screenshots",
+      "reason": "AI cannot accurately recreate specific UIs, will look fake",
+      "examples": [
+        "Step-by-Step: How to Navigate [Specific App]",
+        "Exact Settings to Change in Your Dashboard",
+        "Screenshot Tutorial of [Software]"
+      ],
+      "betterAlternative": "General concepts and principles, not pixel-perfect UI recreations"
+    },
+    {
+      "category": "Medical Legal or Financial Advice",
+      "reason": "Liability issues, requires disclaimers, not your expertise area",
+      "examples": [
+        "How to Structure Your LLC",
+        "Tax Strategies for Entrepreneurs",
+        "HIPAA Compliance Requirements"
+      ],
+      "betterAlternative": "General business efficiency and automation - stay in your lane"
+    },
+    {
+      "category": "Celebrity Drama or Pop Culture Gossip",
+      "reason": "Off-brand, damages professional credibility, attracts wrong audience",
+      "examples": [
+        "What [Celebrity] Said About AI",
+        "Hot Take on [Trending Drama]",
+        "Commentary on entertainment news"
+      ],
+      "betterAlternative": "Business and tech trends from credible sources with practical takeaways"
+    },
+    {
+      "category": "Unverified Statistics or Claims",
+      "reason": "Damages trust, looks unprofessional if wrong, erodes credibility",
+      "examples": [
+        "AI Will Replace 80% of Jobs by 2025",
+        "Made-up statistics about small business",
+        "Sensationalized predictions without sources"
+      ],
+      "betterAlternative": "Real data from credible sources OR clearly labeled hypothetical scenarios"
+    },
+    {
+      "category": "Content About Competitors Failures",
+      "reason": "Looks petty and unprofessional, bad karma, reflects poorly on you",
+      "examples": [
+        "Why [Competitor] Is Failing",
+        "Don't Use [Other Tool] - Here's Why",
+        "Trash-talking other AI companies"
+      ],
+      "betterAlternative": "Focus on what YOU do well, honest comparisons without negativity"
+    },
+    {
+      "category": "Overly Long Text-Heavy Posts",
+      "reason": "People scroll past, hard to visualize, loses attention quickly",
+      "examples": [
+        "15-slide carousels with paragraphs per slide",
+        "Essay-length Instagram captions",
+        "Dense technical documentation dumps"
+      ],
+      "betterAlternative": "Short punchy visual content - if it needs 15 slides, it needs a blog post instead"
+    },
+    {
+      "category": "Get Rich Quick or Scammy Vibes",
+      "reason": "Destroys trust instantly, looks desperate, attracts wrong audience",
+      "examples": [
+        "Make $10K/Month with This One AI Trick",
+        "Secret Hack Banks Don't Want You to Know",
+        "Unrealistic income promises"
+      ],
+      "betterAlternative": "Real results with honest expectations, specific verifiable case studies"
+    }
+  ],
+  "lastUpdated": "2025-01-19",
+  "version": "2.0"
+}

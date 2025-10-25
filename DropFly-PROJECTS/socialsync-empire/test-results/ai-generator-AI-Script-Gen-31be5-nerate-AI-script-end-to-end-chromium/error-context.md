@@ -1,0 +1,43 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e3]:
+    - generic [ref=e4]:
+      - img [ref=e7]
+      - heading "Start Creating with AI" [level=1] [ref=e10]
+      - paragraph [ref=e11]: Join thousands of creators on SocialSync
+    - generic [ref=e12]:
+      - heading "Create Account" [level=2] [ref=e13]
+      - paragraph [ref=e15]: Email address "test-ai-1761361528701@socialsync.com" is invalid
+      - generic [ref=e16]:
+        - generic [ref=e17]:
+          - generic [ref=e18]: Full Name
+          - generic [ref=e19]:
+            - img [ref=e20]
+            - textbox "John Doe" [ref=e23]: AI Test User
+        - generic [ref=e24]:
+          - generic [ref=e25]: Email
+          - generic [ref=e26]:
+            - img [ref=e27]
+            - textbox "you@example.com" [ref=e30]: test-ai-1761361528701@socialsync.com
+        - generic [ref=e31]:
+          - generic [ref=e32]: Password
+          - generic [ref=e33]:
+            - img [ref=e34]
+            - textbox "••••••••" [ref=e37]: TestPassword123!
+          - paragraph [ref=e38]: Must be at least 6 characters
+        - button "Create Account" [ref=e39]
+      - generic [ref=e44]: Or continue with
+      - button "Google" [ref=e45]:
+        - img [ref=e46]
+        - text: Google
+      - paragraph [ref=e52]:
+        - text: Already have an account?
+        - link "Log in" [ref=e53] [cursor=pointer]:
+          - /url: /login
+    - paragraph [ref=e54]: By continuing, you agree to our Terms of Service and Privacy Policy
+  - button "Open Next.js Dev Tools" [ref=e60] [cursor=pointer]:
+    - img [ref=e61]
+  - alert [ref=e64]
+```

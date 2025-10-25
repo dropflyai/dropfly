@@ -1,0 +1,147 @@
+{
+  "visualIdentity": {
+    "brandColors": {
+      "primary": ["deep purple", "electric blue", "vibrant cyan"],
+      "accent": ["sunset orange", "bright yellow", "hot pink"],
+      "neutral": ["clean white", "modern gray", "deep black"],
+      "description": "Bold, modern, tech-forward palette with LA sunset vibes"
+    },
+    "styleKeywords": [
+      "modern",
+      "urban",
+      "tech-forward",
+      "professional but approachable",
+      "LA aesthetic",
+      "clean design",
+      "contemporary",
+      "innovative",
+      "community-focused",
+      "authentic"
+    ],
+    "avoidKeywords": [
+      "corporate",
+      "stuffy",
+      "generic stock photo",
+      "overly formal",
+      "cold and impersonal",
+      "Silicon Valley bro culture",
+      "fake diversity stock photos"
+    ]
+  },
+  "contentTypes": {
+    "educational": {
+      "visualStyle": "Clean infographic style with bold text, modern layouts, easy-to-digest visual hierarchy",
+      "mood": "Approachable and empowering",
+      "elements": ["clear typography", "step-by-step visuals", "icons", "diagrams", "before/after comparisons"],
+      "colorPalette": "primary + accent for emphasis",
+      "example": "Think: YouTube thumbnail meets modern startup - bold, clear, makes you want to learn"
+    },
+    "hypotheticalCaseStudy": {
+      "visualStyle": "Real business scenarios, relatable small business settings (LA storefronts, salons, apartments)",
+      "mood": "Realistic and inspiring",
+      "elements": ["local business imagery", "real people working", "technology in action", "results/numbers", "South LA vibes"],
+      "colorPalette": "warm tones + tech blues",
+      "example": "Show actual small businesses using AI - nail salon, corner store, apartment building with tech overlay"
+    },
+    "toolReview": {
+      "visualStyle": "Split screen comparisons, product interfaces, honest comparison charts",
+      "mood": "Straight talk and practical",
+      "elements": ["app screenshots", "side-by-side comparisons", "pros/cons lists", "rating visuals"],
+      "colorPalette": "neutral + accent for highlights",
+      "example": "Clear product comparison - no BS, just facts. Think Consumer Reports but make it Instagram"
+    },
+    "industryInsight": {
+      "visualStyle": "Bold statements, data visualization, trend graphics, futuristic but accessible",
+      "mood": "Confident and forward-thinking",
+      "elements": ["bold typography", "data charts", "trend arrows", "tech aesthetics", "urban backgrounds"],
+      "colorPalette": "primary + dramatic accent",
+      "example": "Tech trend content with attitude - think tech news but from the streets, not boardroom"
+    },
+    "quickWin": {
+      "visualStyle": "Punchy, attention-grabbing, single clear message, minimal design",
+      "mood": "Urgent and actionable",
+      "elements": ["large bold text", "single focal point", "clear CTA visual", "minimal distractions"],
+      "colorPalette": "high contrast - accent colors on dark or light",
+      "example": "Stop-scrolling energy - one message, impossible to miss, makes you act NOW"
+    }
+  },
+  "brandScenes": {
+    "businessSettings": [
+      "Modern nail salon in Inglewood with tech touches",
+      "LA corner store with digital screens",
+      "South LA apartment building exterior",
+      "Small restaurant with AI kiosk",
+      "View Park home office setup",
+      "Local barbershop with tablet check-in",
+      "Crenshaw district storefront",
+      "Community center with tech lab"
+    ],
+    "people": [
+      "Real small business owners (diverse, authentic)",
+      "Entrepreneurs working (not stock photo fake)",
+      "Community members using tech",
+      "Local professionals in their element",
+      "Students learning AI concepts",
+      "Property managers at work"
+    ],
+    "techElements": [
+      "Phones with AI interfaces",
+      "Voice agent dashboard screens",
+      "Modern tablets and devices",
+      "Clean UI mockups",
+      "Holographic tech overlays",
+      "Data visualization floating in space",
+      "Digital elements integrated naturally"
+    ]
+  },
+  "compositionRules": {
+    "carousel": {
+      "layout": "Bold title at top, clear visual in center, readable from thumbnail",
+      "textSpace": "Leave 30% of image for text overlay",
+      "focal": "Center or rule-of-thirds composition",
+      "aspect": "Square (1:1) or 4:5 portrait"
+    },
+    "reel": {
+      "layout": "Vertical 9:16, safe zones for UI elements",
+      "motion": "Smooth, professional movement - no dizzying effects",
+      "pacing": "Clear story in first 3 seconds",
+      "text": "Minimal text, let visuals tell story"
+    }
+  },
+  "qualityStandards": {
+    "resolution": "4K minimum, Instagram-optimized",
+    "lighting": "Professional but not studio-fake, natural LA light when possible",
+    "authenticity": "Real scenarios over stock photos, actual tech over fake interfaces",
+    "diversity": "Authentic LA diversity - Black, Latino, Asian, mixed communities",
+    "accessibility": "High contrast text, readable fonts, clear messaging"
+  },
+  "promptEnhancements": {
+    "alwaysInclude": [
+      "Professional quality",
+      "Instagram-worthy composition",
+      "Modern and clean design",
+      "LA urban aesthetic",
+      "Authentic and relatable"
+    ],
+    "neverInclude": [
+      "Generic stock photo",
+      "Corporate boardroom",
+      "Fake staged scenarios",
+      "Overly polished/unrealistic",
+      "Stereotypical imagery"
+    ]
+  },
+  "examplePrompts": {
+    "educational": "Create a bold, modern infographic about [TOPIC] with clean typography and LA urban aesthetic. Style: YouTube thumbnail meets startup culture - professional but approachable. Use deep purple and electric blue color scheme with bright yellow accents. Include step-by-step visual elements, icons, and clear hierarchy. Leave space for text overlay. Make it look like it's from a South LA tech educator who keeps it real. 4K, Instagram-optimized, highly shareable.",
+
+    "caseStudy": "Create a realistic scene showing [SCENARIO] in an Inglewood/South LA setting. Show actual small business environment (nail salon/restaurant/apartment building) with modern AI technology integrated naturally. Include real working professionals using tech, not stock photo fake. Warm, natural LA lighting. Tech overlay showing results/data. Urban LA aesthetic, authentic diversity. Professional but relatable. 4K quality.",
+
+    "toolReview": "Create a clean comparison visual for [TOOL1] vs [TOOL2]. Split screen design with app interfaces, side-by-side features, honest pros/cons. Modern tech aesthetic with neutral grays and bright accent colors for highlights. Clear typography, easy to read at glance. No BS corporate marketing - show real functionality. Instagram square format, bold and clear.",
+
+    "insight": "Create a bold statement visual about [TREND]. Large impactful typography with data visualization elements. Futuristic but accessible tech aesthetic. LA urban background or abstract tech environment. Deep purple/electric blue gradient with bright accents. Forward-thinking mood - street smart meets tech expert. Confident, attention-grabbing, makes you stop and read.",
+
+    "quickWin": "Create high-impact minimalist design with message '[MESSAGE]'. Single focal point, bold typography, impossible to miss. High contrast - bright accent color on dark background or vice versa. Urgent, actionable energy. Zero clutter. Street sign meets tech ad. Stop-scrolling power. Perfect for Instagram stories."
+  },
+  "lastUpdated": "2025-01-19",
+  "version": "1.0"
+}
