@@ -24,6 +24,20 @@ import Button from '@/components/ui/Button';
 export default function FeaturesPage() {
   const mainFeatures = [
     {
+      icon: Wand2,
+      title: 'AI Image Generation',
+      description: 'Create professional images and product scenes with AI',
+      details: [
+        'Text-to-image using Flux Pro, SDXL, and Qwen-VL',
+        'Product photography with virtual placement',
+        'Multiple aspect ratios (1:1, 16:9, 9:16, 4:5)',
+        'Photorealistic commercial quality',
+        'Lifestyle scene generation',
+        'E-commerce ready images'
+      ],
+      color: 'from-purple-500 to-pink-500'
+    },
+    {
       icon: Video,
       title: 'AI Video Generation',
       description: 'Transform your ideas into stunning videos in seconds',
@@ -35,7 +49,7 @@ export default function FeaturesPage() {
         'Brand watermark support',
         'HD quality exports'
       ],
-      color: 'from-purple-500 to-pink-500'
+      color: 'from-blue-500 to-cyan-500'
     },
     {
       icon: Wand2,
