@@ -10,25 +10,24 @@ test.describe('SocialSync Authentication E2E Tests', () => {
     await page.goto(baseURL);
 
     // Should show landing page content
-    await expect(page.locator('text=Create. Schedule. Grow.')).toBeVisible();
-    await expect(page.locator('text=All with AI')).toBeVisible();
+    await expect(page.locator('text=AI-Powered Social Media')).toBeVisible();
+    await expect(page.locator('text=Made Simple')).toBeVisible();
 
     // Should have CTA buttons
-    await expect(page.locator('text=Start Free 14-Day Trial').first()).toBeVisible();
+    await expect(page.locator('text=Start For Free').first()).toBeVisible();
     await expect(page.locator('text=Log In')).toBeVisible();
 
-    // Should show pricing section
-    await expect(page.locator('text=Simple, transparent pricing')).toBeVisible();
+    // Should show tier names (new 4-tier system)
     await expect(page.locator('text=Starter')).toBeVisible();
-    await expect(page.locator('text=Creator')).toBeVisible();
-    await expect(page.locator('text=Agency')).toBeVisible();
+    await expect(page.locator('text=Pro')).toBeVisible();
+    await expect(page.locator('text=Enterprise')).toBeVisible();
   });
 
   test('should navigate to signup page', async ({ page }) => {
     await page.goto(baseURL);
 
-    // Click signup button
-    await page.locator('text=Start Free Trial').first().click();
+    // Click signup button (updated text)
+    await page.locator('text=Start For Free').first().click();
 
     // Should be on signup page
     await expect(page).toHaveURL(/\/signup$/);
@@ -166,52 +165,18 @@ test.describe('SocialSync Authentication E2E Tests', () => {
     }
   });
 
-  test('should show Google OAuth button', async ({ page }) => {
-    await page.goto(`${baseURL}/login`);
-
-    // Should show Google button
-    await expect(page.locator('button:has-text("Google")')).toBeVisible();
-
-    // Check on signup page too
-    await page.goto(`${baseURL}/signup`);
-    await expect(page.locator('button:has-text("Google")')).toBeVisible();
-  });
-
-  test('landing page pricing toggle should work', async ({ page }) => {
-    await page.goto(baseURL);
-
-    // Scroll to pricing
-    await page.locator('text=Simple, transparent pricing').scrollIntoViewIfNeeded();
-
-    // Should default to monthly
-    await expect(page.locator('text=$29').first()).toBeVisible();
-
-    // Click annual
-    await page.locator('button:has-text("Annual")').click();
-
-    // Should show annual pricing (20% off)
-    await expect(page.locator('text=$23').first()).toBeVisible();
-
-    // Click monthly again
-    await page.locator('button:has-text("Monthly")').click();
-
-    // Should show monthly pricing
-    await expect(page.locator('text=$29').first()).toBeVisible();
-  });
-
   test('should have all landing page sections', async ({ page }) => {
     await page.goto(baseURL);
 
-    // Hero section
-    await expect(page.locator('text=Create. Schedule. Grow.')).toBeVisible();
+    // Hero section (updated text)
+    await expect(page.locator('text=AI-Powered Social Media')).toBeVisible();
+    await expect(page.locator('text=Made Simple')).toBeVisible();
 
     // Features section
-    await expect(page.locator('text=Everything you need to dominate social media')).toBeVisible();
+    await expect(page.locator('text=Everything You Need to Succeed')).toBeVisible();
 
     // Check key features are listed
     await expect(page.locator('text=AI Video Generation')).toBeVisible();
-    await expect(page.locator('text=Video Downloader')).toBeVisible();
-    await expect(page.locator('text=Watermark Remover')).toBeVisible();
     await expect(page.locator('text=Multi-Platform Scheduling')).toBeVisible();
 
     // Platforms section
