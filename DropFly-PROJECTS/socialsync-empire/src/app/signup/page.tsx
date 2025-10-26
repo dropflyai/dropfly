@@ -23,27 +23,44 @@ export default function SignUpPage() {
     setLoading(true);
     setError('');
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          full_name: name,
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: name,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
         },
-      },
-    });
+      });
 
-    if (error) {
-      setError(error.message);
-      setLoading(false);
-    } else {
+      if (error) {
+        setError(error.message);
+        setLoading(false);
+        return;
+      }
+
+      // Check if email confirmation is required
+      if (data?.user && !data?.session) {
+        // Email confirmation required
+        setError('Please check your email to confirm your account');
+        setLoading(false);
+        return;
+      }
+
+      // Success - user created and logged in
       setSuccess(true);
       setLoading(false);
-      // Auto login and redirect
+
+      // Redirect to home
       setTimeout(() => {
         router.push('/home');
         router.refresh();
       }, 1500);
+    } catch (err) {
+      setError('An error occurred. Please try again.');
+      setLoading(false);
     }
   };
 
