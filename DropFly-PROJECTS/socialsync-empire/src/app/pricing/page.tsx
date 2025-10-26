@@ -13,8 +13,8 @@ export default function PricingPage() {
   const plans = [
     { key: 'free', ...STRIPE_PLANS.free },
     { key: 'starter', ...STRIPE_PLANS.starter },
-    { key: 'creator', ...STRIPE_PLANS.creator },
-    { key: 'agency', ...STRIPE_PLANS.agency },
+    { key: 'pro', ...STRIPE_PLANS.pro },
+    { key: 'enterprise', ...STRIPE_PLANS.enterprise },
   ];
 
   return (
@@ -100,8 +100,8 @@ export default function PricingPage() {
                 <p className="text-[var(--text-secondary)] mb-6">
                   {plan.key === 'free' && 'Get started, no credit card'}
                   {plan.key === 'starter' && 'Perfect for beginners'}
-                  {plan.key === 'creator' && 'For serious creators'}
-                  {plan.key === 'agency' && 'For teams & agencies'}
+                  {plan.key === 'pro' && 'For serious creators'}
+                  {plan.key === 'enterprise' && 'For teams & agencies'}
                 </p>
 
                 <div className="mb-6">

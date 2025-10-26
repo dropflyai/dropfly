@@ -1,88 +1,89 @@
 export const STRIPE_PLANS = {
-  starter: {
-    name: 'Starter',
-    priceId: process.env.STRIPE_PRICE_STARTER || 'price_starter',
-    monthly: 29,
-    annual: 276, // 20% off = $23/month
-    features: [
-      '50 video downloads/month',
-      '20 AI videos/month',
-      '5 social accounts',
-      'Up to 1080p quality',
-      'Basic analytics',
-      'Email support',
-    ],
-    limits: {
-      aiGenerations: 20,
-      videoDownloads: 50,
-      socialAccounts: 5,
-      maxResolution: '1080p',
-    },
-  },
-  creator: {
-    name: 'Creator',
-    priceId: process.env.STRIPE_PRICE_CREATOR || 'price_creator',
-    monthly: 79,
-    annual: 756, // 20% off = $63/month
-    features: [
-      '200 video downloads/month',
-      '100 AI videos/month',
-      '15 social accounts',
-      'Up to 4K quality',
-      'Advanced analytics',
-      'Priority support',
-      'Custom watermarks',
-      'Trending topics AI',
-    ],
-    limits: {
-      aiGenerations: 100,
-      videoDownloads: 200,
-      socialAccounts: 15,
-      maxResolution: '4K',
-    },
-    popular: true,
-  },
-  agency: {
-    name: 'Agency',
-    priceId: process.env.STRIPE_PRICE_AGENCY || 'price_agency',
-    monthly: 199,
-    annual: 1908, // 20% off = $159/month
-    features: [
-      'Unlimited downloads',
-      'Unlimited AI videos',
-      '50 social accounts',
-      'Up to 8K quality',
-      'White-label reports',
-      '24/7 priority support',
-      'Team collaboration',
-      'API access',
-      'Custom integrations',
-    ],
-    limits: {
-      aiGenerations: -1, // unlimited
-      videoDownloads: -1, // unlimited
-      socialAccounts: 50,
-      maxResolution: '8K',
-    },
-  },
   free: {
     name: 'Free',
     priceId: 'free', // No Stripe price needed for free tier
     monthly: 0,
     annual: 0,
     features: [
-      '5 AI video generations/month',
-      '10 video downloads/month',
+      '300 tokens/month (~3-6 videos)',
       '1 social account',
-      'Up to 720p quality',
-      'Basic scheduling',
+      '5 budget AI engines',
+      'Up to 10s videos',
+      '1080p quality',
       'Community support',
     ],
     limits: {
-      aiGenerations: 5,
-      videoDownloads: 10,
+      monthlyTokens: 300,
       socialAccounts: 1,
-      maxResolution: '720p',
+      maxResolution: '1080p',
+    },
+  },
+  starter: {
+    name: 'Starter',
+    priceId: process.env.STRIPE_PRICE_STARTER || 'price_starter',
+    monthly: 29,
+    annual: 276, // 20% off = $23/month
+    features: [
+      '2,000 tokens/month (~20-40 videos)',
+      '2 social accounts',
+      '12 professional engines',
+      'Up to 30s videos',
+      'No watermark',
+      'Multi-platform posting',
+      'Priority email support',
+    ],
+    limits: {
+      monthlyTokens: 2000,
+      socialAccounts: 2,
+      maxResolution: '1080p',
+    },
+  },
+  pro: {
+    name: 'Pro',
+    priceId: process.env.STRIPE_PRICE_PRO || 'price_pro',
+    monthly: 99,
+    annual: 950, // 20% off = $79/month
+    features: [
+      '6,000 tokens/month (~60-120 videos)',
+      '5 social accounts',
+      'ALL 25 video engines',
+      'OpenAI Sora 2 & Sora 2 Pro',
+      'Google Veo 3.1 access',
+      'Up to 148s videos',
+      '1080p HDR output',
+      'API access (basic)',
+      'Advanced analytics',
+      'Commercial license',
+    ],
+    limits: {
+      monthlyTokens: 6000,
+      socialAccounts: 5,
+      maxResolution: '1080p-hdr',
+    },
+    popular: true,
+  },
+  enterprise: {
+    name: 'Enterprise',
+    priceId: process.env.STRIPE_PRICE_ENTERPRISE || 'price_enterprise',
+    monthly: 299,
+    annual: 2868, // 20% off = $239/month
+    features: [
+      '20,000 tokens/month (custom available)',
+      'Unlimited social accounts',
+      'Unlimited team members',
+      'ALL 25 engines (token-based)',
+      'White-label branding',
+      'Dedicated account manager',
+      'Custom integrations',
+      'API access (advanced + priority)',
+      'SLA guarantees (99.9%)',
+      'SSO & enterprise security',
+    ],
+    limits: {
+      monthlyTokens: 20000, // High but not unlimited - premium engines are expensive
+      socialAccounts: -1, // unlimited
+      teamMembers: -1, // unlimited
+      maxResolution: '1080p-hdr',
     },
   },
 };
