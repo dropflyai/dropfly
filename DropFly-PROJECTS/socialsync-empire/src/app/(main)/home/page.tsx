@@ -73,9 +73,81 @@ export default async function HomePage() {
           Welcome back, {firstName}! 👋
         </h1>
         <p className="text-[var(--text-secondary)]">
-          Here's what's happening with your content today
+          {videoCreditsUsed === 0
+            ? 'Get started by creating your first AI-powered video below'
+            : 'Here's what's happening with your content today'}
         </p>
       </div>
+
+      {/* Welcome Guide for New Users */}
+      {videoCreditsUsed === 0 && (
+        <Card
+          variant="glass"
+          padding="lg"
+          className="bg-gradient-to-br from-[var(--primary-500)]/5 to-[var(--secondary-500)]/5 border-2 border-[var(--primary-500)]/10"
+        >
+          <div className="flex items-start gap-4">
+            <div className="p-3 bg-gradient-to-br from-[var(--primary-500)] to-[var(--secondary-500)] rounded-xl">
+              <Sparkles className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
+                🎉 Welcome to SocialSync Empire!
+              </h3>
+              <p className="text-[var(--text-secondary)] mb-4">
+                You're all set! Here's how to get started:
+              </p>
+              <div className="space-y-3 mb-4">
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--primary-500)] text-white flex items-center justify-center text-sm font-semibold">
+                    1
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
+                      Create your first AI video
+                    </p>
+                    <p className="text-xs text-[var(--text-tertiary)]">
+                      Click "Generate Video" below to create AI-powered content in seconds
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--primary-500)] text-white flex items-center justify-center text-sm font-semibold">
+                    2
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
+                      Connect your social accounts
+                    </p>
+                    <p className="text-xs text-[var(--text-tertiary)]">
+                      Link your platforms to schedule posts and track analytics
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--primary-500)] text-white flex items-center justify-center text-sm font-semibold">
+                    3
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-[var(--text-primary)]">
+                      Upgrade for more power
+                    </p>
+                    <p className="text-xs text-[var(--text-tertiary)]">
+                      Get access to premium AI engines and unlimited videos
+                    </p>
+                  </div>
+                </div>
+              </div>
+              <Link href="/create">
+                <Button variant="primary" size="lg">
+                  <Sparkles className="w-4 h-4 mr-2" />
+                  Create Your First Video
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </Card>
+      )}
 
       {/* Token Balance & Daily Limits - Featured */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -341,8 +413,10 @@ export default async function HomePage() {
               <Eye className="w-5 h-5 text-[var(--secondary-500)]" />
               <span className="text-sm text-[var(--text-tertiary)]">Total Views</span>
             </div>
-            <p className="text-3xl font-bold text-[var(--text-primary)]">45.2K</p>
-            <p className="text-xs text-[var(--success)] mt-1">+12% this month</p>
+            <p className="text-3xl font-bold text-[var(--text-primary)]">0</p>
+            <p className="text-xs text-[var(--text-tertiary)] mt-1">
+              {videoCreditsUsed === 0 ? 'Create your first video' : 'Connect accounts to track'}
+            </p>
           </Card>
 
           <Card padding="lg">
@@ -350,8 +424,10 @@ export default async function HomePage() {
               <Heart className="w-5 h-5 text-[var(--accent-500)]" />
               <span className="text-sm text-[var(--text-tertiary)]">Engagement</span>
             </div>
-            <p className="text-3xl font-bold text-[var(--text-primary)]">1.8K</p>
-            <p className="text-xs text-[var(--success)] mt-1">+8% this month</p>
+            <p className="text-3xl font-bold text-[var(--text-primary)]">0</p>
+            <p className="text-xs text-[var(--text-tertiary)] mt-1">
+              {videoCreditsUsed === 0 ? 'Create your first video' : 'Connect accounts to track'}
+            </p>
           </Card>
 
           <Card padding="lg">
@@ -359,8 +435,10 @@ export default async function HomePage() {
               <TrendingUp className="w-5 h-5 text-[var(--success)]" />
               <span className="text-sm text-[var(--text-tertiary)]">Reach</span>
             </div>
-            <p className="text-3xl font-bold text-[var(--text-primary)]">62.1K</p>
-            <p className="text-xs text-[var(--success)] mt-1">+15% this month</p>
+            <p className="text-3xl font-bold text-[var(--text-primary)]">0</p>
+            <p className="text-xs text-[var(--text-tertiary)] mt-1">
+              {videoCreditsUsed === 0 ? 'Create your first video' : 'Connect accounts to track'}
+            </p>
           </Card>
         </div>
       </section>

@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test';
 
 test.describe('AI Script Generator E2E Test', () => {
   const baseURL = 'http://localhost:3001';
-  const testEmail = `test-ai-${Date.now()}@socialsync.com`;
+  // Using real email domain (@gmail.com) so Supabase accepts it
+  const testEmail = `socialsync.test+ai${Date.now()}@gmail.com`;
   const testPassword = 'TestPassword123!';
 
   test('should generate AI script end-to-end', async ({ page }) => {

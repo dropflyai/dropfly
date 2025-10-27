@@ -43,13 +43,13 @@ export default function SignUpPage() {
 
       // Check if email confirmation is required
       if (data?.user && !data?.session) {
-        // Email confirmation required
-        setError('Please check your email to confirm your account');
+        // Show success message asking user to check email
+        setSuccess(true);
         setLoading(false);
         return;
       }
 
-      // Success - user created and logged in
+      // If we get here, email confirmation is disabled and user is logged in
       setSuccess(true);
       setLoading(false);
 
@@ -72,15 +72,23 @@ export default function SignUpPage() {
         <Card padding="xl" className="max-w-md text-center">
           <div className="mb-4">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-green-500/20 rounded-full mb-4">
-              <Sparkles className="w-8 h-8 text-green-500" />
+              <Mail className="w-8 h-8 text-green-500" />
             </div>
           </div>
           <h2 className="text-2xl font-bold text-[var(--text-primary)] mb-2">
-            Welcome to SocialSync!
+            Check Your Email!
           </h2>
-          <p className="text-[var(--text-secondary)]">
-            Your account has been created. Redirecting to your dashboard...
+          <p className="text-[var(--text-secondary)] mb-4">
+            We've sent a confirmation link to <strong>{email}</strong>
           </p>
+          <p className="text-sm text-[var(--text-tertiary)]">
+            Click the link in the email to verify your account and start creating amazing content!
+          </p>
+          <div className="mt-6">
+            <Link href="/login" className="text-[var(--primary-500)] hover:underline text-sm">
+              Already confirmed? Log in here →
+            </Link>
+          </div>
         </Card>
       </div>
     );

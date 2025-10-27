@@ -2,7 +2,9 @@ import { test, expect } from '@playwright/test';
 
 test.describe('SocialSync Authentication E2E Tests', () => {
   const baseURL = 'http://localhost:3001';
-  const testEmail = `test-${Date.now()}@socialsync.com`;
+  // Using real email domain (@gmail.com) so Supabase accepts it
+  // Gmail's + addressing: test+something@gmail.com all go to test@gmail.com
+  const testEmail = `socialsync.test+auth${Date.now()}@gmail.com`;
   const testPassword = 'TestPassword123!';
   const testName = 'Test User';
 
@@ -85,7 +87,7 @@ test.describe('SocialSync Authentication E2E Tests', () => {
   test('should login with existing account', async ({ page }) => {
     // First create account
     await page.goto(`${baseURL}/signup`);
-    const email = `test-login-${Date.now()}@socialsync.com`;
+    const email = `socialsync.test+login${Date.now()}@gmail.com`;
 
     await page.locator('input[type="text"]').fill(testName);
     await page.locator('input[type="email"]').fill(email);
@@ -141,7 +143,7 @@ test.describe('SocialSync Authentication E2E Tests', () => {
   test('should access protected routes when authenticated', async ({ page }) => {
     // Create account
     await page.goto(`${baseURL}/signup`);
-    const email = `test-protected-${Date.now()}@socialsync.com`;
+    const email = `socialsync.test+protected${Date.now()}@gmail.com`;
 
     await page.locator('input[type="text"]').fill(testName);
     await page.locator('input[type="email"]').fill(email);
