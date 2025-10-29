@@ -1,10 +1,10 @@
-import { Sparkles, Video, Calendar, TrendingUp, Eye, Heart, Download, Zap, Award, Film, Coins, Wand2, Package } from 'lucide-react';
+import { Sparkles, Video, Calendar, TrendingUp, Eye, Heart, Download, Coins, Wand2, Package } from 'lucide-react';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 import Link from 'next/link';
-import { SUBSCRIPTION_TIERS, getEnginesForTier } from '@/lib/video-engines/config';
+import { getEnginesForTier } from '@/lib/video-engines/config';
 import { tokenService } from '@/lib/tokens/token-service';
 import { BuyTokensButton } from '@/components/billing/BuyTokensButton';
 
@@ -26,22 +26,19 @@ export default async function HomePage() {
     .single();
 
   const userTier = profile?.subscription_tier || 'free';
-  const subscriptionInfo = SUBSCRIPTION_TIERS.find((t) => t.id === userTier);
 
-  // Get video generation usage
-  const currentMonth = new Date().toISOString().slice(0, 7);
-  const { data: videoUsage } = await supabase
-    .from('usage_tracking')
-    .select('*')
-    .eq('user_id', user.id)
-    .eq('resource_type', 'video_generation')
-    .eq('period', currentMonth)
-    .single();
+  // Check if user is first-time (no posts created yet)
+  const { data: userPosts, count: postCount } = await supabase
+    .from('posts')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id);
 
-  const videoCreditsUsed = videoUsage?.usage_count || 0;
-  const videoCreditsTotal = subscriptionInfo?.videoCredits || 3;
-  const videoCreditsRemaining = videoCreditsTotal - videoCreditsUsed;
-  const videoUsagePercentage = (videoCreditsUsed / videoCreditsTotal) * 100;
+  const { data: userContent, count: contentCount } = await supabase
+    .from('content')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', user.id);
+
+  const isFirstTime = (postCount === 0 && contentCount === 0);
 
   // Get available engines
   const availableEngines = getEnginesForTier(userTier);
@@ -70,80 +67,87 @@ export default async function HomePage() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-[var(--text-primary)] mb-2">
-          Welcome back, {firstName}! 👋
+          {isFirstTime ? `Welcome, ${firstName}!` : `Welcome back, ${firstName}!`} 👋
         </h1>
         <p className="text-[var(--text-secondary)]">
-          {videoCreditsUsed === 0
-            ? 'Get started by creating your first AI-powered video below'
+          {isFirstTime
+            ? 'Let\'s get you set up and ready to create viral content'
             : 'Here\'s what\'s happening with your content today'}
         </p>
       </div>
 
-      {/* Welcome Guide for New Users */}
-      {videoCreditsUsed === 0 && (
+      {/* First-Time Onboarding - Connect Social Accounts */}
+      {isFirstTime && (
         <Card
           variant="glass"
           padding="lg"
-          className="bg-gradient-to-br from-[var(--primary-500)]/5 to-[var(--secondary-500)]/5 border-2 border-[var(--primary-500)]/10"
+          className="bg-gradient-to-br from-[var(--primary-500)]/10 to-[var(--accent-500)]/10 border-2 border-[var(--primary-500)]/30"
         >
           <div className="flex items-start gap-4">
-            <div className="p-3 bg-gradient-to-br from-[var(--primary-500)] to-[var(--secondary-500)] rounded-xl">
-              <Sparkles className="w-6 h-6 text-white" />
+            <div className="p-4 bg-gradient-to-br from-[var(--primary-500)] to-[var(--accent-500)] rounded-xl flex-shrink-0">
+              <Calendar className="w-8 h-8 text-white" />
             </div>
             <div className="flex-1">
-              <h3 className="text-xl font-semibold text-[var(--text-primary)] mb-2">
-                🎉 Welcome to SocialSync Empire!
-              </h3>
-              <p className="text-[var(--text-secondary)] mb-4">
-                You're all set! Here's how to get started:
+              <div className="flex items-center gap-2 mb-2">
+                <h3 className="text-2xl font-bold text-[var(--text-primary)]">
+                  🎉 Welcome to SocialSync Empire!
+                </h3>
+                <span className="px-2 py-1 text-xs font-bold bg-[var(--accent-500)] text-white rounded-full animate-pulse">
+                  STEP 1
+                </span>
+              </div>
+              <p className="text-[var(--text-secondary)] mb-6 text-lg">
+                First, let's connect your social media accounts so you can post and track your content
               </p>
-              <div className="space-y-3 mb-4">
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--primary-500)] text-white flex items-center justify-center text-sm font-semibold">
-                    1
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
+                <div className="p-3 bg-[var(--bg-secondary)] rounded-lg border border-[var(--bg-elevated)]">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">✅</span>
+                    <span className="text-sm font-semibold text-[var(--text-primary)]">Post to multiple platforms</span>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-[var(--text-primary)]">
-                      Create your first AI video
-                    </p>
-                    <p className="text-xs text-[var(--text-tertiary)]">
-                      Click "Generate Video" below to create AI-powered content in seconds
-                    </p>
-                  </div>
+                  <p className="text-xs text-[var(--text-tertiary)] ml-6">TikTok, Instagram, YouTube & more</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--primary-500)] text-white flex items-center justify-center text-sm font-semibold">
-                    2
+                <div className="p-3 bg-[var(--bg-secondary)] rounded-lg border border-[var(--bg-elevated)]">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">📊</span>
+                    <span className="text-sm font-semibold text-[var(--text-primary)]">Track analytics</span>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-[var(--text-primary)]">
-                      Connect your social accounts
-                    </p>
-                    <p className="text-xs text-[var(--text-tertiary)]">
-                      Link your platforms to schedule posts and track analytics
-                    </p>
-                  </div>
+                  <p className="text-xs text-[var(--text-tertiary)] ml-6">Views, engagement, and growth</p>
                 </div>
-                <div className="flex items-start gap-3">
-                  <div className="flex-shrink-0 w-6 h-6 rounded-full bg-[var(--primary-500)] text-white flex items-center justify-center text-sm font-semibold">
-                    3
+                <div className="p-3 bg-[var(--bg-secondary)] rounded-lg border border-[var(--bg-elevated)]">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">⏰</span>
+                    <span className="text-sm font-semibold text-[var(--text-primary)]">Schedule posts</span>
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-[var(--text-primary)]">
-                      Upgrade for more power
-                    </p>
-                    <p className="text-xs text-[var(--text-tertiary)]">
-                      Get access to premium AI engines and unlimited videos
-                    </p>
+                  <p className="text-xs text-[var(--text-tertiary)] ml-6">Automate your content calendar</p>
+                </div>
+                <div className="p-3 bg-[var(--bg-secondary)] rounded-lg border border-[var(--bg-elevated)]">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-lg">🚀</span>
+                    <span className="text-sm font-semibold text-[var(--text-primary)]">Cross-post instantly</span>
                   </div>
+                  <p className="text-xs text-[var(--text-tertiary)] ml-6">One click to reach everywhere</p>
                 </div>
               </div>
-              <Link href="/create">
-                <Button variant="primary" size="lg">
-                  <Sparkles className="w-4 h-4 mr-2" />
-                  Create Your First Video
-                </Button>
-              </Link>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <Link href="/post" className="flex-1">
+                  <Button variant="primary" size="lg" className="w-full">
+                    <Calendar className="w-5 h-5 mr-2" />
+                    Connect Social Accounts
+                  </Button>
+                </Link>
+                <Link href="/create">
+                  <Button variant="ghost" size="lg">
+                    Skip for now
+                  </Button>
+                </Link>
+              </div>
+
+              <p className="text-xs text-[var(--text-tertiary)] mt-3 text-center">
+                💡 You can connect accounts later in Settings, but we highly recommend doing it now
+              </p>
             </div>
           </div>
         </Card>
@@ -225,98 +229,6 @@ export default async function HomePage() {
         </Card>
       </div>
 
-      {/* Video Credits Card - Featured */}
-      <Card
-        variant="glass"
-        padding="lg"
-        className="bg-gradient-to-br from-[var(--primary-500)]/10 to-[var(--secondary-500)]/10 border-2 border-[var(--primary-500)]/20"
-      >
-        <div className="flex items-start justify-between mb-4">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
-              <Film className="w-6 h-6 text-[var(--primary-500)]" />
-              <h3 className="text-lg font-semibold text-[var(--text-primary)]">
-                AI Video Credits
-              </h3>
-              <span className="px-2 py-0.5 text-xs font-medium bg-[var(--primary-500)] text-white rounded-full">
-                {userTier.toUpperCase()}
-              </span>
-            </div>
-            <p className="text-sm text-[var(--text-tertiary)]">
-              {videoCreditsRemaining} of {videoCreditsTotal} videos remaining this month
-            </p>
-          </div>
-          <Link href="/create">
-            <Button variant="primary" size="sm">
-              <Sparkles className="w-4 h-4 mr-1" />
-              Generate Video
-            </Button>
-          </Link>
-        </div>
-
-        {/* Progress Bar */}
-        <div className="mb-4">
-          <div className="w-full h-3 bg-[var(--bg-tertiary)] rounded-full overflow-hidden">
-            <div
-              className={`h-full transition-all duration-500 ${
-                videoUsagePercentage >= 100
-                  ? 'bg-red-500'
-                  : videoUsagePercentage >= 80
-                  ? 'bg-[var(--warning)]'
-                  : 'bg-gradient-to-r from-[var(--primary-500)] to-[var(--secondary-500)]'
-              }`}
-              style={{ width: `${Math.min(videoUsagePercentage, 100)}%` }}
-            />
-          </div>
-        </div>
-
-        {/* Available Engines */}
-        <div>
-          <p className="text-xs text-[var(--text-tertiary)] mb-2">
-            {availableEngines.length} AI Engine{availableEngines.length !== 1 ? 's' : ''} Available:
-          </p>
-          <div className="flex flex-wrap gap-2">
-            {availableEngines.slice(0, 5).map((engine) => (
-              <div
-                key={engine.id}
-                className="px-3 py-1.5 bg-[var(--bg-secondary)] border border-[var(--bg-elevated)] rounded-lg flex items-center gap-2"
-              >
-                {engine.badge === '#1 Ranked' && <Award className="w-3 h-3 text-[var(--primary-500)]" />}
-                {engine.badge === '3x Faster' && <Zap className="w-3 h-3 text-[var(--primary-500)]" />}
-                <span className="text-xs font-medium text-[var(--text-primary)]">
-                  {engine.displayName}
-                </span>
-                {engine.badge && (
-                  <span className="text-xs text-[var(--text-tertiary)]">• {engine.badge}</span>
-                )}
-              </div>
-            ))}
-            {availableEngines.length > 5 && (
-              <div className="px-3 py-1.5 text-xs text-[var(--text-tertiary)]">
-                +{availableEngines.length - 5} more
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Upgrade CTA if needed */}
-        {videoCreditsRemaining === 0 && (
-          <div className="mt-4 p-3 bg-[var(--warning)]/10 border border-[var(--warning)]/20 rounded-lg">
-            <p className="text-sm text-[var(--warning)] font-medium">
-              🚀 You've used all your video credits this month!
-            </p>
-            <p className="text-xs text-[var(--text-tertiary)] mt-1">
-              Upgrade to generate more AI videos with premium engines
-            </p>
-            <Link href="/pricing">
-              <Button variant="primary" size="sm" className="mt-2">
-                View Plans
-              </Button>
-            </Link>
-          </div>
-        )}
-      </Card>
-
       {/* Quick Actions */}
       <section>
         <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">Quick Actions</h2>
@@ -393,55 +305,57 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Stats Overview */}
-      <section>
-        <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">This Month</h2>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <Card padding="lg">
-            <div className="flex items-center gap-3 mb-2">
-              <Video className="w-5 h-5 text-[var(--primary-500)]" />
-              <span className="text-sm text-[var(--text-tertiary)]">Videos Created</span>
-            </div>
-            <p className="text-3xl font-bold text-[var(--text-primary)]">{videoCreditsUsed}</p>
-            <p className="text-xs text-[var(--text-tertiary)] mt-1">
-              {videoCreditsRemaining} credits left
-            </p>
-          </Card>
+      {/* Stats Overview - Only show if user has content */}
+      {!isFirstTime && (
+        <section>
+          <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">This Month</h2>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <Card padding="lg">
+              <div className="flex items-center gap-3 mb-2">
+                <Video className="w-5 h-5 text-[var(--primary-500)]" />
+                <span className="text-sm text-[var(--text-tertiary)]">Videos Created</span>
+              </div>
+              <p className="text-3xl font-bold text-[var(--text-primary)]">{contentCount || 0}</p>
+              <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                Total content pieces
+              </p>
+            </Card>
 
-          <Card padding="lg">
-            <div className="flex items-center gap-3 mb-2">
-              <Eye className="w-5 h-5 text-[var(--secondary-500)]" />
-              <span className="text-sm text-[var(--text-tertiary)]">Total Views</span>
-            </div>
-            <p className="text-3xl font-bold text-[var(--text-primary)]">0</p>
-            <p className="text-xs text-[var(--text-tertiary)] mt-1">
-              {videoCreditsUsed === 0 ? 'Create your first video' : 'Connect accounts to track'}
-            </p>
-          </Card>
+            <Card padding="lg">
+              <div className="flex items-center gap-3 mb-2">
+                <Eye className="w-5 h-5 text-[var(--secondary-500)]" />
+                <span className="text-sm text-[var(--text-tertiary)]">Total Views</span>
+              </div>
+              <p className="text-3xl font-bold text-[var(--text-primary)]">-</p>
+              <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                Connect accounts to track
+              </p>
+            </Card>
 
-          <Card padding="lg">
-            <div className="flex items-center gap-3 mb-2">
-              <Heart className="w-5 h-5 text-[var(--accent-500)]" />
-              <span className="text-sm text-[var(--text-tertiary)]">Engagement</span>
-            </div>
-            <p className="text-3xl font-bold text-[var(--text-primary)]">0</p>
-            <p className="text-xs text-[var(--text-tertiary)] mt-1">
-              {videoCreditsUsed === 0 ? 'Create your first video' : 'Connect accounts to track'}
-            </p>
-          </Card>
+            <Card padding="lg">
+              <div className="flex items-center gap-3 mb-2">
+                <Heart className="w-5 h-5 text-[var(--accent-500)]" />
+                <span className="text-sm text-[var(--text-tertiary)]">Engagement</span>
+              </div>
+              <p className="text-3xl font-bold text-[var(--text-primary)]">-</p>
+              <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                Connect accounts to track
+              </p>
+            </Card>
 
-          <Card padding="lg">
-            <div className="flex items-center gap-3 mb-2">
-              <TrendingUp className="w-5 h-5 text-[var(--success)]" />
-              <span className="text-sm text-[var(--text-tertiary)]">Reach</span>
-            </div>
-            <p className="text-3xl font-bold text-[var(--text-primary)]">0</p>
-            <p className="text-xs text-[var(--text-tertiary)] mt-1">
-              {videoCreditsUsed === 0 ? 'Create your first video' : 'Connect accounts to track'}
-            </p>
-          </Card>
-        </div>
-      </section>
+            <Card padding="lg">
+              <div className="flex items-center gap-3 mb-2">
+                <TrendingUp className="w-5 h-5 text-[var(--success)]" />
+                <span className="text-sm text-[var(--text-tertiary)]">Reach</span>
+              </div>
+              <p className="text-3xl font-bold text-[var(--text-primary)]">-</p>
+              <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                Connect accounts to track
+              </p>
+            </Card>
+          </div>
+        </section>
+      )}
 
       {/* Recent Videos */}
       {recentVideos && recentVideos.length > 0 && (
