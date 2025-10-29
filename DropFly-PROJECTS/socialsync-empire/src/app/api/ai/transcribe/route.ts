@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOpenAIClient } from '@/lib/openai';
-import { getUserFromRequest } from '@/lib/auth/session';
-import TokenService from '@/lib/tokens/token-service';
-
-const tokenService = new TokenService();
+import { createClient } from '@/lib/supabase/server';
+import { tokenService } from '@/lib/tokens/token-service';
 
 // Helper to convert seconds to SRT timestamp format (00:00:00,000)
 function toSRTTime(seconds: number): string {
@@ -52,7 +50,9 @@ function toVTT(segments: any[]): string {
 export async function POST(request: NextRequest) {
   try {
     // 1. Authenticate user
-    const user = await getUserFromRequest(request);
+    const supabase = await createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
     if (!user) {
       return NextResponse.json(
         { error: 'Unauthorized' },

@@ -75,7 +75,7 @@ export default async function HomePage() {
         <p className="text-[var(--text-secondary)]">
           {videoCreditsUsed === 0
             ? 'Get started by creating your first AI-powered video below'
-            : 'Here's what's happening with your content today'}
+            : 'Here\'s what\'s happening with your content today'}
         </p>
       </div>
 

@@ -3,21 +3,32 @@ import { test, expect } from '@playwright/test';
 test.describe('AI Tools - Video Transcription', () => {
   test.beforeEach(async ({ page }) => {
     // Go to homepage
-    await page.goto('http://localhost:3010');
+    await page.goto('http://localhost:3010', { waitUntil: 'networkidle' });
 
-    // Sign up or login
+    // Sign up or login with increased timeout
     const signupLink = page.locator('a[href="/signup"]').first();
-    if (await signupLink.isVisible()) {
+    const isSignupVisible = await signupLink.isVisible({ timeout: 5000 }).catch(() => false);
+
+    if (isSignupVisible) {
       await signupLink.click({ force: true });
 
-      // Fill signup form
+      // Wait for signup page to load
+      await page.waitForLoadState('networkidle');
+      await page.waitForTimeout(1000);
+
+      // Fill signup form with better selectors
       const email = `test-${Date.now()}@example.com`;
-      await page.fill('input[type="email"]', email);
-      await page.fill('input[type="password"]', 'TestPassword123!');
+      const emailInput = page.locator('input[type="email"]').first();
+      const passwordInput = page.locator('input[type="password"]').first();
+
+      await emailInput.waitFor({ state: 'visible', timeout: 10000 });
+      await emailInput.fill(email);
+      await passwordInput.fill('TestPassword123!');
       await page.click('button[type="submit"]', { force: true });
 
-      // Wait for redirect
-      await page.waitForTimeout(2000);
+      // Wait for redirect to complete
+      await page.waitForURL(/\/(home|tools)/, { timeout: 15000 });
+      await page.waitForTimeout(1000);
     }
   });
 
@@ -77,7 +88,9 @@ test.describe('AI Tools - Video Transcription', () => {
   });
 
   test('should transcribe video successfully', async ({ page }) => {
-    // Mock the API response
+    await page.goto('http://localhost:3010/tools');
+
+    // Mock the API response AFTER navigation
     await page.route('**/api/ai/transcribe', async route => {
       await route.fulfill({
         status: 200,
@@ -110,8 +123,6 @@ test.describe('AI Tools - Video Transcription', () => {
       });
     });
 
-    await page.goto('http://localhost:3010/tools');
-
     // Open Video Transcription
     await page.click('text=Video Transcription', { force: true });
 
@@ -130,15 +141,21 @@ test.describe('AI Tools - Video Transcription', () => {
     // Check if results appeared
     await expect(page.locator('text=Generated Results')).toBeVisible();
 
-    // Wait a bit longer for transcription UI to render
-    await page.waitForTimeout(1500);
+    // Wait for transcription UI to render with better conditions
+    await page.waitForTimeout(2000);
 
     // Check if download buttons are visible (key indicator of transcription results)
-    await expect(page.locator('button:has-text("Download SRT")').first()).toBeVisible();
-    await expect(page.locator('button:has-text("Download VTT")').first()).toBeVisible();
+    const srtButton = page.locator('button:has-text("Download SRT")');
+    const vttButton = page.locator('button:has-text("Download VTT")');
+    await srtButton.waitFor({ state: 'visible', timeout: 10000 });
+    await vttButton.waitFor({ state: 'visible', timeout: 10000 });
+    await expect(srtButton.first()).toBeVisible();
+    await expect(vttButton.first()).toBeVisible();
 
     // Check if the transcript text content is visible
-    await expect(page.locator('text=This is a sample transcription').first()).toBeVisible();
+    const transcriptText = page.locator('text=This is a sample transcription').first();
+    await transcriptText.waitFor({ state: 'visible', timeout: 10000 });
+    await expect(transcriptText).toBeVisible();
   });
 
   test('should show error for insufficient tokens', async ({ page }) => {
@@ -165,7 +182,9 @@ test.describe('AI Tools - Video Transcription', () => {
   });
 
   test('should display timestamped segments', async ({ page }) => {
-    // Mock the API response
+    await page.goto('http://localhost:3010/tools');
+
+    // Mock the API response AFTER navigation
     await page.route('**/api/ai/transcribe', async route => {
       await route.fulfill({
         status: 200,
@@ -190,8 +209,6 @@ test.describe('AI Tools - Video Transcription', () => {
       });
     });
 
-    await page.goto('http://localhost:3010/tools');
-
     // Open Video Transcription
     await page.click('text=Video Transcription', { force: true });
 
@@ -206,16 +223,23 @@ test.describe('AI Tools - Video Transcription', () => {
     await expect(page.locator('text=Generated Results')).toBeVisible();
 
     // Wait for UI to fully render
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(2000);
 
-    // Check if segments text is visible
-    await expect(page.locator('text=First segment text').first()).toBeVisible();
-    await expect(page.locator('text=Second segment text').first()).toBeVisible();
-    await expect(page.locator('text=Third segment text').first()).toBeVisible();
+    // Check if segments text is visible with explicit waits
+    const firstSegment = page.locator('text=First segment text').first();
+    const secondSegment = page.locator('text=Second segment text').first();
+    const thirdSegment = page.locator('text=Third segment text').first();
+
+    await firstSegment.waitFor({ state: 'visible', timeout: 10000 });
+    await expect(firstSegment).toBeVisible();
+    await expect(secondSegment).toBeVisible();
+    await expect(thirdSegment).toBeVisible();
   });
 
   test('should copy full transcript', async ({ page }) => {
-    // Mock the API response
+    await page.goto('http://localhost:3010/tools');
+
+    // Mock the API response AFTER navigation
     await page.route('**/api/ai/transcribe', async route => {
       await route.fulfill({
         status: 200,
@@ -236,8 +260,6 @@ test.describe('AI Tools - Video Transcription', () => {
       });
     });
 
-    await page.goto('http://localhost:3010/tools');
-
     // Open Video Transcription
     await page.click('text=Video Transcription', { force: true });
 
@@ -252,10 +274,11 @@ test.describe('AI Tools - Video Transcription', () => {
     await expect(page.locator('text=Generated Results')).toBeVisible();
 
     // Wait for UI to fully render
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(2000);
 
     // Find any copy button (they should all be visible in transcription results)
     const copyButton = page.locator('button:has-text("Copy")').first();
+    await copyButton.waitFor({ state: 'visible', timeout: 10000 });
     await expect(copyButton).toBeVisible();
 
     // Click the copy button
@@ -263,7 +286,9 @@ test.describe('AI Tools - Video Transcription', () => {
   });
 
   test('should copy individual segment text', async ({ page }) => {
-    // Mock the API response
+    await page.goto('http://localhost:3010/tools');
+
+    // Mock the API response AFTER navigation
     await page.route('**/api/ai/transcribe', async route => {
       await route.fulfill({
         status: 200,
@@ -286,8 +311,6 @@ test.describe('AI Tools - Video Transcription', () => {
       });
     });
 
-    await page.goto('http://localhost:3010/tools');
-
     // Open Video Transcription
     await page.click('text=Video Transcription', { force: true });
 
@@ -302,10 +325,11 @@ test.describe('AI Tools - Video Transcription', () => {
     await expect(page.locator('text=Generated Results')).toBeVisible();
 
     // Wait for UI to fully render
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(2000);
 
     // Check if there are any copy buttons (should have at least one)
     const copyButtons = page.locator('button:has-text("Copy")');
+    await copyButtons.first().waitFor({ state: 'visible', timeout: 10000 });
     const count = await copyButtons.count();
     expect(count).toBeGreaterThan(0);
 
@@ -329,7 +353,9 @@ test.describe('AI Tools - Video Transcription', () => {
     await page.waitForTimeout(2000);
 
     // Should be back at tools list
-    await expect(page.locator('text=Caption Generator')).toBeVisible();
+    const captionGenerator = page.locator('text=Caption Generator');
+    await captionGenerator.waitFor({ state: 'visible', timeout: 10000 });
+    await expect(captionGenerator).toBeVisible();
   });
 
   test('should validate empty input', async ({ page }) => {
@@ -367,7 +393,9 @@ test.describe('AI Tools - Video Transcription', () => {
   });
 
   test('should display scrollable segments list', async ({ page }) => {
-    // Mock the API response with many segments
+    await page.goto('http://localhost:3010/tools');
+
+    // Mock the API response with many segments AFTER navigation
     await page.route('**/api/ai/transcribe', async route => {
       const segments = Array.from({ length: 20 }, (_, i) => ({
         start: i * 3,
@@ -394,8 +422,6 @@ test.describe('AI Tools - Video Transcription', () => {
       });
     });
 
-    await page.goto('http://localhost:3010/tools');
-
     // Open Video Transcription
     await page.click('text=Video Transcription', { force: true });
 
@@ -408,10 +434,12 @@ test.describe('AI Tools - Video Transcription', () => {
 
     // Wait for results
     await expect(page.locator('text=Generated Results')).toBeVisible();
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(2000);
 
-    // Check if segments are visible
-    await expect(page.locator('text=Segment 1 text content').first()).toBeVisible();
+    // Check if segments are visible with explicit waits
+    const firstSegment = page.locator('text=Segment 1 text content').first();
+    await firstSegment.waitFor({ state: 'visible', timeout: 10000 });
+    await expect(firstSegment).toBeVisible();
 
     // Check if the segments container is scrollable (has max-h class)
     const segmentsContainer = page.locator('[class*="max-h"]').first();
@@ -423,7 +451,9 @@ test.describe('AI Tools - Video Transcription', () => {
   });
 
   test('should display proper timestamp format', async ({ page }) => {
-    // Mock the API response
+    await page.goto('http://localhost:3010/tools');
+
+    // Mock the API response AFTER navigation
     await page.route('**/api/ai/transcribe', async route => {
       await route.fulfill({
         status: 200,
@@ -447,8 +477,6 @@ test.describe('AI Tools - Video Transcription', () => {
       });
     });
 
-    await page.goto('http://localhost:3010/tools');
-
     // Open Video Transcription
     await page.click('text=Video Transcription', { force: true });
 
@@ -463,15 +491,21 @@ test.describe('AI Tools - Video Transcription', () => {
     await expect(page.locator('text=Generated Results')).toBeVisible();
 
     // Wait for UI to fully render
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(2000);
 
     // Check if segment text is visible (indicates timestamps are being rendered with segments)
-    await expect(page.locator('text=First segment').first()).toBeVisible();
-    await expect(page.locator('text=Second segment').first()).toBeVisible();
+    const firstSegment = page.locator('text=First segment').first();
+    const secondSegment = page.locator('text=Second segment').first();
+
+    await firstSegment.waitFor({ state: 'visible', timeout: 10000 });
+    await expect(firstSegment).toBeVisible();
+    await expect(secondSegment).toBeVisible();
   });
 
   test('should display download buttons', async ({ page }) => {
-    // Mock the API response
+    await page.goto('http://localhost:3010/tools');
+
+    // Mock the API response AFTER navigation
     await page.route('**/api/ai/transcribe', async route => {
       await route.fulfill({
         status: 200,
@@ -491,8 +525,6 @@ test.describe('AI Tools - Video Transcription', () => {
         })
       });
     });
-
-    await page.goto('http://localhost:3010/tools');
 
     // Open Video Transcription
     await page.click('text=Video Transcription', { force: true });
@@ -514,12 +546,14 @@ test.describe('AI Tools - Video Transcription', () => {
     await expect(page.locator('text=Generated Results')).toBeVisible();
 
     // Wait for UI to fully render
-    await page.waitForTimeout(1500);
+    await page.waitForTimeout(2000);
 
     // Check if both download buttons are visible
     const srtButton = page.locator('button:has-text("Download SRT")').first();
     const vttButton = page.locator('button:has-text("Download VTT")').first();
 
+    await srtButton.waitFor({ state: 'visible', timeout: 10000 });
+    await vttButton.waitFor({ state: 'visible', timeout: 10000 });
     await expect(srtButton).toBeVisible();
     await expect(vttButton).toBeVisible();
 

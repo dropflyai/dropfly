@@ -43,8 +43,13 @@ export const TOKEN_COSTS: TokenCost[] = [
   // CONTENT GENERATION
   {
     operation: 'script_generation',
-    baseTokens: 10,
-    description: 'AI script generation',
+    baseTokens: 7,
+    description: 'AI script generation with GPT-4o',
+  },
+  {
+    operation: 'image_generation',
+    baseTokens: 5,
+    description: 'AI image generation (per image)',
   },
   {
     operation: 'script_enhancement',
