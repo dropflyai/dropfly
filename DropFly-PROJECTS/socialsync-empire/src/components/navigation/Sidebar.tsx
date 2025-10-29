@@ -1,7 +1,9 @@
 'use client';
 
-import { Home, Sparkles, Calendar, Folder, Settings, User } from 'lucide-react';
+import { Home, Sparkles, Calendar, Folder, Settings, User, LogOut } from 'lucide-react';
 import { NavTab } from './BottomNav';
+import { createClient } from '@/lib/supabase/client';
+import { useRouter } from 'next/navigation';
 
 interface SidebarProps {
   activeTab: NavTab;
@@ -28,6 +30,14 @@ const bottomNavItems = [
 ];
 
 export default function Sidebar({ activeTab, onTabChange, userTier = 'Starter' }: SidebarProps) {
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push('/login');
+  };
+
   const renderNavItem = (item: NavItem) => {
     const Icon = item.icon;
     const isActive = activeTab === item.id;
@@ -96,6 +106,15 @@ export default function Sidebar({ activeTab, onTabChange, userTier = 'Starter' }
       {/* Bottom Navigation */}
       <div className="p-4 border-t border-[var(--bg-tertiary)]/50 space-y-1">
         {bottomNavItems.map(renderNavItem)}
+
+        {/* Logout Button */}
+        <button
+          onClick={handleLogout}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-[var(--error)] hover:bg-[var(--error)]/10 transition-all duration-200 group"
+        >
+          <LogOut className="w-5 h-5" strokeWidth={2} />
+          <span className="font-medium">Log Out</span>
+        </button>
 
         {/* User Profile */}
         <div className="mt-4 p-3 bg-[var(--bg-tertiary)]/50 rounded-lg flex items-center gap-3">
