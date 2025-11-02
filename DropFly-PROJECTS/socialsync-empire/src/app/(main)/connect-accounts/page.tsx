@@ -26,7 +26,30 @@ export default function ConnectAccountsPage() {
   ]);
 
   const [connecting, setConnecting] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  // Fetch real connected accounts on mount
+  useEffect(() => {
+    fetchConnectedAccounts();
+  }, []);
+
+  const fetchConnectedAccounts = async () => {
+    try {
+      const response = await fetch('/api/social/profiles');
+      const data = await response.json();
+
+      if (data.success && data.profiles) {
+        // Update platform connection status based on real data
+        // Note: This depends on Ayrshare response format
+        console.log('Ayrshare profiles:', data.profiles);
+      }
+    } catch (err) {
+      console.error('Failed to fetch profiles:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleConnect = async (platformId: string) => {
     setConnecting(platformId);
@@ -91,6 +114,23 @@ export default function ConnectAccountsPage() {
           </div>
         )}
       </div>
+
+      {/* Beta Notice */}
+      <Card variant="glass" padding="md" className="border-[var(--warning)]/20 bg-[var(--warning)]/5">
+        <div className="flex items-start gap-3">
+          <AlertCircle className="w-5 h-5 text-[var(--warning)] flex-shrink-0 mt-0.5" />
+          <div className="flex-1">
+            <h4 className="text-sm font-semibold text-[var(--warning)] mb-1">🚧 Beta Feature - OAuth Coming Soon</h4>
+            <p className="text-sm text-[var(--text-secondary)]">
+              <strong>For testing:</strong> Click "Connect" to simulate account connections.
+              <strong> For production:</strong> Full OAuth integration for each platform is in development.
+            </p>
+            <p className="text-xs text-[var(--text-tertiary)] mt-2">
+              You can skip this step and test content creation features. Social posting will use simulated connections.
+            </p>
+          </div>
+        </div>
+      </Card>
 
       {/* Error Message */}
       {error && (
@@ -212,23 +252,38 @@ export default function ConnectAccountsPage() {
 
       {/* Action Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center">
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={handleContinue}
-          disabled={connectedCount === 0}
-          className="min-w-[200px]"
-        >
-          {connectedCount > 0 ? 'Continue to Dashboard' : 'Connect at least one account'}
-        </Button>
-        {canSkip && (
-          <Button
-            variant="ghost"
-            size="lg"
-            onClick={handleContinue}
-          >
-            Skip for now
-          </Button>
+        {connectedCount > 0 ? (
+          <>
+            <Button
+              variant="primary"
+              size="lg"
+              onClick={handleContinue}
+              className="min-w-[200px]"
+            >
+              Continue to Dashboard
+            </Button>
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={handleContinue}
+            >
+              Add more later
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              variant="ghost"
+              size="lg"
+              onClick={handleContinue}
+              className="min-w-[200px]"
+            >
+              Skip & Test Features
+            </Button>
+            <p className="text-sm text-[var(--text-tertiary)] text-center w-full">
+              You can connect accounts later in Settings
+            </p>
+          </>
         )}
       </div>
 
