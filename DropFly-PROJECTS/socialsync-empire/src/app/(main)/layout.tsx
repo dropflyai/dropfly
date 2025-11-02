@@ -17,6 +17,7 @@ export default function MainLayout({
   const getActiveTab = (): NavTab => {
     if (pathname.includes('/create')) return 'create';
     if (pathname.includes('/post')) return 'post';
+    if (pathname.includes('/manage')) return 'manage';
     if (pathname.includes('/library')) return 'library';
     if (pathname.includes('/more')) return 'more';
     return 'home';
@@ -32,6 +33,7 @@ export default function MainLayout({
       home: '/home',
       create: '/create',
       post: '/post',
+      manage: '/manage',
       library: '/library',
       more: '/more',
     };

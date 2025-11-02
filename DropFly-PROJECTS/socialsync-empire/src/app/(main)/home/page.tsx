@@ -27,18 +27,19 @@ export default async function HomePage() {
 
   const userTier = profile?.subscription_tier || 'free';
 
-  // Check if user is first-time (no posts created yet)
-  const { data: userPosts, count: postCount } = await supabase
+  // Check if user is first-time (no posts or content created yet)
+  const { count: postCount } = await supabase
     .from('posts')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id);
 
-  const { data: userContent, count: contentCount } = await supabase
+  const { count: contentCount } = await supabase
     .from('content')
     .select('*', { count: 'exact', head: true })
     .eq('user_id', user.id);
 
-  const isFirstTime = (postCount === 0 && contentCount === 0);
+  // First-time if no posts AND no content (handle null as 0)
+  const isFirstTime = (postCount === null || postCount === 0) && (contentCount === null || contentCount === 0);
 
   // Get available engines
   const availableEngines = getEnginesForTier(userTier);
@@ -132,7 +133,7 @@ export default async function HomePage() {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-3">
-                <Link href="/post" className="flex-1">
+                <Link href="/connect-accounts" className="flex-1">
                   <Button variant="primary" size="lg" className="w-full">
                     <Calendar className="w-5 h-5 mr-2" />
                     Connect Social Accounts
