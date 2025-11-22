@@ -18,14 +18,14 @@ export default function ProductsPage() {
       {/* Navigation */}
       <nav className="relative bg-black/50 backdrop-blur-xl border-b border-white/10 sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex justify-between items-center h-14">
             <div className="flex items-center">
-              <Link href="/" className="text-2xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
+              <Link href="/" className="text-xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent">
                 DropFly™
               </Link>
             </div>
             <div className="hidden md:block">
-              <div className="ml-10 flex items-baseline space-x-8">
+              <div className="ml-10 flex items-baseline space-x-6">
                 <Link href="/products" className="text-white px-3 py-2 text-sm font-medium">
                   Products
                 </Link>
@@ -45,7 +45,7 @@ export default function ProductsPage() {
                     </button>
                   </SignInButton>
                   <SignUpButton>
-                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-2 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all ml-4">
+                    <button className="bg-gradient-to-r from-blue-600 to-purple-600 text-white px-4 py-1.5 rounded-lg text-sm font-medium hover:from-blue-700 hover:to-purple-700 transition-all ml-4">
                       Get Started
                     </button>
                   </SignUpButton>
@@ -60,89 +60,89 @@ export default function ProductsPage() {
       </nav>
 
       {/* Hero Section */}
-      <section className="relative pt-20 pb-12 px-4 sm:px-6 lg:px-8">
+      <section className="relative pt-12 pb-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto text-center">
-          <h1 className="text-5xl md:text-6xl font-bold mb-6">
+          <h1 className="text-3xl md:text-4xl font-bold mb-3">
             <span className="bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
               Our Products
             </span>
           </h1>
-          <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+          <p className="text-base text-gray-300 max-w-3xl mx-auto">
             Cutting-edge AI solutions designed to transform your business operations and accelerate growth
           </p>
         </div>
       </section>
 
       {/* Featured Product - LeadFly */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-gradient-to-br from-purple-900/30 via-blue-900/30 to-pink-900/30 backdrop-blur-xl rounded-2xl border border-purple-500/50 p-8 md:p-12 relative overflow-hidden">
-            <div className="absolute top-4 right-4">
-              <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-sm font-bold px-4 py-2 rounded-full">
+          <div className="bg-gradient-to-br from-purple-900/30 via-blue-900/30 to-pink-900/30 backdrop-blur-xl rounded-2xl border border-purple-500/50 p-6 md:p-8 relative overflow-hidden">
+            <div className="absolute top-3 right-3">
+              <span className="bg-gradient-to-r from-purple-600 to-pink-600 text-white text-xs font-bold px-3 py-1 rounded-full">
                 FEATURED
               </span>
             </div>
-            
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+
+            <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
-                <h2 className="text-4xl font-bold text-white mb-6">
+                <h2 className="text-2xl font-bold text-white mb-4">
                   LeadFly™ AI
                 </h2>
-                <p className="text-xl text-gray-300 mb-6">
+                <p className="text-base text-gray-300 mb-4">
                   Advanced AI-powered lead generation platform that delivers high-quality, conversion-ready prospects through intelligent multi-channel automation.
                 </p>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 mb-6">
                   <li className="flex items-start">
-                    <TrendingUp className="w-6 h-6 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                    <TrendingUp className="w-5 h-5 text-purple-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">2.4M+ Leads Generated</span>
-                      <p className="text-gray-400 text-sm">Proven track record of success</p>
+                      <span className="text-white font-semibold text-sm">2.4M+ Leads Generated</span>
+                      <p className="text-gray-400 text-xs">Proven track record of success</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <Shield className="w-6 h-6 text-blue-400 mr-3 flex-shrink-0 mt-1" />
+                    <Shield className="w-5 h-5 text-blue-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">95.7% AI Accuracy</span>
-                      <p className="text-gray-400 text-sm">Industry-leading precision</p>
+                      <span className="text-white font-semibold text-sm">95.7% AI Accuracy</span>
+                      <p className="text-gray-400 text-xs">Industry-leading precision</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <BarChart className="w-6 h-6 text-pink-400 mr-3 flex-shrink-0 mt-1" />
+                    <BarChart className="w-5 h-5 text-pink-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">$127M+ Revenue Generated</span>
-                      <p className="text-gray-400 text-sm">For our clients worldwide</p>
+                      <span className="text-white font-semibold text-sm">$127M+ Revenue Generated</span>
+                      <p className="text-gray-400 text-xs">For our clients worldwide</p>
                     </div>
                   </li>
                 </ul>
-                <Link 
-                  href="https://leadflyai.com" 
+                <Link
+                  href="https://leadflyai.com"
                   target="_blank"
-                  className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all"
+                  className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-purple-600 to-pink-600 rounded-lg hover:from-purple-700 hover:to-pink-700 transition-all"
                 >
                   Visit LeadFly™ AI
-                  <ArrowRight className="ml-2 w-5 h-5" />
+                  <ArrowRight className="ml-2 w-4 h-4" />
                 </Link>
               </div>
               
               <div className="relative">
                 <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-600 rounded-xl blur-3xl opacity-30"></div>
-                <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-purple-900/50 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-white">500+</div>
-                      <div className="text-sm text-purple-300">Leads/Month</div>
+                <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="bg-purple-900/50 rounded-lg p-3">
+                      <div className="text-xl font-bold text-white">500+</div>
+                      <div className="text-xs text-purple-300">Leads/Month</div>
                     </div>
-                    <div className="bg-blue-900/50 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-white">80%</div>
-                      <div className="text-sm text-blue-300">Profit Margins</div>
+                    <div className="bg-blue-900/50 rounded-lg p-3">
+                      <div className="text-xl font-bold text-white">80%</div>
+                      <div className="text-xs text-blue-300">Profit Margins</div>
                     </div>
-                    <div className="bg-pink-900/50 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-white">&lt;1s</div>
-                      <div className="text-sm text-pink-300">Processing</div>
+                    <div className="bg-pink-900/50 rounded-lg p-3">
+                      <div className="text-xl font-bold text-white">&lt;1s</div>
+                      <div className="text-xs text-pink-300">Processing</div>
                     </div>
-                    <div className="bg-green-900/50 rounded-lg p-4">
-                      <div className="text-2xl font-bold text-white">24/7</div>
-                      <div className="text-sm text-green-300">Automation</div>
+                    <div className="bg-green-900/50 rounded-lg p-3">
+                      <div className="text-xl font-bold text-white">24/7</div>
+                      <div className="text-xs text-green-300">Automation</div>
                     </div>
                   </div>
                 </div>
@@ -153,17 +153,17 @@ export default function ProductsPage() {
       </section>
 
       {/* VoiceFly Voice AI Platform */}
-      <section id="voicefly" className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section id="voicefly" className="relative py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-gradient-to-br from-blue-900/30 via-indigo-900/30 to-purple-900/30 backdrop-blur-xl rounded-2xl border border-blue-500/30 p-8 md:p-12">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="bg-gradient-to-br from-blue-900/30 via-indigo-900/30 to-purple-900/30 backdrop-blur-xl rounded-2xl border border-blue-500/30 p-6 md:p-8">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-2 md:order-1">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-xl blur-3xl opacity-30"></div>
-                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
-                    <div className="flex items-center justify-center mb-6">
-                      <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
-                        <Phone className="w-12 h-12 text-white" />
+                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
+                        <Phone className="w-8 h-8 text-white" />
                       </div>
                     </div>
                     <div className="space-y-4">
@@ -202,54 +202,54 @@ export default function ProductsPage() {
                     VOICE AI
                   </span>
                 </div>
-                <h2 className="text-4xl font-bold text-white mb-6">
+                <h2 className="text-2xl font-bold text-white mb-4">
                   VoiceFly™ AI Platform
                 </h2>
-                <p className="text-xl text-gray-300 mb-6">
+                <p className="text-base text-gray-300 mb-4">
                   Multi-tenant AI platform combining 24/7 voice agents, SMS marketing, AI research, and CRM automation. Perfect for beauty salons, dental offices, medical practices, and service businesses.
                 </p>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 mb-6">
                   <li className="flex items-start">
-                    <Phone className="w-6 h-6 text-blue-400 mr-3 flex-shrink-0 mt-1" />
+                    <Phone className="w-5 h-5 text-blue-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">24/7 AI Voice Agents</span>
-                      <p className="text-gray-400 text-sm">Never miss a call - automated phone answering and appointment booking</p>
+                      <span className="text-white font-semibold text-sm">24/7 AI Voice Agents</span>
+                      <p className="text-gray-400 text-xs">Never miss a call - automated phone answering and appointment booking</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <MessageSquare className="w-6 h-6 text-indigo-400 mr-3 flex-shrink-0 mt-1" />
+                    <MessageSquare className="w-5 h-5 text-indigo-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">SMS Marketing Automation</span>
-                      <p className="text-gray-400 text-sm">Text campaigns, reminders, and customer engagement via Twilio</p>
+                      <span className="text-white font-semibold text-sm">SMS Marketing Automation</span>
+                      <p className="text-gray-400 text-xs">Text campaigns, reminders, and customer engagement via Twilio</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <Bot className="w-6 h-6 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                    <Bot className="w-5 h-5 text-purple-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">AI Research & CRM</span>
-                      <p className="text-gray-400 text-sm">DeepSeek-R1 powered research at 98% lower cost than GPT-4</p>
+                      <span className="text-white font-semibold text-sm">AI Research & CRM</span>
+                      <p className="text-gray-400 text-xs">DeepSeek-R1 powered research at 98% lower cost than GPT-4</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <DollarSign className="w-6 h-6 text-pink-400 mr-3 flex-shrink-0 mt-1" />
+                    <DollarSign className="w-5 h-5 text-pink-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Credit-Based Pricing</span>
-                      <p className="text-gray-400 text-sm">$99-399/month + pay-per-use credits with 85% margins</p>
+                      <span className="text-white font-semibold text-sm">Credit-Based Pricing</span>
+                      <p className="text-gray-400 text-xs">$99-399/month + pay-per-use credits with 85% margins</p>
                     </div>
                   </li>
                 </ul>
-                <div className="flex flex-col sm:flex-row gap-4">
+                <div className="flex flex-col sm:flex-row gap-3">
                   <Link
                     href="/products/voicefly"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all"
+                    className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all"
                   >
                     Learn More About VoiceFly™
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
                   <Link
                     href="https://voiceflyai.com"
                     target="_blank"
-                    className="px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center"
+                    className="px-6 py-3 text-base font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center"
                   >
                     Visit Live Platform
                   </Link>
@@ -261,63 +261,63 @@ export default function ProductsPage() {
       </section>
 
       {/* CodeFly - Gamified Coding Education */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-gradient-to-br from-violet-900/30 via-cyan-900/30 to-emerald-900/30 backdrop-blur-xl rounded-2xl border border-violet-500/30 p-8 md:p-12">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="bg-gradient-to-br from-violet-900/30 via-cyan-900/30 to-emerald-900/30 backdrop-blur-xl rounded-2xl border border-violet-500/30 p-6 md:p-8">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
                 <div className="inline-flex items-center mb-4">
                   <span className="bg-gradient-to-r from-violet-600 to-cyan-600 text-white text-sm font-bold px-4 py-1 rounded-full">
                     EDUCATION AI
                   </span>
                 </div>
-                <h2 className="text-4xl font-bold text-white mb-6">
+                <h2 className="text-2xl font-bold text-white mb-4">
                   CodeFly™ Pro
                 </h2>
-                <p className="text-xl text-gray-300 mb-6">
+                <p className="text-base text-gray-300 mb-4">
                   Gamified AI-powered coding education platform that transforms learning into an epic adventure. Complete with XP systems, AI tutoring, and Black Cipher spy-themed curriculum that makes students actually excited about coding.
                 </p>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 mb-6">
                   <li className="flex items-start">
-                    <Gamepad2 className="w-6 h-6 text-violet-400 mr-3 flex-shrink-0 mt-1" />
+                    <Gamepad2 className="w-5 h-5 text-violet-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Full Gamification System</span>
-                      <p className="text-gray-400 text-sm">XP, badges, leaderboards, and team competitions with Black Cipher adventure</p>
+                      <span className="text-white font-semibold text-sm">Full Gamification System</span>
+                      <p className="text-gray-400 text-xs">XP, badges, leaderboards, and team competitions with Black Cipher adventure</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <Bot className="w-6 h-6 text-cyan-400 mr-3 flex-shrink-0 mt-1" />
+                    <Bot className="w-5 h-5 text-cyan-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Coach Nova AI Tutor</span>
-                      <p className="text-gray-400 text-sm">Intelligent, teacher-controlled AI assistance with curriculum alignment</p>
+                      <span className="text-white font-semibold text-sm">Coach Nova AI Tutor</span>
+                      <p className="text-gray-400 text-xs">Intelligent, teacher-controlled AI assistance with curriculum alignment</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <BookOpen className="w-6 h-6 text-emerald-400 mr-3 flex-shrink-0 mt-1" />
+                    <BookOpen className="w-5 h-5 text-emerald-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Complete 18-Week Curriculum</span>
-                      <p className="text-gray-400 text-sm">CPALMS-aligned with automated grading and standards tracking</p>
+                      <span className="text-white font-semibold text-sm">Complete 18-Week Curriculum</span>
+                      <p className="text-gray-400 text-xs">CPALMS-aligned with automated grading and standards tracking</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <Trophy className="w-6 h-6 text-amber-400 mr-3 flex-shrink-0 mt-1" />
+                    <Trophy className="w-5 h-5 text-amber-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Proven Results</span>
-                      <p className="text-gray-400 text-sm">87% completion rate vs 42% industry average with 4.8/5 satisfaction</p>
+                      <span className="text-white font-semibold text-sm">Proven Results</span>
+                      <p className="text-gray-400 text-xs">87% completion rate vs 42% industry average with 4.8/5 satisfaction</p>
                     </div>
                   </li>
                 </ul>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link 
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
                     href="/products/codefly"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-violet-600 to-cyan-600 rounded-lg hover:from-violet-700 hover:to-cyan-700 transition-all"
+                    className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-violet-600 to-cyan-600 rounded-lg hover:from-violet-700 hover:to-cyan-700 transition-all"
                   >
                     Explore CodeFly™ Pro
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
-                  <Link 
+                  <Link
                     href="/products/codefly"
-                    className="px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center"
+                    className="px-6 py-3 text-base font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center"
                   >
                     View Demo
                   </Link>
@@ -327,10 +327,10 @@ export default function ProductsPage() {
               <div className="order-2 md:order-1">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-violet-600 to-cyan-600 rounded-xl blur-3xl opacity-30"></div>
-                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
-                    <div className="flex items-center justify-center mb-6">
-                      <div className="w-24 h-24 bg-gradient-to-br from-violet-600 to-cyan-600 rounded-full flex items-center justify-center">
-                        <Code className="w-12 h-12 text-white" />
+                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-violet-600 to-cyan-600 rounded-full flex items-center justify-center">
+                        <Code className="w-8 h-8 text-white" />
                       </div>
                     </div>
                     <div className="space-y-4">
@@ -368,57 +368,57 @@ export default function ProductsPage() {
       </section>
 
       {/* LawFly Pro */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-gradient-to-br from-amber-900/30 via-yellow-900/30 to-orange-900/30 backdrop-blur-xl rounded-2xl border border-amber-500/30 p-8 md:p-12">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="bg-gradient-to-br from-amber-900/30 via-yellow-900/30 to-orange-900/30 backdrop-blur-xl rounded-2xl border border-amber-500/30 p-6 md:p-8">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
                 <div className="inline-flex items-center mb-4">
                   <span className="bg-gradient-to-r from-amber-600 to-orange-600 text-white text-sm font-bold px-4 py-1 rounded-full">
                     LEGAL AI
                   </span>
                 </div>
-                <h2 className="text-4xl font-bold text-white mb-6">
+                <h2 className="text-2xl font-bold text-white mb-4">
                   LawFly™ Pro
                 </h2>
-                <p className="text-xl text-gray-300 mb-6">
+                <p className="text-base text-gray-300 mb-4">
                   Enterprise law firm backend system with multi-tenant architecture, attorney-client privilege protection, and complete case management automation. Built for firms handling high-stakes litigation.
                 </p>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 mb-6">
                   <li className="flex items-start">
-                    <Scale className="w-6 h-6 text-amber-400 mr-3 flex-shrink-0 mt-1" />
+                    <Scale className="w-5 h-5 text-amber-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Attorney-Client Privilege Protection</span>
-                      <p className="text-gray-400 text-sm">Database-level privilege enforcement with field encryption</p>
+                      <span className="text-white font-semibold text-sm">Attorney-Client Privilege Protection</span>
+                      <p className="text-gray-400 text-xs">Database-level privilege enforcement with field encryption</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <FileText className="w-6 h-6 text-yellow-400 mr-3 flex-shrink-0 mt-1" />
+                    <FileText className="w-5 h-5 text-yellow-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Electronic Signature System</span>
-                      <p className="text-gray-400 text-sm">Legally binding signatures with tamper-proof audit trails</p>
+                      <span className="text-white font-semibold text-sm">Electronic Signature System</span>
+                      <p className="text-gray-400 text-xs">Legally binding signatures with tamper-proof audit trails</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <Gavel className="w-6 h-6 text-orange-400 mr-3 flex-shrink-0 mt-1" />
+                    <Gavel className="w-5 h-5 text-orange-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Multi-Tenant Case Management</span>
-                      <p className="text-gray-400 text-sm">Complete isolation between law firms with role-based access</p>
+                      <span className="text-white font-semibold text-sm">Multi-Tenant Case Management</span>
+                      <p className="text-gray-400 text-xs">Complete isolation between law firms with role-based access</p>
                     </div>
                   </li>
                 </ul>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link 
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
                     href="/products/lawfly"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg hover:from-amber-700 hover:to-orange-700 transition-all"
+                    className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-amber-600 to-orange-600 rounded-lg hover:from-amber-700 hover:to-orange-700 transition-all"
                   >
                     Learn More About LawFly™ Pro
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
-                  <Link 
-                    href="https://lawflyai.com" 
+                  <Link
+                    href="https://lawflyai.com"
                     target="_blank"
-                    className="px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center"
+                    className="px-6 py-3 text-base font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center"
                   >
                     Visit Live Site
                   </Link>
@@ -428,10 +428,10 @@ export default function ProductsPage() {
               <div className="order-2 md:order-1">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-amber-600 to-orange-600 rounded-xl blur-3xl opacity-30"></div>
-                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
-                    <div className="flex items-center justify-center mb-6">
-                      <div className="w-24 h-24 bg-gradient-to-br from-amber-600 to-orange-600 rounded-full flex items-center justify-center">
-                        <Scale className="w-12 h-12 text-white" />
+                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-amber-600 to-orange-600 rounded-full flex items-center justify-center">
+                        <Scale className="w-8 h-8 text-white" />
                       </div>
                     </div>
                     <div className="space-y-4">
@@ -469,17 +469,17 @@ export default function ProductsPage() {
       </section>
 
       {/* HomeFly - Social Community Platform */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-gradient-to-br from-green-900/30 via-teal-900/30 to-blue-900/30 backdrop-blur-xl rounded-2xl border border-green-500/30 p-8 md:p-12">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="bg-gradient-to-br from-green-900/30 via-teal-900/30 to-blue-900/30 backdrop-blur-xl rounded-2xl border border-green-500/30 p-6 md:p-8">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-2 md:order-1">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-green-600 to-teal-600 rounded-xl blur-3xl opacity-30"></div>
-                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
-                    <div className="flex items-center justify-center mb-6">
-                      <div className="w-24 h-24 bg-gradient-to-br from-green-600 to-teal-600 rounded-full flex items-center justify-center">
-                        <Home className="w-12 h-12 text-white" />
+                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-green-600 to-teal-600 rounded-full flex items-center justify-center">
+                        <Home className="w-8 h-8 text-white" />
                       </div>
                     </div>
                     <div className="space-y-4">
@@ -518,44 +518,44 @@ export default function ProductsPage() {
                     SOCIAL COMMUNITY
                   </span>
                 </div>
-                <h2 className="text-4xl font-bold text-white mb-6">
+                <h2 className="text-2xl font-bold text-white mb-4">
                   HomeFly™ Pro
                 </h2>
-                <p className="text-xl text-gray-300 mb-6">
+                <p className="text-base text-gray-300 mb-4">
                   Social-first community management platform for HOAs and large apartment buildings. The &ldquo;TikTok + Instagram of property management&rdquo; with rent/dues collection and real-time community engagement.
                 </p>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 mb-6">
                   <li className="flex items-start">
-                    <MessageSquare className="w-6 h-6 text-green-400 mr-3 flex-shrink-0 mt-1" />
+                    <MessageSquare className="w-5 h-5 text-green-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Social Community Feed</span>
-                      <p className="text-gray-400 text-sm">Facebook-style social network for residents and tenants</p>
+                      <span className="text-white font-semibold text-sm">Social Community Feed</span>
+                      <p className="text-gray-400 text-xs">Facebook-style social network for residents and tenants</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <Calendar className="w-6 h-6 text-teal-400 mr-3 flex-shrink-0 mt-1" />
+                    <Calendar className="w-5 h-5 text-teal-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Event & Meeting Management</span>
-                      <p className="text-gray-400 text-sm">Community calendar with RSVPs and video meetings</p>
+                      <span className="text-white font-semibold text-sm">Event & Meeting Management</span>
+                      <p className="text-gray-400 text-xs">Community calendar with RSVPs and video meetings</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <Users className="w-6 h-6 text-blue-400 mr-3 flex-shrink-0 mt-1" />
+                    <Users className="w-5 h-5 text-blue-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Rent & Dues Collection</span>
-                      <p className="text-gray-400 text-sm">Automated rent collection for apartments and HOA dues processing</p>
+                      <span className="text-white font-semibold text-sm">Rent & Dues Collection</span>
+                      <p className="text-gray-400 text-xs">Automated rent collection for apartments and HOA dues processing</p>
                     </div>
                   </li>
                 </ul>
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link 
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
                     href="/products/homefly"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-green-600 to-teal-600 rounded-lg hover:from-green-700 hover:to-teal-700 transition-all"
+                    className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-green-600 to-teal-600 rounded-lg hover:from-green-700 hover:to-teal-700 transition-all"
                   >
                     Learn More About HomeFly™ Pro
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
-                  <button className="px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center">
+                  <button className="px-6 py-3 text-base font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center">
                     View Demo Community
                   </button>
                 </div>
@@ -566,23 +566,23 @@ export default function ProductsPage() {
       </section>
 
       {/* RealFly Pro - Real Estate Platform */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="bg-gradient-to-br from-orange-900/30 via-red-900/30 to-pink-900/30 backdrop-blur-xl rounded-2xl border border-orange-500/30 p-8 md:p-12">
-            <div className="grid md:grid-cols-2 gap-12 items-center">
+          <div className="bg-gradient-to-br from-orange-900/30 via-red-900/30 to-pink-900/30 backdrop-blur-xl rounded-2xl border border-orange-500/30 p-6 md:p-8">
+            <div className="grid md:grid-cols-2 gap-8 items-center">
               <div className="order-2 md:order-1">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gradient-to-r from-orange-600 to-red-600 rounded-xl blur-3xl opacity-30"></div>
-                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
-                    <div className="flex items-center justify-center mb-6">
-                      <div className="w-24 h-24 bg-gradient-to-br from-orange-600 to-red-600 rounded-full flex items-center justify-center">
-                        <Building className="w-12 h-12 text-white" />
+                  <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+                    <div className="flex items-center justify-center mb-4">
+                      <div className="w-16 h-16 bg-gradient-to-br from-orange-600 to-red-600 rounded-full flex items-center justify-center">
+                        <Building className="w-8 h-8 text-white" />
                       </div>
                     </div>
                     <div className="text-center">
-                      <div className="text-sm text-orange-400 mb-2 font-semibold">COMING SOON</div>
-                      <h3 className="text-xl font-semibold text-white mb-4">Real Estate Platform</h3>
-                      <p className="text-gray-400 text-sm mb-6">Complete real estate business automation</p>
+                      <div className="text-xs text-orange-400 mb-2 font-semibold">COMING SOON</div>
+                      <h3 className="text-lg font-semibold text-white mb-3">Real Estate Platform</h3>
+                      <p className="text-gray-400 text-xs mb-4">Complete real estate business automation</p>
                     </div>
                     
                     <div className="space-y-4">
@@ -608,56 +608,56 @@ export default function ProductsPage() {
               </div>
               
               <div className="order-1 md:order-2">
-                <h2 className="text-4xl font-bold text-white mb-6">
+                <h2 className="text-2xl font-bold text-white mb-4">
                   RealFly™ Pro
                 </h2>
-                <p className="text-xl text-gray-300 mb-6">
+                <p className="text-base text-gray-300 mb-4">
                   Complete real estate business automation platform. From lead generation to closing, everything you need to run a successful real estate operation in one streamlined system.
                 </p>
-                <ul className="space-y-4 mb-8">
+                <ul className="space-y-3 mb-6">
                   <li className="flex items-start">
-                    <Key className="w-6 h-6 text-orange-400 mr-3 flex-shrink-0 mt-1" />
+                    <Key className="w-5 h-5 text-orange-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Property Management</span>
-                      <p className="text-gray-400 text-sm">Complete property portfolio management and tenant relations</p>
+                      <span className="text-white font-semibold text-sm">Property Management</span>
+                      <p className="text-gray-400 text-xs">Complete property portfolio management and tenant relations</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <MapPin className="w-6 h-6 text-red-400 mr-3 flex-shrink-0 mt-1" />
+                    <MapPin className="w-5 h-5 text-red-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Market Intelligence</span>
-                      <p className="text-gray-400 text-sm">AI-driven market analysis and investment opportunities</p>
+                      <span className="text-white font-semibold text-sm">Market Intelligence</span>
+                      <p className="text-gray-400 text-xs">AI-driven market analysis and investment opportunities</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <DollarSign className="w-6 h-6 text-pink-400 mr-3 flex-shrink-0 mt-1" />
+                    <DollarSign className="w-5 h-5 text-pink-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Financial Analytics</span>
-                      <p className="text-gray-400 text-sm">ROI tracking, cash flow analysis, and profit optimization</p>
+                      <span className="text-white font-semibold text-sm">Financial Analytics</span>
+                      <p className="text-gray-400 text-xs">ROI tracking, cash flow analysis, and profit optimization</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <Users className="w-6 h-6 text-orange-400 mr-3 flex-shrink-0 mt-1" />
+                    <Users className="w-5 h-5 text-orange-400 mr-2 flex-shrink-0 mt-0.5" />
                     <div>
-                      <span className="text-white font-semibold">Client Portal</span>
-                      <p className="text-gray-400 text-sm">Automated client onboarding and communication workflows</p>
+                      <span className="text-white font-semibold text-sm">Client Portal</span>
+                      <p className="text-gray-400 text-xs">Automated client onboarding and communication workflows</p>
                     </div>
                   </li>
                 </ul>
                 
-                <div className="flex flex-col sm:flex-row gap-4">
-                  <Link 
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Link
                     href="/products/realfly"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all"
+                    className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-orange-600 to-red-600 rounded-lg hover:from-orange-700 hover:to-red-700 transition-all"
                   >
                     Get Early Access
                   </Link>
-                  <Link 
+                  <Link
                     href="/products/realfly"
-                    className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all"
+                    className="inline-flex items-center justify-center px-6 py-3 text-base font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all"
                   >
                     Learn More
-                    <ArrowRight className="ml-2 w-5 h-5" />
+                    <ArrowRight className="ml-2 w-4 h-4" />
                   </Link>
                 </div>
               </div>
@@ -667,59 +667,59 @@ export default function ProductsPage() {
       </section>
 
       {/* Coming Soon Section */}
-      <section className="relative py-20 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-10 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-white mb-4">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold text-white mb-3">
               More Products Coming Soon
             </h2>
-            <p className="text-xl text-gray-400">
+            <p className="text-base text-gray-400">
               We&apos;re constantly innovating to bring you the best AI solutions
             </p>
           </div>
-          
-          <div className="grid md:grid-cols-3 gap-6">
-            <div className="bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-green-600/20 to-transparent rounded-bl-full"></div>
-              <Sparkles className="w-8 h-8 text-green-400 mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">AI Content Studio</h3>
-              <p className="text-gray-400 text-sm mb-4">Advanced content generation and optimization platform</p>
-              <span className="text-green-400 text-sm font-semibold">Coming Q2 2025</span>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="bg-black/50 backdrop-blur-xl rounded-xl p-4 border border-white/10 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-green-600/20 to-transparent rounded-bl-full"></div>
+              <Sparkles className="w-6 h-6 text-green-400 mb-3" />
+              <h3 className="text-base font-semibold text-white mb-2">AI Content Studio</h3>
+              <p className="text-gray-400 text-xs mb-3">Advanced content generation and optimization platform</p>
+              <span className="text-green-400 text-xs font-semibold">Coming Q2 2025</span>
             </div>
 
-            <div className="bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-orange-600/20 to-transparent rounded-bl-full"></div>
-              <Shield className="w-8 h-8 text-orange-400 mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">SecureAI Platform</h3>
-              <p className="text-gray-400 text-sm mb-4">Enterprise security and compliance automation</p>
-              <span className="text-orange-400 text-sm font-semibold">Coming Q3 2025</span>
+            <div className="bg-black/50 backdrop-blur-xl rounded-xl p-4 border border-white/10 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-orange-600/20 to-transparent rounded-bl-full"></div>
+              <Shield className="w-6 h-6 text-orange-400 mb-3" />
+              <h3 className="text-base font-semibold text-white mb-2">SecureAI Platform</h3>
+              <p className="text-gray-400 text-xs mb-3">Enterprise security and compliance automation</p>
+              <span className="text-orange-400 text-xs font-semibold">Coming Q3 2025</span>
             </div>
 
-            <div className="bg-black/50 backdrop-blur-xl rounded-xl p-6 border border-white/10 relative overflow-hidden">
-              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-red-600/20 to-transparent rounded-bl-full"></div>
-              <BarChart className="w-8 h-8 text-red-400 mb-4" />
-              <h3 className="text-lg font-semibold text-white mb-2">Analytics AI</h3>
-              <p className="text-gray-400 text-sm mb-4">Predictive analytics and business intelligence</p>
-              <span className="text-red-400 text-sm font-semibold">Coming Q4 2025</span>
+            <div className="bg-black/50 backdrop-blur-xl rounded-xl p-4 border border-white/10 relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-gradient-to-br from-red-600/20 to-transparent rounded-bl-full"></div>
+              <BarChart className="w-6 h-6 text-red-400 mb-3" />
+              <h3 className="text-base font-semibold text-white mb-2">Analytics AI</h3>
+              <p className="text-gray-400 text-xs mb-3">Predictive analytics and business intelligence</p>
+              <span className="text-red-400 text-xs font-semibold">Coming Q4 2025</span>
             </div>
           </div>
         </div>
       </section>
 
       {/* CTA Section */}
-      <section className="relative py-24 px-4 sm:px-6 lg:px-8">
+      <section className="relative py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-4xl font-bold text-white mb-6">
+          <h2 className="text-2xl font-bold text-white mb-4">
             Ready to Transform Your Business?
           </h2>
-          <p className="text-xl text-gray-300 mb-12">
+          <p className="text-base text-gray-300 mb-8">
             Start with any of our products and scale as you grow
           </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <button className="px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
               Get Started Today
             </button>
-            <button className="px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all">
+            <button className="px-6 py-3 text-base font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all">
               Contact Sales
             </button>
           </div>
@@ -728,8 +728,8 @@ export default function ProductsPage() {
 
       {/* Footer */}
       <footer className="relative bg-black/50 backdrop-blur-xl border-t border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center text-gray-400">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="text-center text-gray-400 text-sm">
             <p>&copy; 2025 DropFly™. All rights reserved.</p>
           </div>
         </div>
