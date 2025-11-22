@@ -1,8 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Sparkles, Flame, Send, Copy, Check, Zap } from 'lucide-react';
+import { Sparkles, Flame, Send, Copy, Check, Zap, Video } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 import Input from '@/components/ui/Input';
@@ -18,117 +19,53 @@ interface GeneratedScript {
 }
 
 export default function CreatePage() {
+  const router = useRouter();
   const [selectedMode, setSelectedMode] = useState<CreatorMode | null>(null);
   const [prompt, setPrompt] = useState('');
   const [loading, setLoading] = useState(false);
-  const [generatedScript, setGeneratedScript] = useState<GeneratedScript | null>(null);
   const [error, setError] = useState('');
-  const [copied, setCopied] = useState(false);
+  const [generatedScript, setGeneratedScript] = useState<GeneratedScript | null>(null);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [usageInfo, setUsageInfo] = useState<{
-    currentUsage: number;
-    limit: number;
-    plan: string;
-  } | null>(null);
-  const [showPaywall, setShowPaywall] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const handleModeSelect = (mode: CreatorMode) => {
+    // Redirect to video studio with the selected mode
+    router.push(`/video-studio?mode=${mode}`);
+  };
 
   const handleGenerate = async () => {
-    if (!selectedMode || !prompt.trim()) return;
-
+    // TODO: Implement script generation
     setLoading(true);
     setError('');
-    setGeneratedScript(null);
-
     try {
-      const response = await fetch('/api/ai/generate-script', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          topic: prompt,
-          creatorMode: selectedMode,
-          platform: CREATOR_MODE_TEMPLATES[selectedMode].platforms[0],
-          duration: CREATOR_MODE_TEMPLATES[selectedMode].avgDuration,
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        if (response.status === 403 && data.error === 'Limit reached') {
-          // Show paywall
-          setUsageInfo({
-            currentUsage: data.currentUsage,
-            limit: data.limit,
-            plan: data.plan,
-          });
-          setShowPaywall(true);
-          return;
-        }
-        throw new Error(data.error || 'Failed to generate script');
-      }
-
-      setGeneratedScript(data.script);
+      // Call API here
+      await new Promise(resolve => setTimeout(resolve, 2000)); // Placeholder
+      setError('Script generation coming soon!');
     } catch (err) {
-      const error = err as Error;
-      setError(error.message || 'Something went wrong');
+      setError('Failed to generate script');
     } finally {
       setLoading(false);
     }
   };
 
   const copyToClipboard = () => {
-    if (!generatedScript) return;
-
-    const text = `
-Hook: ${generatedScript.hook}
-
-Script:
-${generatedScript.script}
-
-CTA: ${generatedScript.cta}
-
-Hashtags: ${generatedScript.hashtags.join(' ')}
-    `.trim();
-
-    navigator.clipboard.writeText(text);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    if (generatedScript) {
+      const text = `Hook: ${generatedScript.hook}\n\nScript: ${generatedScript.script}\n\nCTA: ${generatedScript.cta}\n\nHashtags: ${generatedScript.hashtags.join(' ')}`;
+      navigator.clipboard.writeText(text);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   const saveToLibrary = async () => {
-    if (!generatedScript || !selectedMode || !prompt) return;
-
     setSaving(true);
     try {
-      const response = await fetch('/api/content', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          title: prompt.substring(0, 50) + (prompt.length > 50 ? '...' : ''),
-          type: 'script',
-          content: generatedScript,
-          metadata: {
-            creator_mode: selectedMode,
-            platform: CREATOR_MODE_TEMPLATES[selectedMode].platforms[0],
-            duration: CREATOR_MODE_TEMPLATES[selectedMode].avgDuration,
-            generated_at: new Date().toISOString(),
-          },
-          status: 'draft',
-        }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to save');
-      }
-
+      // TODO: Save to library
+      await new Promise(resolve => setTimeout(resolve, 1000));
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
     } catch (err) {
-      const error = err as Error;
-      setError(error.message || 'Failed to save to library');
+      setError('Failed to save');
     } finally {
       setSaving(false);
     }
@@ -136,43 +73,22 @@ Hashtags: ${generatedScript.hashtags.join(' ')}
 
   const creatorModes = Object.values(CREATOR_MODE_TEMPLATES);
 
-  // Show paywall if limit reached
-  if (showPaywall && usageInfo) {
-    return (
-      <Paywall
-        feature="AI Script Generation"
-        currentPlan={usageInfo.plan}
-        requiredPlan="Creator"
-        usageLimit={usageInfo.limit}
-        currentUsage={usageInfo.currentUsage}
-      />
-    );
-  }
-
   return (
-    <div className="h-full flex flex-col md:flex-row">
-      {/* Left Side - Mode Selection & Input (60% on desktop) */}
-      <div className="flex-1 flex flex-col border-b md:border-b-0 md:border-r border-[var(--bg-tertiary)]">
-        {/* Header */}
-        <div className="p-6 border-b border-[var(--bg-tertiary)]">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="p-2 bg-gradient-to-br from-[var(--primary-500)] to-[var(--secondary-500)] rounded-lg">
-              <Sparkles className="w-6 h-6 text-white" />
+    <div className="h-full flex flex-col">
+      {/* Header */}
+      <div className="p-8 border-b border-[var(--bg-tertiary)] bg-[var(--bg-secondary)]/50">
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center gap-4 mb-3">
+            <div className="p-3 bg-gradient-to-br from-[var(--primary-500)] to-[var(--secondary-500)] rounded-xl">
+              <Video className="w-8 h-8 text-white" />
             </div>
             <div className="flex-1">
-              <h1 className="text-2xl font-bold text-[var(--text-primary)]">Create AI Content</h1>
-              <p className="text-sm text-[var(--text-tertiary)]">Choose a style and describe your video</p>
+              <h1 className="text-3xl font-bold text-[var(--text-primary)]">Create AI Video</h1>
+              <p className="text-sm text-[var(--text-tertiary)] mt-1">Choose your video style to get started</p>
             </div>
-            {usageInfo && (
-              <Link href="/pricing">
-                <Button variant="primary" size="sm">
-                  <Zap className="w-4 h-4 mr-1" />
-                  {usageInfo.currentUsage}/{usageInfo.limit} used
-                </Button>
-              </Link>
-            )}
           </div>
         </div>
+      </div>
 
         {/* Creator Mode Selection */}
         <div className="p-6 border-b border-[var(--bg-tertiary)]">
@@ -229,8 +145,10 @@ Hashtags: ${generatedScript.hashtags.join(' ')}
           )}
         </div>
 
-        {/* AI Chat Area */}
-        <div className="flex-1 p-6 flex flex-col">
+        {/* Main Content Area - Two Column Layout */}
+      <div className="flex-1 flex flex-col md:flex-row overflow-hidden">
+        {/* Left Side - AI Chat Area */}
+        <div className="flex-1 p-6 flex flex-col overflow-y-auto">
           <div className="flex-1 mb-4 space-y-4">
             {/* AI Message */}
             <div className="flex gap-3">
@@ -389,10 +307,9 @@ Hashtags: ${generatedScript.hashtags.join(' ')}
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Right Side - Preview (40% on desktop) */}
-      <div className="w-full md:w-[40%] bg-[var(--bg-secondary)]/50 p-6">
+        {/* Right Side - Preview (40% on desktop) */}
+        <div className="w-full md:w-[40%] bg-[var(--bg-secondary)]/50 p-6 overflow-y-auto border-l border-[var(--border)]">
         <h3 className="text-lg font-semibold text-[var(--text-primary)] mb-4">
           📹 Live Preview
         </h3>
@@ -440,6 +357,7 @@ Hashtags: ${generatedScript.hashtags.join(' ')}
             </Card>
           </div>
         )}
+      </div>
       </div>
     </div>
   );

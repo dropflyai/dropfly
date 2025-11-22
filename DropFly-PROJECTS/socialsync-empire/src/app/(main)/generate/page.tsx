@@ -59,9 +59,27 @@ export default function GenerateVideoPage() {
           if (data.tokenBalance) {
             setTokenInfo(data.tokenBalance);
           }
+        } else if (response.status === 401) {
+          // User not authenticated - set defaults
+          console.log('User not authenticated - using defaults');
+          setUserTier('free');
+          setTokenInfo({
+            balance: 0,
+            dailySpent: 0,
+            dailyLimit: 0,
+            dailyRemaining: 0,
+          });
         }
       } catch (err) {
         console.error('Failed to fetch user data:', err);
+        // Set defaults on error
+        setUserTier('free');
+        setTokenInfo({
+          balance: 0,
+          dailySpent: 0,
+          dailyLimit: 0,
+          dailyRemaining: 0,
+        });
       }
     };
 
@@ -84,9 +102,17 @@ export default function GenerateVideoPage() {
         if (response.ok) {
           const data = await response.json();
           setEstimatedCost(data.cost || 0);
+        } else if (response.status === 401) {
+          // User not authenticated - estimate locally
+          // Free tier default: hunyuan-video at 6 tokens/sec
+          const baseCost = 6; // tokens per second for free tier
+          setEstimatedCost(Math.ceil(baseCost * duration));
         }
       } catch (err) {
         console.error('Failed to estimate cost:', err);
+        // Fallback to basic estimation
+        const baseCost = 6; // tokens per second for free tier
+        setEstimatedCost(Math.ceil(baseCost * duration));
       }
     };
 
@@ -223,6 +249,8 @@ export default function GenerateVideoPage() {
               selectedEngine={selectedEngine}
               onSelectEngine={setSelectedEngine}
               userTier={userTier}
+              duration={duration}
+              tokenBalance={tokenInfo.balance}
             />
           </Card>
 

@@ -20,9 +20,9 @@ export const TOKEN_COSTS: TokenCost[] = [
       const dollarCost = engineConfig.pricePerSecond * duration;
       const tokens = Math.ceil(dollarCost * 100);
 
-      // 70% profit margin on all engines
-      // To achieve 70% margin: Price = Cost / (1 - 0.70) = Cost * 3.33
-      const PROFIT_MARGIN_MULTIPLIER = 3.33;
+      // 70% profit OVER cost (70% markup)
+      // Price = Cost + (Cost × 0.70) = Cost × 1.70
+      const PROFIT_MARGIN_MULTIPLIER = 1.70;
 
       return Math.ceil(tokens * PROFIT_MARGIN_MULTIPLIER);
     },

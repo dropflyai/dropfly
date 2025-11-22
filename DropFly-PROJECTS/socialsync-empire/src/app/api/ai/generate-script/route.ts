@@ -1,23 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server';
-import OpenAI from 'openai';
 import { createClient } from '@/lib/supabase/server';
 import { tokenService } from '@/lib/tokens/token-service';
-
-// Lazy-load OpenAI client to avoid build-time execution
-function getOpenAIClient() {
-  return new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-  });
-}
+import { getAnthropicClient } from '@/lib/anthropic';
 
 export async function POST(request: NextRequest) {
   try {
     // 1. Authenticate user
     const supabase = await createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+
+    // Try to get the session first
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    console.log('[Script Generation] Session check:', {
+      hasSession: !!session,
+      sessionError: sessionError?.message
+    });
+
+    // Then get the user
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+
+    console.log('[Script Generation] Auth check:', {
+      userId: user?.id,
+      userEmail: user?.email,
+      authError: authError?.message
+    });
 
     if (!user) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      console.error('[Script Generation] No user found', {
+        sessionError: sessionError?.message,
+        authError: authError?.message
+      });
+      return NextResponse.json({
+        error: 'Unauthorized - Please log in again',
+        details: authError?.message || sessionError?.message
+      }, { status: 401 });
     }
 
     // 2. Parse request body
@@ -26,6 +41,34 @@ export async function POST(request: NextRequest) {
 
     if (!topic) {
       return NextResponse.json({ error: 'Topic is required' }, { status: 400 });
+    }
+
+    // 2a. Fetch brand package if provided
+    let brandContext = '';
+    const { brand_package_id } = body;
+
+    if (brand_package_id) {
+      const { data: brandPackage } = await supabase
+        .from('brand_packages')
+        .select('*')
+        .eq('id', brand_package_id)
+        .eq('user_id', user.id)
+        .single();
+
+      if (brandPackage) {
+        brandContext = `
+
+BRAND IDENTITY - IMPORTANT: Use this brand's voice and personality in your response:
+- Brand: ${brandPackage.name}
+${brandPackage.mission_statement ? `- Mission: ${brandPackage.mission_statement}` : ''}
+- Voice: ${brandPackage.brand_voice || 'professional'}
+- Personality: ${brandPackage.brand_personality || 'professional and trustworthy'}
+- Target Audience: ${brandPackage.target_audience || 'general audience'}
+${brandPackage.key_values?.length ? `- Key Values: ${brandPackage.key_values.join(', ')}` : ''}
+
+Align all messaging with this brand's mission and values. Speak directly to their target audience using their brand voice.
+`;
+      }
     }
 
     // 3. Calculate token cost (7 tokens for AI script generation)
@@ -122,26 +165,24 @@ Make it clear, actionable, and beginner-friendly. Number each step.`,
       };
 
       const selectedPrompt = prompts[creatorMode] || prompts.ugc;
+      const finalPrompt = brandContext + selectedPrompt;
 
-      // 6. Call OpenAI API
-      const openai = getOpenAIClient();
-      const completion = await openai.chat.completions.create({
-        model: 'gpt-4',
+      // 6. Call Claude API
+      const anthropic = getAnthropicClient();
+      const completion = await anthropic.messages.create({
+        model: 'claude-sonnet-4-5-20250929',
+        max_tokens: 1500,
+        temperature: 0.8,
+        system: 'You are an expert content creator who generates viral video scripts. Always respond with valid JSON only, no additional text.',
         messages: [
           {
-            role: 'system',
-            content: 'You are an expert content creator who generates viral video scripts. Always respond with valid JSON only, no additional text.',
-          },
-          {
             role: 'user',
-            content: selectedPrompt,
+            content: finalPrompt,
           },
         ],
-        temperature: 0.8,
-        max_tokens: 1500,
       });
 
-      const content = completion.choices[0]?.message?.content;
+      const content = completion.content[0]?.type === 'text' ? completion.content[0].text : null;
 
       if (!content) {
         throw new Error('No content generated');
@@ -152,7 +193,7 @@ Make it clear, actionable, and beginner-friendly. Number each step.`,
       try {
         scriptData = JSON.parse(content);
       } catch (e) {
-        // If OpenAI didn't return valid JSON, extract it
+        // If Claude didn't return valid JSON, extract it
         const jsonMatch = content.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
           scriptData = JSON.parse(jsonMatch[0]);
@@ -193,21 +234,24 @@ Make it clear, actionable, and beginner-friendly. Number each step.`,
         tokensUsed: tokenCost,
         newBalance: deductionResult.newBalance,
         usage: {
-          openaiTokens: completion.usage?.total_tokens || 0,
+          inputTokens: completion.usage?.input_tokens || 0,
+          outputTokens: completion.usage?.output_tokens || 0,
           model: completion.model,
         },
       });
 
     } catch (apiError: any) {
-      console.error('[Script Generation] OpenAI API Error:', apiError);
+      console.error('[Script Generation] Claude API Error:', apiError);
 
       // Refund tokens on API failure
-      await tokenService.refundTokens({
-        userId: user.id,
-        amount: tokenCost,
-        reason: 'Script generation API failure',
-        originalOperation: 'script_generation'
-      });
+      if (deductionResult.transaction?.id) {
+        const refundResult = await tokenService.refundTokens(
+          user.id,
+          deductionResult.transaction.id,
+          'Script generation API failure'
+        );
+        console.log('[Script Generation] Refund result:', refundResult);
+      }
 
       return NextResponse.json(
         {

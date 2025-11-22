@@ -13,7 +13,7 @@ interface PDFEditorProps {
 
 interface Annotation {
   id: string;
-  type: 'text' | 'signature';
+  type: 'text' | 'signature' | 'eraser' | 'formfield';
   x: number;
   y: number;
   width: number;
@@ -21,16 +21,71 @@ interface Annotation {
   pageNumber: number;
   text?: string;
   imageData?: string;
+  fontSize?: number;
+  textColor?: string;
+  fieldName?: string;
+  isFormField?: boolean;
+  fieldType?: 'text' | 'checkbox' | 'radio' | 'dropdown';
+  isChecked?: boolean;
+  groupId?: string;  // For grouping related fields (like SSN digit boxes)
+  groupIndex?: number;  // Position within the group (0, 1, 2, etc.)
+}
+
+interface FieldSplitConfig {
+  [fieldName: string]: number; // field name -> number of boxes
+}
+
+// Known form configurations
+const FORM_FIELD_CONFIGS: { [formType: string]: FieldSplitConfig } = {
+  'FW9': {
+    // SSN fields: 3 digits + 2 digits + 4 digits = 9 total
+    'topmostSubform[0].Page1[0].f1_11[0]': 3,  // SSN part 1
+    'topmostSubform[0].Page1[0].f1_12[0]': 2,  // SSN part 2
+    'topmostSubform[0].Page1[0].f1_13[0]': 4,  // SSN part 3
+    // EIN fields: 2 digits + 7 digits = 9 total
+    'topmostSubform[0].Page1[0].f1_14[0]': 2,  // EIN part 1
+    'topmostSubform[0].Page1[0].f1_15[0]': 7,  // EIN part 2
+  }
+};
+
+interface FormField {
+  name: string;
+  value: string;
+  type: string;
+  rect: number[];
+  pageNumber: number;
+}
+
+interface TextItem {
+  text: string;
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  fontSize: number;
+  fontName: string;
+  pageNumber: number;
 }
 
 export default function PDFEditorSimple({ file }: PDFEditorProps) {
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
-  const [selectedTool, setSelectedTool] = useState<'select' | 'text' | 'signature'>('select');
+  const [selectedTool, setSelectedTool] = useState<'select' | 'text' | 'signature' | 'eraser'>('select');
   const [selectedAnnotation, setSelectedAnnotation] = useState<string | null>(null);
   const [showSignatureModal, setShowSignatureModal] = useState(false);
   const [pendingSignaturePos, setPendingSignaturePos] = useState<{x: number, y: number} | null>(null);
+  const [fontSize, setFontSize] = useState<number>(16);
+  const [textColor, setTextColor] = useState<string>('#000000');
+  const [formFields, setFormFields] = useState<FormField[]>([]);
+  const [showFormFields, setShowFormFields] = useState(false);
+  const [contextMenu, setContextMenu] = useState<{ x: number; y: number; annotationId: string } | null>(null);
+  const [splitDialogOpen, setSplitDialogOpen] = useState(false);
+  const [splitCount, setSplitCount] = useState<number>(2);
+  const [extractedText, setExtractedText] = useState<TextItem[]>([]);
+  const [makeEditableMode, setMakeEditableMode] = useState(false);
+  const [isExtractingText, setIsExtractingText] = useState(false);
+  const [pageScale, setPageScale] = useState<number>(1);
 
   // Drag and resize state
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -38,6 +93,8 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
   const [resizingId, setResizingId] = useState<string | null>(null);
   const [resizeHandle, setResizeHandle] = useState<'nw' | 'ne' | 'sw' | 'se' | null>(null);
   const [resizeStart, setResizeStart] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
+  const [selectedSignatureId, setSelectedSignatureId] = useState<string | null>(null);
+  const [confirmedSignatureIds, setConfirmedSignatureIds] = useState<Set<string>>(new Set());
 
   const signatureCanvasRef = useRef<HTMLCanvasElement>(null);
   const signaturePadRef = useRef<SignaturePad | null>(null);
@@ -47,51 +104,695 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
     console.log('Annotations updated:', annotations);
   }, [annotations]);
 
+  // Handle drag and resize mouse events
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (draggingId && pdfContainerRef.current) {
+        const containerRect = pdfContainerRef.current.getBoundingClientRect();
+        const newX = (e.clientX - containerRect.left - dragOffset.x) / pageScale;
+        const newY = (e.clientY - containerRect.top - dragOffset.y) / pageScale;
+
+        setAnnotations(prev =>
+          prev.map(ann =>
+            ann.id === draggingId
+              ? { ...ann, x: newX, y: newY }
+              : ann
+          )
+        );
+      } else if (resizingId && resizeStart) {
+        const deltaX = e.clientX - resizeStart.x;
+        const deltaY = e.clientY - resizeStart.y;
+        const newWidth = Math.max(50, resizeStart.width + deltaX) / pageScale;
+        const newHeight = Math.max(30, resizeStart.height + deltaY) / pageScale;
+
+        setAnnotations(prev =>
+          prev.map(ann =>
+            ann.id === resizingId
+              ? { ...ann, width: newWidth, height: newHeight }
+              : ann
+          )
+        );
+      }
+    };
+
+    const handleMouseUp = () => {
+      setDraggingId(null);
+      setResizingId(null);
+      setResizeStart(null);
+    };
+
+    if (draggingId || resizingId) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      return () => {
+        document.removeEventListener('mousemove', handleMouseMove);
+        document.removeEventListener('mouseup', handleMouseUp);
+      };
+    }
+  }, [draggingId, resizingId, dragOffset, resizeStart, pageScale]);
+
   useEffect(() => {
     if (showSignatureModal && signatureCanvasRef.current) {
       signaturePadRef.current = new SignaturePad(signatureCanvasRef.current, {
-        backgroundColor: 'rgb(255, 255, 255)',
+        backgroundColor: 'rgba(255, 255, 255, 0)',  // Transparent background
       });
     }
   }, [showSignatureModal]);
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
+  const onDocumentLoadSuccess = async ({ numPages }: { numPages: number }) => {
     setNumPages(numPages);
+    // Automatically extract form fields on load (like Adobe Fill & Sign)
+    const extractedFields = await extractFormFields();
+
+    // If no fields found with pdf-lib, try pdf.js annotation detection
+    if (extractedFields.length === 0) {
+      console.log('No AcroForm fields found, trying pdf.js annotation detection...');
+      await extractAnnotationsWithPdfJs();
+    }
+
+    setShowFormFields(true);
+  };
+
+  const extractAllText = async () => {
+    if (isExtractingText) return;
+    setIsExtractingText(true);
+
+    try {
+      const loadingTask = pdfjs.getDocument(await file.arrayBuffer());
+      const pdf = await loadingTask.promise;
+      const allTextItems: TextItem[] = [];
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const textContent = await page.getTextContent();
+        const viewport = page.getViewport({ scale: 1 });
+
+        for (const item of textContent.items) {
+          if ('str' in item && item.str.trim()) {
+            // Extract transform matrix: [scaleX, skewY, skewX, scaleY, translateX, translateY]
+            const transform = item.transform;
+            const x = transform[4];
+            const y = transform[5];
+            const fontSize = Math.sqrt(transform[0] * transform[0] + transform[1] * transform[1]);
+            const width = item.width;
+            const height = item.height;
+
+            // Convert PDF coordinates (bottom-left origin) to canvas coordinates (top-left origin)
+            const canvasY = viewport.height - y - height;
+
+            allTextItems.push({
+              text: item.str,
+              x: x,
+              y: canvasY,
+              width: width,
+              height: height,
+              fontSize: fontSize,
+              fontName: item.fontName || 'default',
+              pageNumber: pageNum,
+            });
+          }
+        }
+      }
+
+      console.log('Extracted text items:', allTextItems);
+      setExtractedText(allTextItems);
+
+      // Convert text items to editable annotations
+      if (allTextItems.length > 0) {
+        convertTextItemsToAnnotations(allTextItems);
+      }
+    } catch (error) {
+      console.error('Error extracting text:', error);
+      alert('Error extracting text from PDF. The PDF may not contain extractable text.');
+    } finally {
+      setIsExtractingText(false);
+    }
+  };
+
+  const convertTextItemsToAnnotations = (textItems: TextItem[]) => {
+    const newAnnotations: Annotation[] = textItems.map((item, index) => ({
+      id: `text-${index}-${Date.now()}`,
+      type: 'formfield' as const,
+      x: item.x,
+      y: item.y,
+      width: item.width,
+      height: item.height,
+      pageNumber: item.pageNumber,
+      text: item.text,
+      isFormField: false,
+      fontSize: Math.max(8, item.fontSize * 0.8), // Slightly smaller to fit
+      textColor: '#000000',
+    }));
+
+    // Clear existing annotations and set new ones
+    setAnnotations(newAnnotations);
+  };
+
+  const splitFieldIntoBoxes = (annotationId: string, boxCount: number) => {
+    const annotation = annotations.find(a => a.id === annotationId);
+    if (!annotation || annotation.fieldType !== 'text') return;
+
+    // Remove the original annotation
+    const otherAnnotations = annotations.filter(a => a.id !== annotationId);
+
+    // Create new split boxes
+    const boxWidth = annotation.width / boxCount;
+    const gap = boxWidth * 0.05;
+    const actualBoxWidth = boxWidth - gap;
+
+    const newBoxes: Annotation[] = [];
+    for (let i = 0; i < boxCount; i++) {
+      const boxX = annotation.x + (i * boxWidth);
+      newBoxes.push({
+        ...annotation,
+        id: `${annotationId}-split${i}-${Date.now()}`,
+        x: boxX,
+        width: actualBoxWidth,
+        fieldName: `${annotation.fieldName}_${i}`,
+        text: '', // Clear text when splitting
+      });
+    }
+
+    setAnnotations([...otherAnnotations, ...newBoxes]);
+    console.log(`✂️ Split field into ${boxCount} boxes`);
+  };
+
+  const extractFormFields = async () => {
+    console.log('=== STARTING FORM FIELD EXTRACTION ===');
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      console.log('PDF loaded, size:', arrayBuffer.byteLength, 'bytes');
+
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      console.log('PDFDocument loaded');
+
+      const form = pdfDoc.getForm();
+      console.log('Form object:', form);
+
+      const fields = form.getFields();
+      console.log('Total fields found:', fields.length);
+
+      const extractedFields: FormField[] = [];
+
+      for (const field of fields) {
+        const fieldName = field.getName();
+        console.log('Processing field:', fieldName);
+
+        let fieldValue = '';
+        let fieldType = 'unknown';
+
+        try {
+          // Try to get value based on field type
+          const fieldConstructor = field.constructor.name;
+          console.log('  Field type:', fieldConstructor);
+
+          if (fieldConstructor === 'PDFTextField') {
+            const textField = form.getTextField(fieldName);
+            fieldValue = textField.getText() || '';
+            fieldType = 'text';
+          } else if (fieldConstructor === 'PDFCheckBox') {
+            const checkBox = form.getCheckBox(fieldName);
+            fieldValue = checkBox.isChecked() ? 'Yes' : 'No';
+            fieldType = 'checkbox';
+          } else if (fieldConstructor === 'PDFDropdown') {
+            const dropdown = form.getDropdown(fieldName);
+            const selected = dropdown.getSelected();
+            fieldValue = selected ? selected.join(', ') : '';
+            fieldType = 'dropdown';
+          } else if (fieldConstructor === 'PDFRadioGroup') {
+            const radioGroup = form.getRadioGroup(fieldName);
+            fieldValue = radioGroup.getSelected() || '';
+            fieldType = 'radio';
+          }
+
+          // Get field widget (location info)
+          const widgets = (field as any).acroField.getWidgets();
+          console.log('  Widgets found:', widgets?.length || 0);
+
+          if (widgets && widgets.length > 0) {
+            const widget = widgets[0];
+            const rect = widget.getRectangle();
+
+            // Try to find the page index by checking each page
+            let pageIndex = -1;
+            const pages = pdfDoc.getPages();
+            const pageRef = widget.P();
+
+            // Try comparing page.ref with pageRef (most reliable method)
+            for (let i = 0; i < pages.length; i++) {
+              if (pages[i].ref === pageRef) {
+                pageIndex = i;
+                break;
+              }
+            }
+
+            // Fallback: try indexOf
+            if (pageIndex === -1) {
+              pageIndex = pages.indexOf(pageRef as any);
+            }
+
+            // Fallback 2: try comparing page.node
+            if (pageIndex === -1) {
+              for (let i = 0; i < pages.length; i++) {
+                const pageDict = (pages[i] as any).node;
+                if (pageDict === pageRef || pageDict.dict === pageRef) {
+                  pageIndex = i;
+                  break;
+                }
+              }
+            }
+
+            // If still not found, default to page 0
+            if (pageIndex === -1) {
+              console.log('  ⚠️ Could not determine page, defaulting to page 1');
+              pageIndex = 0;
+            }
+
+            console.log('  Rectangle:', rect);
+            console.log('  Page index:', pageIndex);
+
+            if (rect) {
+              extractedFields.push({
+                name: fieldName,
+                value: fieldValue,
+                type: fieldType,
+                rect: [rect.x, rect.y, rect.width, rect.height],
+                pageNumber: pageIndex + 1,
+              });
+              console.log('  ✓ Field extracted successfully');
+            } else {
+              console.log('  ✗ No rectangle found');
+            }
+          } else {
+            console.log('  ✗ No widgets found');
+          }
+        } catch (err) {
+          console.warn(`Could not extract field ${fieldName}:`, err);
+        }
+      }
+
+      console.log('=== EXTRACTION COMPLETE ===');
+      console.log('Total fields extracted:', extractedFields.length);
+      console.log('Extracted form fields:', extractedFields);
+      setFormFields(extractedFields);
+
+      // Automatically create annotations for form fields
+      if (extractedFields.length > 0) {
+        console.log('Converting fields to annotations...');
+        await convertFormFieldsToAnnotations(extractedFields);
+      } else {
+        console.log('⚠️ No fields to convert - PDF may not have form fields');
+      }
+
+      return extractedFields;
+    } catch (error) {
+      console.error('❌ Error extracting form fields:', error);
+      return [];
+    }
+  };
+
+  const extractAnnotationsWithPdfJs = async () => {
+    console.log('=== EXTRACTING ANNOTATIONS WITH PDF.JS ===');
+    try {
+      const loadingTask = pdfjs.getDocument(await file.arrayBuffer());
+      const pdf = await loadingTask.promise;
+      console.log('PDF loaded, total pages:', pdf.numPages);
+
+      const newAnnotations: Annotation[] = [];
+
+      for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+        const page = await pdf.getPage(pageNum);
+        const annotations = await page.getAnnotations();
+
+        console.log(`Page ${pageNum}: Found ${annotations.length} annotations`);
+
+        for (const annot of annotations) {
+          console.log('Annotation:', annot);
+
+          // Check if it's a widget annotation (form field)
+          if (annot.subtype === 'Widget' && annot.fieldType) {
+            const rect = annot.rect; // [x1, y1, x2, y2]
+            const x = rect[0];
+            const y = rect[1];
+            const width = rect[2] - rect[0];
+            const height = rect[3] - rect[1];
+
+            const viewport = page.getViewport({ scale: 1 });
+            const pageHeight = viewport.height;
+
+            // Convert PDF coordinates to canvas coordinates
+            const canvasY = pageHeight - rect[3];
+
+            console.log(`  Widget field:`, {
+              fieldName: annot.fieldName,
+              fieldType: annot.fieldType,
+              rect,
+              converted: { x, y: canvasY, width, height }
+            });
+
+            // Create annotation based on field type
+            if (annot.fieldType === 'Tx') { // Text field
+              newAnnotations.push({
+                id: `pdfjs-field-${annot.fieldName || annot.id}-${Date.now()}`,
+                type: 'formfield' as const,
+                x: x,
+                y: canvasY,
+                width: width,
+                height: height,
+                pageNumber: pageNum,
+                text: annot.fieldValue || '',
+                fieldName: annot.fieldName || `field-${annot.id}`,
+                isFormField: true,
+                fieldType: 'text',
+                fontSize: Math.min(12, height * 0.7),
+                textColor: '#000000',
+              });
+            } else if (annot.fieldType === 'Btn') { // Button/Checkbox
+              newAnnotations.push({
+                id: `pdfjs-checkbox-${annot.fieldName || annot.id}-${Date.now()}`,
+                type: 'formfield' as const,
+                x: x,
+                y: canvasY,
+                width: width,
+                height: height,
+                pageNumber: pageNum,
+                text: annot.buttonValue ? '☑' : '☐',
+                fieldName: annot.fieldName || `checkbox-${annot.id}`,
+                isFormField: true,
+                fieldType: 'checkbox',
+                isChecked: annot.buttonValue === 'Yes' || annot.buttonValue === true,
+                fontSize: Math.min(16, height * 0.8),
+                textColor: '#000000',
+              });
+            }
+          }
+        }
+      }
+
+      console.log('=== PDF.JS EXTRACTION COMPLETE ===');
+      console.log('Total annotations found:', newAnnotations.length);
+
+      if (newAnnotations.length > 0) {
+        setAnnotations(newAnnotations);
+        console.log('Annotations set from pdf.js detection');
+      } else {
+        console.log('⚠️ No widget annotations found with pdf.js either');
+      }
+    } catch (error) {
+      console.error('❌ Error extracting annotations with pdf.js:', error);
+    }
+  };
+
+  const detectFormType = (fields: FormField[]): string | null => {
+    // Check field names to identify form type
+    const fieldNames = fields.map(f => f.name);
+
+    // Check for FW9 - look for characteristic field names
+    if (fieldNames.some(name => name.includes('topmostSubform') && name.includes('Page1'))) {
+      console.log('📋 Detected form type: FW9');
+      return 'FW9';
+    }
+
+    console.log('📋 Form type not recognized - using generic handling');
+    return null;
+  };
+
+  const extractVisualBoxes = async (pageNum: number) => {
+    try {
+      const loadingTask = pdfjs.getDocument(await file.arrayBuffer());
+      const pdf = await loadingTask.promise;
+      const page = await pdf.getPage(pageNum);
+      const ops = await page.getOperatorList();
+
+      const rectangles: { x: number; y: number; width: number; height: number }[] = [];
+
+      // Scan for rectangle drawing operations
+      for (let i = 0; i < ops.fnArray.length; i++) {
+        const fn = ops.fnArray[i];
+        const args = ops.argsArray[i];
+
+        // OPS.rectangle = 43 (re command in PDF)
+        if (fn === 43 && args.length >= 4) {
+          const [x, y, width, height] = args;
+          rectangles.push({ x, y, width, height });
+        }
+      }
+
+      return rectangles;
+    } catch (error) {
+      console.error('Error extracting visual boxes:', error);
+      return [];
+    }
+  };
+
+  const convertFormFieldsToAnnotations = async (fields: FormField[]) => {
+    console.log('=== CONVERTING FORM FIELDS TO ANNOTATIONS ===');
+    console.log('Fields to convert:', fields.length);
+    try {
+      // We need the page dimensions to convert coordinates
+      const arrayBuffer = await file.arrayBuffer();
+      const pdfDoc = await PDFDocument.load(arrayBuffer);
+      const pages = pdfDoc.getPages();
+      console.log('Total pages:', pages.length);
+
+      const newAnnotations: Annotation[] = [];
+
+      // Detect form type to use configurations
+      const formType = detectFormType(fields);
+      const fieldConfig = formType ? FORM_FIELD_CONFIGS[formType] : {};
+
+      // Extract visual boxes from PDF for intelligent field splitting
+      const visualBoxesCache = new Map<number, { x: number; y: number; width: number; height: number }[]>();
+
+      for (const field of fields) {
+        const [x, y, width, height] = field.rect;
+        const pageIndex = field.pageNumber - 1;
+
+        console.log(`Converting field "${field.name}":`, {
+          type: field.type,
+          rect: field.rect,
+          pageNumber: field.pageNumber,
+          pageIndex
+        });
+
+        // Check if page exists
+        if (pageIndex >= 0 && pageIndex < pages.length) {
+          const page = pages[pageIndex];
+          const pageHeight = page.getSize().height;
+
+          // Convert PDF coordinates (bottom-left origin) to canvas coordinates (top-left origin)
+          let canvasY = pageHeight - y - height;
+
+          // Only shift upward for single-line text fields (not digit boxes)
+          // Digit boxes (height > 20) and wide fields should stay in their original position
+          const isDigitBox = height > 20 || (width < height * 2);
+          if (!isDigitBox) {
+            // Shift boxes upward so the bottom border sits on the line
+            canvasY = canvasY - (height * 0.5);
+          }
+
+          // For text fields, check if we should split into individual digit boxes
+          if (field.type === 'text') {
+            let boxCount = 0;
+
+            // Priority 1: Check configuration for this specific field
+            if (fieldConfig[field.name]) {
+              boxCount = fieldConfig[field.name];
+              console.log(`  ✓ Using configured split: ${boxCount} boxes for field: ${field.name}`);
+            } else if (width > height * 1.5) {
+              // Only use heuristic splitting if no config exists
+              console.log(`  No config for field: ${field.name}, checking heuristics...`);
+            } else {
+              console.log(`  Field ${field.name} too narrow for splitting (width:${width} height:${height})`);
+            }
+
+            // Priority 2: Try to detect visual boxes (only for wider fields without config)
+            if (boxCount === 0 && width > height * 1.5) {
+              if (!visualBoxesCache.has(field.pageNumber)) {
+                console.log(`  Extracting visual boxes from page ${field.pageNumber}...`);
+                const boxes = await extractVisualBoxes(field.pageNumber);
+                visualBoxesCache.set(field.pageNumber, boxes);
+                console.log(`  Found ${boxes.length} visual rectangles on page`);
+              }
+
+              const visualBoxes = visualBoxesCache.get(field.pageNumber) || [];
+
+              // Find visual boxes that are WITHIN this form field's boundaries
+              const tolerance = 5;
+              const containedBoxes = visualBoxes.filter(box => {
+                const boxInBounds =
+                  box.x >= (x - tolerance) &&
+                  box.x + box.width <= (x + width + tolerance) &&
+                  box.y >= (y - tolerance) &&
+                  box.y + box.height <= (y + height + tolerance);
+
+                const isSmallBox = box.width > 5 && box.width < 50 && box.height > 5 && box.height < 50;
+                return boxInBounds && isSmallBox;
+              });
+
+              containedBoxes.sort((a, b) => a.x - b.x);
+
+              if (containedBoxes.length >= 2) {
+                console.log(`  ✓ Using ${containedBoxes.length} detected visual boxes`);
+
+                // Use the ACTUAL visual boxes!
+                for (let i = 0; i < containedBoxes.length; i++) {
+                  const vbox = containedBoxes[i];
+                  let vboxCanvasY = pageHeight - vbox.y - vbox.height;
+
+                  // Don't shift digit boxes upward
+                  const isDigitBox = vbox.height > 20 || (vbox.width < vbox.height * 2);
+                  if (!isDigitBox) {
+                    vboxCanvasY = vboxCanvasY - (vbox.height * 0.5);
+                  }
+
+                  const annotation = {
+                    id: `formfield-${field.name}-box${i}-${Date.now()}`,
+                    type: 'formfield' as const,
+                    x: vbox.x,
+                    y: vboxCanvasY,
+                    width: vbox.width,
+                    height: vbox.height,
+                    pageNumber: field.pageNumber,
+                    text: '',
+                    fieldName: `${field.name}_digit${i}`,
+                    isFormField: true,
+                    fieldType: 'text' as const,
+                    isChecked: false,
+                    fontSize: Math.min(12, vbox.height * 0.7),
+                    textColor: '#000000',
+                  };
+                  newAnnotations.push(annotation);
+                }
+                continue; // Skip to next field
+              }
+            }
+
+            // Use configured or default box count
+            if (boxCount >= 2) {
+              const boxWidth = width / boxCount;
+              const gap = boxWidth * 0.05;
+              const actualBoxWidth = boxWidth - gap;
+
+              console.log(`  Creating ${boxCount} evenly-spaced boxes`);
+
+              for (let i = 0; i < boxCount; i++) {
+                const boxX = x + (i * boxWidth);
+                const annotation = {
+                  id: `formfield-${field.name}-box${i}-${Date.now()}`,
+                  type: 'formfield' as const,
+                  x: boxX,
+                  y: canvasY,
+                  width: actualBoxWidth,
+                  height: height,
+                  pageNumber: field.pageNumber,
+                  text: '',
+                  fieldName: `${field.name}_digit${i}`,
+                  isFormField: true,
+                  fieldType: 'text' as const,
+                  isChecked: false,
+                  fontSize: Math.min(12, height * 0.7),
+                  textColor: '#000000',
+                  groupId: field.name,  // All boxes from same field share groupId
+                  groupIndex: i,  // Position in the group
+                };
+                newAnnotations.push(annotation);
+              }
+            } else {
+              // Single box - create as normal
+              const annotation = {
+                id: `formfield-${field.name}-${Date.now()}`,
+                type: 'formfield' as const,
+                x: x,
+                y: canvasY,
+                width: width,
+                height: height,
+                pageNumber: field.pageNumber,
+                text: '',
+                fieldName: field.name,
+                isFormField: true,
+                fieldType: 'text' as const,
+                isChecked: false,
+                fontSize: Math.min(12, height * 0.7),
+                textColor: '#000000',
+              };
+              console.log('  Created single annotation:', annotation);
+              newAnnotations.push(annotation);
+            }
+          } else {
+            // Checkbox, radio, dropdown, or narrow text field - create as normal
+            const annotation = {
+              id: `formfield-${field.name}-${Date.now()}`,
+              type: 'formfield' as const,
+              x: x,
+              y: canvasY,
+              width: width,
+              height: height,
+              pageNumber: field.pageNumber,
+              text: field.type === 'checkbox' ? (field.value === 'Yes' ? '☑' : '☐') : '',
+              fieldName: field.name,
+              isFormField: true,
+              fieldType: field.type as 'text' | 'checkbox' | 'radio' | 'dropdown',
+              isChecked: field.type === 'checkbox' && field.value === 'Yes',
+              fontSize: Math.min(12, height * 0.7),
+              textColor: '#000000',
+            };
+
+            console.log('  Created annotation:', annotation);
+            newAnnotations.push(annotation);
+          }
+        } else {
+          console.warn(`Page ${field.pageNumber} not found for field ${field.name}`);
+        }
+      }
+
+      console.log('=== CONVERSION COMPLETE ===');
+      console.log('Total annotations created:', newAnnotations.length);
+      console.log('Annotations:', newAnnotations);
+
+      // Replace all annotations with just the form fields
+      setAnnotations(newAnnotations);
+      console.log('Annotations state updated');
+    } catch (error) {
+      console.error('❌ Error converting form fields:', error);
+    }
   };
 
   const handlePdfClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (selectedTool === 'select') return;
-
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
 
-    console.log('PDF clicked at:', x, y, 'tool:', selectedTool);
-
+    // Handle text placement
     if (selectedTool === 'text') {
-      // Create text annotation immediately
       const newAnnotation: Annotation = {
         id: Date.now().toString(),
         type: 'text',
         x,
         y,
         width: 200,
-        height: 50,
+        height: 30,
         pageNumber: currentPage,
-        text: 'Double-click to edit',
+        text: '',
+        fontSize: 14,
+        textColor: '#000000',
       };
 
-      console.log('Creating text annotation:', newAnnotation);
-      setAnnotations(prev => {
-        const updated = [...prev, newAnnotation];
-        console.log('Annotations after adding text:', updated);
-        return updated;
-      });
+      setAnnotations(prev => [...prev, newAnnotation]);
+
+      // Deselect tool after placing text
       setSelectedTool('select');
-    } else if (selectedTool === 'signature') {
+    }
+    // Handle signature placement
+    else if (selectedTool === 'signature') {
       // Store position and open modal
       setPendingSignaturePos({ x, y });
       setShowSignatureModal(true);
+    }
+    // Deselect any selected annotation when clicking on empty PDF area
+    else {
+      setSelectedAnnotation(null);
+      setSelectedSignatureId(null);
     }
   };
 
@@ -239,22 +940,147 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
 
   const downloadPDF = async () => {
     try {
+      console.log('=== DOWNLOAD STARTED ===');
+      console.log(`Total annotations: ${annotations.length}`);
+
       const existingPdfBytes = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(existingPdfBytes);
       const pages = pdfDoc.getPages();
+      const form = pdfDoc.getForm();
 
+      // First, handle grouped fields (SSN/EIN) - reconstruct full values
+      const groupedFields = new Map<string, { fieldName: string; digits: string[] }>();
+      for (const annotation of annotations) {
+        if (annotation.type === 'formfield') {
+          console.log(`Formfield: ${annotation.fieldName}, has groupId: ${!!annotation.groupId}, groupIndex: ${annotation.groupIndex}, text: "${annotation.text}"`);
+        }
+        if (annotation.type === 'formfield' && annotation.groupId && annotation.groupIndex !== undefined) {
+          console.log(`  ✓ Found grouped field: groupId=${annotation.groupId}, index=${annotation.groupIndex}, text="${annotation.text}"`);
+          if (!groupedFields.has(annotation.groupId)) {
+            groupedFields.set(annotation.groupId, { fieldName: annotation.groupId, digits: [] });
+          }
+          const group = groupedFields.get(annotation.groupId)!;
+          group.digits[annotation.groupIndex] = annotation.text || '';
+        }
+      }
+      console.log(`Total grouped fields found: ${groupedFields.size}`);
+
+      // Set the reconstructed values for grouped fields
+      for (const [groupId, group] of groupedFields) {
+        try {
+          const fullValue = group.digits.join('');
+          console.log(`Setting grouped field ${groupId} to: "${fullValue}"`);
+          const field = form.getFieldMaybe(groupId);
+          if (field && field.constructor.name === 'PDFTextField') {
+            const textField = form.getTextField(groupId);
+            textField.setText(fullValue);
+            textField.enableReadOnly();
+            console.log(`  ✓ Successfully set ${groupId}`);
+          } else {
+            console.warn(`  ✗ Field ${groupId} not found or not a text field`);
+          }
+        } catch (err) {
+          console.warn(`Could not update grouped field ${groupId}:`, err);
+        }
+      }
+
+      // Then, update regular form field values
+      for (const annotation of annotations) {
+        if (annotation.type === 'formfield' && annotation.fieldName && annotation.isFormField && !annotation.groupId) {
+          try {
+            const field = form.getFieldMaybe(annotation.fieldName);
+            if (field) {
+              const fieldConstructor = field.constructor.name;
+              if (fieldConstructor === 'PDFTextField') {
+                const textField = form.getTextField(annotation.fieldName);
+                // Set the form field value
+                textField.setText(annotation.text || '');
+                // Make the field read-only to prevent editing
+                textField.enableReadOnly();
+              } else if (fieldConstructor === 'PDFCheckBox') {
+                const checkBox = form.getCheckBox(annotation.fieldName);
+                if (annotation.isChecked) {
+                  checkBox.check();
+                } else {
+                  checkBox.uncheck();
+                }
+              }
+            }
+          } catch (err) {
+            console.warn(`Could not update field ${annotation.fieldName}:`, err);
+          }
+        }
+      }
+
+      // Then, add other annotations (text, signatures, erasers, and editable text)
       for (const annotation of annotations) {
         const page = pages[annotation.pageNumber - 1];
         if (!page) continue;
 
         const { height } = page.getSize();
 
-        if (annotation.type === 'text' && annotation.text) {
+        // Skip formfield annotations - they were already handled above by setting form values
+        if (annotation.type === 'formfield' && annotation.isFormField) {
+          continue;
+        } else if (annotation.type === 'eraser') {
+          // Draw white rectangle to cover existing content
+          page.drawRectangle({
+            x: annotation.x,
+            y: height - annotation.y - annotation.height,
+            width: annotation.width,
+            height: annotation.height,
+            color: rgb(1, 1, 1), // White
+          });
+        } else if (annotation.type === 'formfield' && annotation.isFormField === false) {
+          // This is an editable text item (from Make Editable mode)
+          // First, draw white rectangle to cover original text
+          page.drawRectangle({
+            x: annotation.x,
+            y: height - annotation.y - annotation.height,
+            width: annotation.width,
+            height: annotation.height,
+            color: rgb(1, 1, 1), // White
+          });
+
+          // Then, draw the new text
+          if (annotation.text) {
+            const textSize = annotation.fontSize || 12;
+            const colorMatch = annotation.textColor?.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+            const textRgb = colorMatch
+              ? rgb(
+                  parseInt(colorMatch[1], 16) / 255,
+                  parseInt(colorMatch[2], 16) / 255,
+                  parseInt(colorMatch[3], 16) / 255
+                )
+              : rgb(0, 0, 0);
+
+            try {
+              page.drawText(annotation.text, {
+                x: annotation.x,
+                y: height - annotation.y - annotation.height + 2,
+                size: textSize,
+                color: textRgb,
+              });
+            } catch (err) {
+              console.warn('Could not draw text:', err);
+            }
+          }
+        } else if (annotation.type === 'text' && annotation.text) {
+          const textSize = annotation.fontSize || 16;
+          const colorMatch = annotation.textColor?.match(/^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i);
+          const textRgb = colorMatch
+            ? rgb(
+                parseInt(colorMatch[1], 16) / 255,
+                parseInt(colorMatch[2], 16) / 255,
+                parseInt(colorMatch[3], 16) / 255
+              )
+            : rgb(0, 0, 0);
+
           page.drawText(annotation.text, {
             x: annotation.x,
-            y: height - annotation.y - 20,
-            size: 16,
-            color: rgb(0, 0, 0),
+            y: height - annotation.y - textSize - 5,
+            size: textSize,
+            color: textRgb,
           });
         } else if (annotation.type === 'signature' && annotation.imageData) {
           const imageBytes = Uint8Array.from(
@@ -272,7 +1098,7 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
       }
 
       const pdfBytes = await pdfDoc.save();
-      const blob = new Blob([pdfBytes], { type: 'application/pdf' });
+      const blob = new Blob([pdfBytes as any], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
@@ -288,41 +1114,51 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
   return (
     <div className="flex h-screen flex-col">
       {/* Toolbar */}
-      <div className="bg-gradient-to-b from-gray-100 to-gray-200 border-b border-gray-300 px-4 py-3 flex gap-4 items-center">
-        <div className="bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden inline-flex">
-          <button
-            onClick={() => setSelectedTool('select')}
-            className={`px-4 py-2 text-sm font-medium transition-all border-r border-gray-300 ${
-              selectedTool === 'select' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            ↖ Select
-          </button>
-          <button
-            onClick={() => setSelectedTool('text')}
-            className={`px-4 py-2 text-sm font-medium transition-all border-r border-gray-300 ${
-              selectedTool === 'text' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            Aa Text
-          </button>
-          <button
-            onClick={() => setSelectedTool('signature')}
-            className={`px-4 py-2 text-sm font-medium transition-all ${
-              selectedTool === 'signature' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'
-            }`}
-          >
-            ✍️ Sign
-          </button>
-        </div>
+      <div className="bg-white border-b border-gray-200 px-6 py-4 flex gap-4 items-center flex-wrap shadow-sm">
+        <button
+          onClick={() => setSelectedTool('text')}
+          className={`px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
+            selectedTool === 'text'
+              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40'
+              : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
+          }`}
+        >
+          <span className="inline-flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Add Text
+          </span>
+        </button>
+
+        <button
+          onClick={() => setSelectedTool('signature')}
+          className={`px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
+            selectedTool === 'signature'
+              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40'
+              : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
+          }`}
+        >
+          <span className="inline-flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+            </svg>
+            Add Signature
+          </span>
+        </button>
 
         <div className="flex-1" />
 
         <button
           onClick={downloadPDF}
-          className="px-5 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-medium"
+          className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-200"
         >
-          📥 Download
+          <span className="inline-flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            Download
+          </span>
         </button>
       </div>
 
@@ -332,13 +1168,22 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
           ref={pdfContainerRef}
           className="relative bg-white shadow-2xl mx-auto w-fit"
           onClick={handlePdfClick}
-          onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUp}
-          onMouseLeave={handleMouseUp}
-          style={{ cursor: selectedTool !== 'select' ? 'crosshair' : 'default' }}
+          style={{ cursor: selectedTool === 'signature' || selectedTool === 'text' ? 'crosshair' : 'default' }}
         >
           <Document file={file} onLoadSuccess={onDocumentLoadSuccess}>
-            <Page pageNumber={currentPage} renderTextLayer={false} renderAnnotationLayer={false} />
+            <div style={{ pointerEvents: 'none' }}>
+              <Page
+                pageNumber={currentPage}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+                onRenderSuccess={(page) => {
+                  console.log('Page rendered:', page);
+                  const scale = page.width / page.originalWidth;
+                  console.log('Calculated scale:', scale);
+                  setPageScale(scale);
+                }}
+              />
+            </div>
           </Document>
 
           {/* Render Annotations */}
@@ -349,177 +1194,482 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
                 key={ann.id}
                 style={{
                   position: 'absolute',
-                  left: ann.x,
-                  top: ann.y,
-                  width: ann.width,
-                  height: ann.height,
-                  border: selectedTool === 'select' ? '2px solid rgba(59, 130, 246, 0.8)' : '2px dashed rgba(100, 100, 100, 0.3)',
-                  backgroundColor: ann.type === 'text' ? 'rgba(255, 255, 255, 0.9)' : 'transparent',
-                  cursor: selectedTool === 'select' ? 'move' : 'default',
-                  padding: ann.type === 'text' ? '8px' : '0',
+                  left: ann.fieldType === 'checkbox' ? (ann.x * pageScale) - 6 : ann.x * pageScale,
+                  top: ann.fieldType === 'checkbox' ? (ann.y * pageScale) - 6 : ann.y * pageScale,
+                  width: ann.fieldType === 'checkbox' ? Math.max(ann.width * pageScale, 24) : ann.width * pageScale,
+                  height: ann.fieldType === 'checkbox' ? Math.max(ann.height * pageScale, 24) : ann.height * pageScale,
+                  padding: '0',
                   pointerEvents: 'auto',
-                }}
-                onMouseDown={(e) => startDrag(e, ann.id, ann)}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  if (selectedTool === 'select') {
-                    setSelectedAnnotation(ann.id);
-                  }
-                }}
-                onDoubleClick={(e) => {
-                  e.stopPropagation();
-                  if (ann.type === 'text') {
-                    const newText = prompt('Edit text:', ann.text);
-                    if (newText !== null) {
-                      updateAnnotationText(ann.id, newText);
-                    }
-                  }
+                  zIndex: 1000,
                 }}
               >
-                {ann.type === 'text' && (
-                  <div
+                {/* Render text fields */}
+                {ann.type === 'formfield' && ann.isFormField && ann.fieldType === 'text' && (
+                  <input
+                    type="text"
+                    value={ann.text || ''}
+                    onChange={(e) => {
+                      const newValue = e.target.value;
+                      updateAnnotationText(ann.id, newValue);
+
+                      // Auto-advance to next field if this is part of a group (SSN/EIN)
+                      if (ann.groupId && ann.groupIndex !== undefined && newValue.length === 1) {
+                        // Find the next field in the group
+                        const nextField = annotations.find(a =>
+                          a.groupId === ann.groupId &&
+                          a.groupIndex === (ann.groupIndex! + 1)
+                        );
+                        if (nextField) {
+                          // Focus the next field
+                          setTimeout(() => {
+                            const nextInput = document.querySelector(`input[data-field-id="${nextField.id}"]`) as HTMLInputElement;
+                            if (nextInput) {
+                              nextInput.focus();
+                              nextInput.select();
+                            }
+                          }, 0);
+                        }
+                      }
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                    }}
+                    data-field-id={ann.id}
+                    onFocus={(e) => {
+                      e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+                      e.target.style.border = '2px solid rgba(99, 102, 241, 0.8)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.border = '1px solid rgba(99, 102, 241, 0.3)';
+                    }}
                     style={{
-                      fontSize: '16px',
-                      color: '#000',
-                      userSelect: 'none',
-                      wordWrap: 'break-word',
-                      overflow: 'hidden',
+                      width: '100%',
+                      height: '100%',
+                      border: '1px solid rgba(99, 102, 241, 0.3)',
+                      outline: 'none',
+                      backgroundColor: 'transparent',
+                      fontSize: `${Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.55)}px`,
+                      color: '#000000',
+                      fontWeight: ann.groupId ? '600' : 'normal',
+                      padding: ann.groupId ? '2px 1px' : '1px 3px',
+                      boxSizing: 'border-box',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      transition: 'all 0.15s ease',
+                      cursor: 'text',
+                      pointerEvents: 'auto',
+                      zIndex: 1001,
+                      position: 'relative',
+                      borderRadius: '2px',
+                      overflow: 'visible',
+                      textOverflow: 'clip',
+                      whiteSpace: 'nowrap',
+                      lineHeight: `${ann.height * pageScale - 4}px`,
+                      textAlign: ann.width < 40 ? 'center' : 'left',
+                    }}
+                    placeholder=""
+                    autoComplete="off"
+                    tabIndex={0}
+                    maxLength={ann.width < 40 ? 1 : undefined}
+                  />
+                )}
+                {/* Render checkboxes */}
+                {ann.type === 'formfield' && ann.isFormField && ann.fieldType === 'checkbox' && (
+                  <div
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                      console.log('🖱️ Checkbox clicked:', ann.id, 'Was:', ann.isChecked);
+                      // Toggle checkbox
+                      setAnnotations(prev =>
+                        prev.map(a =>
+                          a.id === ann.id
+                            ? { ...a, isChecked: !a.isChecked, text: !a.isChecked ? '☑' : '☐' }
+                            : a
+                        )
+                      );
+                      console.log('🖱️ Now should be:', !ann.isChecked);
+                    }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                      e.preventDefault();
+                    }}
+                    tabIndex={0}
+                    role="checkbox"
+                    aria-checked={ann.isChecked}
+                    style={{
                       width: '100%',
                       height: '100%',
                       display: 'flex',
                       alignItems: 'center',
                       justifyContent: 'center',
-                      textAlign: 'center',
+                      cursor: 'pointer',
+                      pointerEvents: 'auto',
+                      zIndex: 10000,
+                      fontSize: '16px',
+                      fontWeight: 'bold',
+                      color: '#000000',
+                      userSelect: 'none',
+                      backgroundColor: 'transparent',
+                      border: 'none',
+                      boxSizing: 'border-box',
                     }}
+                    title={ann.isChecked ? 'Checked - Click to uncheck' : 'Unchecked - Click to check'}
                   >
-                    {ann.text}
+                    {ann.isChecked ? '✓' : ''}
                   </div>
                 )}
-                {ann.type === 'signature' && ann.imageData && (
-                  <img
-                    src={ann.imageData}
-                    alt="Signature"
+                {/* Render fields without specified type as text inputs (fallback) */}
+                {ann.type === 'formfield' && ann.isFormField && !ann.fieldType && (
+                  <input
+                    type="text"
+                    value={ann.text || ''}
+                    onChange={(e) => {
+                      updateAnnotationText(ann.id, e.target.value);
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onMouseDown={(e) => {
+                      e.stopPropagation();
+                    }}
+                    onFocus={(e) => {
+                      e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+                      e.target.style.border = '2px solid rgba(99, 102, 241, 0.8)';
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.border = '1px solid rgba(99, 102, 241, 0.3)';
+                    }}
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'contain',
-                      pointerEvents: 'none',
+                      border: '1px solid rgba(99, 102, 241, 0.3)',
+                      outline: 'none',
+                      backgroundColor: 'transparent',
+                      fontSize: `${Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.6)}px`,
+                      color: ann.textColor || '#000',
+                      padding: '1px 3px',
+                      boxSizing: 'border-box',
+                      fontFamily: 'system-ui, -apple-system, sans-serif',
+                      transition: 'all 0.15s ease',
+                      cursor: 'text',
+                      pointerEvents: 'auto',
+                      zIndex: 1001,
+                      position: 'relative',
+                      borderRadius: '2px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      lineHeight: `${ann.height * pageScale - 4}px`,
+                      textAlign: ann.width < 40 ? 'center' : 'left',
                     }}
+                    placeholder=""
+                    autoComplete="off"
+                    tabIndex={0}
+                    maxLength={ann.width < 40 ? 1 : undefined}
                   />
                 )}
-
-                {selectedTool === 'select' && (
-                  <>
-                    {/* Delete button */}
-                    <button
+                {/* Render manually-placed text annotations */}
+                {ann.type === 'text' && !ann.isFormField && (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      position: 'relative',
+                      border: selectedAnnotation === ann.id ? '2px solid #6366f1' : 'none',
+                      borderRadius: '3px',
+                      backgroundColor: selectedAnnotation === ann.id ? 'rgba(255, 255, 255, 0.95)' : 'transparent',
+                      padding: '4px',
+                      boxSizing: 'border-box',
+                      cursor: selectedAnnotation === ann.id ? 'move' : 'default',
+                    }}
+                    onMouseDown={(e) => {
+                      // Start dragging from anywhere except the input field
+                      if (e.target !== e.currentTarget.querySelector('input')) {
+                        e.stopPropagation();
+                        if (pdfContainerRef.current) {
+                          const annotationRect = e.currentTarget.getBoundingClientRect();
+                          setDraggingId(ann.id);
+                          setSelectedAnnotation(ann.id);
+                          setDragOffset({
+                            x: e.clientX - annotationRect.left,
+                            y: e.clientY - annotationRect.top
+                          });
+                        }
+                      }
+                    }}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedAnnotation(ann.id);
+                    }}
+                  >
+                    <input
+                      type="text"
+                      value={ann.text || ''}
+                      onChange={(e) => {
+                        updateAnnotationText(ann.id, e.target.value);
+                      }}
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteAnnotation(ann.id);
+                        setSelectedAnnotation(ann.id);
+                      }}
+                      onMouseDown={(e) => {
+                        // Prevent drag from starting when clicking in input
+                        e.stopPropagation();
+                      }}
+                      onFocus={(e) => {
+                        e.target.parentElement!.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
+                        e.target.parentElement!.style.border = '2px solid rgba(99, 102, 241, 0.8)';
+                        setSelectedAnnotation(ann.id);
+                      }}
+                      onBlur={(e) => {
+                        e.target.parentElement!.style.backgroundColor = 'rgba(255, 255, 255, 0.8)';
+                        e.target.parentElement!.style.border = selectedAnnotation === ann.id ? '2px solid #6366f1' : '1px solid rgba(99, 102, 241, 0.5)';
                       }}
                       style={{
-                        position: 'absolute',
-                        top: -10,
-                        right: -10,
-                        width: 24,
-                        height: 24,
-                        borderRadius: '50%',
-                        backgroundColor: '#EF4444',
-                        color: 'white',
-                        border: '2px solid white',
-                        cursor: 'pointer',
-                        fontSize: '14px',
-                        fontWeight: 'bold',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        width: '100%',
+                        height: '100%',
+                        border: 'none',
+                        outline: 'none',
+                        backgroundColor: 'transparent',
+                        fontSize: `${Math.min((ann.fontSize || 14) * pageScale, (ann.height * pageScale) * 0.6)}px`,
+                        color: ann.textColor || '#000',
+                        padding: '2px 4px',
+                        boxSizing: 'border-box',
+                        fontFamily: 'system-ui, -apple-system, sans-serif',
+                        cursor: 'text',
+                        pointerEvents: 'auto',
+                        zIndex: 1001,
                       }}
-                    >
-                      ×
-                    </button>
+                      placeholder="Type here..."
+                      autoComplete="off"
+                      tabIndex={0}
+                    />
+                    {/* Resize handle - only show when selected */}
+                    {selectedAnnotation === ann.id && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          right: -6,
+                          bottom: -6,
+                          width: 16,
+                          height: 16,
+                          backgroundColor: '#6366f1',
+                          border: '2px solid white',
+                          borderRadius: '50%',
+                          cursor: 'nwse-resize',
+                          pointerEvents: 'auto',
+                          zIndex: 10,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        }}
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                          setResizingId(ann.id);
+                          setSelectedAnnotation(ann.id);
+                          setResizeStart({
+                            x: e.clientX,
+                            y: e.clientY,
+                            width: ann.width * pageScale,
+                            height: ann.height * pageScale
+                          });
+                        }}
+                      />
+                    )}
+                    {/* Delete button */}
+                    {selectedAnnotation === ann.id && !draggingId && !resizingId && (
+                      <button
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          setAnnotations(prev => prev.filter(a => a.id !== ann.id));
+                          setSelectedAnnotation(null);
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: -40,
+                          right: 0,
+                          padding: '8px 16px',
+                          backgroundColor: '#ef4444',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                          whiteSpace: 'nowrap',
+                          zIndex: 10000,
+                          pointerEvents: 'auto',
+                        }}
+                      >
+                        🗑️ Delete
+                      </button>
+                    )}
+                  </div>
+                )}
+                {/* Render signatures */}
+                {ann.type === 'signature' && ann.imageData && (
+                  <div
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      position: 'relative',
+                      cursor: confirmedSignatureIds.has(ann.id) ? 'not-allowed' : (draggingId === ann.id ? 'grabbing' : 'grab'),
+                      pointerEvents: 'none',  // Allow clicks to pass through to fields below
+                      border: confirmedSignatureIds.has(ann.id)
+                        ? 'none'
+                        : (draggingId === ann.id || resizingId === ann.id || selectedSignatureId === ann.id ? '2px solid #6366f1' : '1px dashed rgba(99, 102, 241, 0.3)'),
+                    }}
+                  >
+                    {/* Interactive overlay - only for unconfirmed signatures */}
+                    {!confirmedSignatureIds.has(ann.id) && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          top: 0,
+                          left: 0,
+                          width: '100%',
+                          height: '100%',
+                          pointerEvents: 'auto',
+                          zIndex: 1,
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setSelectedSignatureId(ann.id);
+                        }}
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                          const rect = e.currentTarget.getBoundingClientRect();
+                          setDraggingId(ann.id);
+                          setSelectedSignatureId(ann.id);
+                          setDragOffset({
+                            x: e.clientX - rect.left,
+                            y: e.clientY - rect.top
+                          });
+                        }}
+                      />
+                    )}
+                    <img
+                      src={ann.imageData}
+                      alt="Signature"
+                      style={{
+                        width: '100%',
+                        height: '100%',
+                        objectFit: 'contain',
+                        pointerEvents: 'none',
+                        backgroundColor: 'transparent',
+                      }}
+                      draggable={false}
+                    />
+                    {/* Resize handle - only show if not confirmed */}
+                    {!confirmedSignatureIds.has(ann.id) && (
+                      <div
+                        style={{
+                          position: 'absolute',
+                          right: -6,
+                          bottom: -6,
+                          width: 16,
+                          height: 16,
+                          backgroundColor: '#6366f1',
+                          border: '2px solid white',
+                          borderRadius: '50%',
+                          cursor: 'nwse-resize',
+                          pointerEvents: 'auto',
+                          zIndex: 10,
+                          boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
+                        }}
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                          setResizingId(ann.id);
+                          setSelectedSignatureId(ann.id);
+                          setResizeStart({
+                            x: e.clientX,
+                            y: e.clientY,
+                            width: ann.width * pageScale,
+                            height: ann.height * pageScale
+                          });
+                        }}
+                      />
+                    )}
+                    {/* Confirm button - only show if selected and not confirmed */}
+                    {selectedSignatureId === ann.id && !confirmedSignatureIds.has(ann.id) && !draggingId && !resizingId && (
+                      <button
+                        onMouseDown={(e) => {
+                          e.stopPropagation();
+                        }}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          e.preventDefault();
+                          console.log('🖱️ Confirm button clicked - Signature locked!');
 
-                    {/* Resize handles - All 4 corners */}
-                    {/* Northwest */}
-                    <div
-                      onMouseDown={(e) => startResize(e, ann.id, ann, 'nw')}
-                      style={{
-                        position: 'absolute',
-                        top: -4,
-                        left: -4,
-                        width: 12,
-                        height: 12,
-                        backgroundColor: '#3B82F6',
-                        border: '2px solid white',
-                        borderRadius: '50%',
-                        cursor: 'nw-resize',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                      }}
-                    />
-                    {/* Northeast */}
-                    <div
-                      onMouseDown={(e) => startResize(e, ann.id, ann, 'ne')}
-                      style={{
-                        position: 'absolute',
-                        top: -4,
-                        right: -4,
-                        width: 12,
-                        height: 12,
-                        backgroundColor: '#3B82F6',
-                        border: '2px solid white',
-                        borderRadius: '50%',
-                        cursor: 'ne-resize',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                      }}
-                    />
-                    {/* Southwest */}
-                    <div
-                      onMouseDown={(e) => startResize(e, ann.id, ann, 'sw')}
-                      style={{
-                        position: 'absolute',
-                        bottom: -4,
-                        left: -4,
-                        width: 12,
-                        height: 12,
-                        backgroundColor: '#3B82F6',
-                        border: '2px solid white',
-                        borderRadius: '50%',
-                        cursor: 'sw-resize',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                      }}
-                    />
-                    {/* Southeast */}
-                    <div
-                      onMouseDown={(e) => startResize(e, ann.id, ann, 'se')}
-                      style={{
-                        position: 'absolute',
-                        bottom: -4,
-                        right: -4,
-                        width: 12,
-                        height: 12,
-                        backgroundColor: '#3B82F6',
-                        border: '2px solid white',
-                        borderRadius: '50%',
-                        cursor: 'se-resize',
-                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)',
-                      }}
-                    />
-                  </>
+                          setConfirmedSignatureIds(prev => new Set([...prev, ann.id]));
+                          setSelectedSignatureId(null);
+                        }}
+                        style={{
+                          position: 'absolute',
+                          top: -40,
+                          right: 0,
+                          padding: '8px 16px',
+                          backgroundColor: '#10b981',
+                          color: 'white',
+                          border: 'none',
+                          borderRadius: '8px',
+                          fontSize: '13px',
+                          fontWeight: '600',
+                          cursor: 'pointer',
+                          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
+                          whiteSpace: 'nowrap',
+                          zIndex: 10000,
+                          pointerEvents: 'auto',
+                        }}
+                      >
+                        ✓ Confirm Signature
+                      </button>
+                    )}
+                  </div>
                 )}
               </div>
             ))}
         </div>
 
-        {/* Debug Info */}
-        <div style={{ marginTop: '20px', padding: '10px', backgroundColor: 'white', borderRadius: '4px' }}>
-          <strong>Debug Info:</strong>
-          <div>Current Tool: {selectedTool}</div>
-          <div>Total Annotations: {annotations.length}</div>
-          <div>Current Page: {currentPage}</div>
-          <div>
-            Annotations on this page:{' '}
-            {annotations.filter(ann => ann.pageNumber === currentPage).length}
+        {/* Info Panel - Form Fields */}
+        {formFields.length > 0 && showFormFields && (
+          <div style={{ marginTop: '20px', padding: '16px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e0e7ff' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '12px' }}>
+              <div style={{ width: '32px', height: '32px', borderRadius: '8px', background: 'linear-gradient(135deg, #6366f1 0%, #a855f7 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontSize: '16px' }}>✓</span>
+              </div>
+              <strong style={{ fontSize: '15px', color: '#1e293b', fontWeight: '600' }}>Form Fields Ready</strong>
+            </div>
+            <div style={{ fontSize: '13px', color: '#64748b', marginBottom: '12px', lineHeight: '1.6' }}>
+              {formFields.length} fillable field{formFields.length > 1 ? 's' : ''} automatically detected. Just click and type!
+            </div>
+            <div style={{ fontSize: '12px', color: '#64748b', lineHeight: '1.8', padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
+              <strong style={{ color: '#475569', display: 'block', marginBottom: '6px' }}>How it works:</strong>
+              • Click inside any green field<br />
+              • Type your information<br />
+              • Old values are automatically replaced<br />
+              • Download to save your changes
+            </div>
           </div>
-        </div>
+        )}
+
+        {/* No Fields Found */}
+        {formFields.length === 0 && !isExtractingText && (
+          <div style={{ marginTop: '20px', padding: '16px', backgroundColor: 'white', borderRadius: '12px', boxShadow: '0 2px 8px rgba(0,0,0,0.08)', border: '1px solid #e2e8f0' }}>
+            <div style={{ fontSize: '13px', color: '#64748b', textAlign: 'center', lineHeight: '1.6' }}>
+              No fillable form fields detected in this PDF.<br/>
+              <span style={{ fontSize: '12px', color: '#94a3b8' }}>Use the tools above to add text or signatures manually.</span>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Page Navigation */}
@@ -527,17 +1677,17 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
         <button
           onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
           disabled={currentPage === 1}
-          className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="px-5 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow font-medium text-sm"
         >
           ← Previous
         </button>
-        <span className="text-sm">
+        <span className="text-sm font-medium text-gray-700 px-3">
           Page {currentPage} of {numPages}
         </span>
         <button
           onClick={() => setCurrentPage(Math.min(numPages, currentPage + 1))}
           disabled={currentPage === numPages}
-          className="px-4 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed"
+          className="px-5 py-2.5 bg-white text-gray-700 border border-gray-200 rounded-xl hover:bg-gray-50 hover:border-gray-300 disabled:opacity-40 disabled:cursor-not-allowed transition-all duration-200 shadow-sm hover:shadow font-medium text-sm"
         >
           Next →
         </button>

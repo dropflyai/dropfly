@@ -15,7 +15,14 @@ export async function POST(request: NextRequest) {
 
     // 2. Parse request
     const body = await request.json();
-    const { content, platforms, mediaUrls, scheduleDate } = body;
+    const {
+      content,
+      platforms,
+      mediaUrls,
+      scheduleDate,
+      campaign_post_id, // NEW: For campaign posts
+      video_url // NEW: Alias for mediaUrls
+    } = body;
 
     if (!content || !platforms || platforms.length === 0) {
       return NextResponse.json(
@@ -24,23 +31,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // 3. Determine token cost based on number of platforms
-    const operation = platforms.length > 1 ? 'social_post_multi_platform' : 'social_post';
-    const tokenCost = tokenService.calculateCost(operation);
+    // 3. Calculate token cost: 8 tokens per platform
+    const tokenCost = platforms.length * 8;
 
     console.log(`[Social Post] Posting to ${platforms.length} platform(s), Cost: ${tokenCost} tokens`);
 
     // 4. Deduct tokens BEFORE posting
     const deductionResult = await tokenService.deductTokens({
       userId: user.id,
-      operation,
+      operation: 'social_posting',
       cost: tokenCost,
-      description: `Social post to ${platforms.join(', ')}`,
+      description: `Post to ${platforms.join(', ')}`,
       metadata: {
         platforms,
         content: content.substring(0, 100),
-        hasMedia: !!mediaUrls && mediaUrls.length > 0,
+        hasMedia: !!(mediaUrls || video_url),
         scheduled: !!scheduleDate,
+        campaign_post_id,
       }
     });
 
@@ -48,7 +55,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         {
           error: deductionResult.error || 'Insufficient tokens',
-          errorCode: deductionResult.errorCode
+          errorCode: deductionResult.errorCode,
+          required: tokenCost
         },
         { status: 403 }
       );
@@ -57,38 +65,59 @@ export async function POST(request: NextRequest) {
     try {
       // 5. Post to social media via Ayrshare
       const ayrshare = getAyrshareClient();
+      const mediaToUse = mediaUrls || (video_url ? [video_url] : undefined);
+
       const result = await ayrshare.post({
         post: content,
         platforms,
-        mediaUrls,
+        mediaUrls: mediaToUse,
         scheduleDate,
       });
 
-      // 6. Save to database
-      const { data: savedPost, error: dbError } = await supabase
-        .from('posts')
-        .insert({
-          user_id: user.id,
-          content,
-          platforms,
-          media_urls: mediaUrls || [],
-          scheduled_for: scheduleDate || new Date().toISOString(),
-          ayrshare_id: result.id,
-          status: scheduleDate ? 'scheduled' : 'published',
-        })
-        .select()
-        .single();
+      // 6. If this is a campaign post, update campaign_posts table
+      if (campaign_post_id) {
+        const { error: updateError } = await supabase
+          .from('campaign_posts')
+          .update({
+            status: 'published',
+            published_at: new Date().toISOString(),
+            metadata: {
+              ayrshare_result: result,
+              platforms,
+              post_ids: result.postIds,
+            }
+          })
+          .eq('id', campaign_post_id);
 
-      if (dbError) {
-        console.error('Database error:', dbError);
-        // Don't fail the request if DB save fails
+        if (updateError) {
+          console.error('[Social Post] Error updating campaign_posts:', updateError);
+        }
+      } else {
+        // 6b. Save to posts table (for non-campaign posts)
+        const { data: savedPost, error: dbError } = await supabase
+          .from('posts')
+          .insert({
+            user_id: user.id,
+            content,
+            platforms,
+            media_urls: mediaToUse || [],
+            scheduled_for: scheduleDate || new Date().toISOString(),
+            ayrshare_id: result.id,
+            status: scheduleDate ? 'scheduled' : 'published',
+          })
+          .select()
+          .single();
+
+        if (dbError) {
+          console.error('[Social Post] Database error:', dbError);
+          // Don't fail the request if DB save fails
+        }
       }
 
       // 7. Return success
       return NextResponse.json({
         success: true,
-        post: savedPost,
-        ayrshareResult: result,
+        postIds: result.postIds,
         tokensUsed: tokenCost,
         newBalance: deductionResult.newBalance,
       });
@@ -97,12 +126,13 @@ export async function POST(request: NextRequest) {
       console.error('[Social Post] Ayrshare API Error:', apiError);
 
       // Refund tokens on API failure
-      await tokenService.refundTokens({
-        userId: user.id,
-        amount: tokenCost,
-        reason: 'Social posting API failure',
-        originalOperation: operation
-      });
+      if (deductionResult.transaction?.id) {
+        await tokenService.refundTokens(
+          user.id,
+          deductionResult.transaction.id,
+          'Social posting failed'
+        );
+      }
 
       return NextResponse.json(
         {

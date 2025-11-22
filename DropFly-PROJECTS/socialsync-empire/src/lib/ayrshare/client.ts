@@ -113,6 +113,91 @@ export class AyrshareClient {
 
     return response.json();
   }
+
+  /**
+   * Get analytics for a specific post by its ID
+   * Returns metrics like views, likes, shares, comments
+   */
+  async getPostAnalytics(postId: string) {
+    const response = await fetch(`${AYRSHARE_API_URL}/analytics/post/${postId}`, {
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch post analytics');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Get account-level analytics for specified platforms
+   * Returns engagement, reach, followers, and demographic data
+   */
+  async getSocialAnalytics(platforms: string[], options?: {
+    quarters?: number;
+    daily?: boolean;
+  }) {
+    const response = await fetch(`${AYRSHARE_API_URL}/analytics/social`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${this.apiKey}`,
+      },
+      body: JSON.stringify({
+        platforms,
+        ...options,
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.json();
+      throw new Error(error.message || 'Failed to fetch social analytics');
+    }
+
+    return response.json();
+  }
+
+  /**
+   * Get aggregated analytics for all user's posts
+   * Useful for dashboard metrics
+   */
+  async getAggregatedAnalytics(postIds: string[]) {
+    const analytics = await Promise.allSettled(
+      postIds.map(id => this.getPostAnalytics(id))
+    );
+
+    let totalViews = 0;
+    let totalLikes = 0;
+    let totalShares = 0;
+    let totalComments = 0;
+    let totalImpressions = 0;
+
+    analytics.forEach(result => {
+      if (result.status === 'fulfilled') {
+        const data = result.value;
+        // Aggregate metrics from different platforms
+        totalViews += data.views || 0;
+        totalLikes += data.likes || data.likeCount || 0;
+        totalShares += data.shares || data.shareCount || 0;
+        totalComments += data.comments || data.commentCount || 0;
+        totalImpressions += data.impressions || 0;
+      }
+    });
+
+    return {
+      totalViews,
+      totalLikes,
+      totalShares,
+      totalComments,
+      totalImpressions,
+      engagement: totalLikes + totalShares + totalComments,
+      reach: totalImpressions || totalViews,
+    };
+  }
 }
 
 // Lazy-load Ayrshare client to avoid build-time execution

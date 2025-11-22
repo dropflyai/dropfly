@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import {
   Folder,
   Download,
@@ -17,8 +18,60 @@ import { useRouter } from 'next/navigation';
 import Card from '@/components/ui/Card';
 import Button from '@/components/ui/Button';
 
+interface UserStats {
+  mediaLibrary: {
+    total: number;
+    videos: number;
+    images: number;
+  };
+  avatars: {
+    count: number;
+    max: number;
+  };
+  analytics: {
+    views: number;
+    engagement: number;
+    reach: number;
+    avgRating: number;
+  };
+}
+
 export default function ManagePage() {
   const router = useRouter();
+  const [stats, setStats] = useState<UserStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  // Fetch REAL user stats from database
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const response = await fetch('/api/user/stats');
+        if (response.ok) {
+          const data = await response.json();
+          setStats(data);
+        } else {
+          console.error('Failed to fetch stats');
+          // Set empty stats instead of mock data
+          setStats({
+            mediaLibrary: { total: 0, videos: 0, images: 0 },
+            avatars: { count: 0, max: 2 },
+            analytics: { views: 0, engagement: 0, reach: 0, avgRating: 0 },
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching stats:', error);
+        setStats({
+          mediaLibrary: { total: 0, videos: 0, images: 0 },
+          avatars: { count: 0, max: 2 },
+          analytics: { views: 0, engagement: 0, reach: 0, avgRating: 0 },
+        });
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchStats();
+  }, []);
 
   const toolRoutes: Record<string, string> = {
     downloader: '/tools/downloader',
@@ -121,7 +174,9 @@ export default function ManagePage() {
                 <User className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-semibold text-[var(--text-primary)] mb-1">AI Avatars</h3>
-              <p className="text-xs text-[var(--text-tertiary)]">2/2 avatars</p>
+              <p className="text-xs text-[var(--text-tertiary)]">
+                {loading ? 'Loading...' : `${stats?.avatars.count || 0}/${stats?.avatars.max || 2} avatars`}
+              </p>
             </div>
           </Card>
 
@@ -131,7 +186,9 @@ export default function ManagePage() {
                 <Image className="w-6 h-6 text-white" />
               </div>
               <h3 className="font-semibold text-[var(--text-primary)] mb-1">Media Library</h3>
-              <p className="text-xs text-[var(--text-tertiary)]">120 files</p>
+              <p className="text-xs text-[var(--text-tertiary)]">
+                {loading ? 'Loading...' : `${stats?.mediaLibrary.total || 0} file${stats?.mediaLibrary.total === 1 ? '' : 's'}`}
+              </p>
             </div>
           </Card>
 
@@ -231,7 +288,7 @@ export default function ManagePage() {
               </button>
             </div>
             <p className="text-sm text-[var(--text-tertiary)] mb-3">
-              2/2 avatars used (Starter plan)
+              {loading ? 'Loading...' : `${stats?.avatars.count || 0}/${stats?.avatars.max || 2} avatars used`}
             </p>
             <Button variant="secondary" size="sm">Manage Avatars</Button>
           </Card>
@@ -242,31 +299,53 @@ export default function ManagePage() {
       <section>
         <h2 className="text-xl font-semibold text-[var(--text-primary)] mb-4">📊 Analytics (Last 7 Days)</h2>
         <Card padding="lg">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-            <div>
-              <p className="text-sm text-[var(--text-tertiary)] mb-1">Views</p>
-              <p className="text-3xl font-bold text-[var(--text-primary)]">45.2K</p>
-              <p className="text-xs text-[var(--success)] mt-1">+12% this week</p>
-            </div>
-            <div>
-              <p className="text-sm text-[var(--text-tertiary)] mb-1">Engagement</p>
-              <p className="text-3xl font-bold text-[var(--text-primary)]">1.8K</p>
-              <p className="text-xs text-[var(--success)] mt-1">+8% this week</p>
-            </div>
-            <div>
-              <p className="text-sm text-[var(--text-tertiary)] mb-1">Reach</p>
-              <p className="text-3xl font-bold text-[var(--text-primary)]">62.1K</p>
-              <p className="text-xs text-[var(--success)] mt-1">+15% this week</p>
-            </div>
-            <div>
-              <p className="text-sm text-[var(--text-tertiary)] mb-1">Avg Rating</p>
-              <p className="text-3xl font-bold text-[var(--text-primary)]">4.2</p>
-              <p className="text-xs text-[var(--text-tertiary)] mt-1">⭐⭐⭐⭐☆</p>
-            </div>
-          </div>
-          <div className="mt-6 pt-6 border-t border-[var(--bg-tertiary)]">
-            <Button variant="ghost" size="sm">View Full Analytics</Button>
-          </div>
+          {loading ? (
+            <div className="text-center py-8 text-[var(--text-tertiary)]">Loading analytics...</div>
+          ) : (
+            <>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <div>
+                  <p className="text-sm text-[var(--text-tertiary)] mb-1">Views</p>
+                  <p className="text-3xl font-bold text-[var(--text-primary)]">
+                    {stats?.analytics.views || 0}
+                  </p>
+                  <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                    {stats?.analytics.views === 0 ? 'No data yet' : 'This week'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-[var(--text-tertiary)] mb-1">Engagement</p>
+                  <p className="text-3xl font-bold text-[var(--text-primary)]">
+                    {stats?.analytics.engagement || 0}
+                  </p>
+                  <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                    {stats?.analytics.engagement === 0 ? 'No data yet' : 'This week'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-[var(--text-tertiary)] mb-1">Reach</p>
+                  <p className="text-3xl font-bold text-[var(--text-primary)]">
+                    {stats?.analytics.reach || 0}
+                  </p>
+                  <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                    {stats?.analytics.reach === 0 ? 'No data yet' : 'This week'}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-[var(--text-tertiary)] mb-1">Content</p>
+                  <p className="text-3xl font-bold text-[var(--text-primary)]">
+                    {stats?.mediaLibrary.total || 0}
+                  </p>
+                  <p className="text-xs text-[var(--text-tertiary)] mt-1">
+                    {stats?.mediaLibrary.videos || 0} video{stats?.mediaLibrary.videos === 1 ? '' : 's'}
+                  </p>
+                </div>
+              </div>
+              <div className="mt-6 pt-6 border-t border-[var(--bg-tertiary)]">
+                <Button variant="ghost" size="sm">View Full Analytics</Button>
+              </div>
+            </>
+          )}
         </Card>
       </section>
 

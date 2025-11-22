@@ -19,24 +19,24 @@ export default function Home() {
     }
   };
 
-  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
   };
 
-  const handleDragEnter = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(true);
   };
 
-  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+  const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
@@ -50,48 +50,71 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/30">
       {!pdfFile ? (
-        <div className="min-h-screen">
-          {/* Header */}
-          <header className="bg-white border-b border-gray-200 shadow-sm">
-            <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white text-xl font-bold">📄</span>
+        <div className="min-h-screen flex flex-col">
+          {/* Minimal Header */}
+          <header className="border-b border-slate-100/50 bg-white/70 backdrop-blur-md">
+            <div className="max-w-4xl mx-auto px-8 py-4 flex items-center justify-between">
+              <div className="flex items-center gap-2.5">
+                <div className="w-7 h-7 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
+                  <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
                 </div>
-                <h1 className="text-2xl font-bold text-gray-800">PDF Editor</h1>
-              </div>
-              <div className="flex items-center gap-3">
-                <button className="px-4 py-2 text-gray-600 hover:text-gray-800 text-sm font-medium">
-                  Help
-                </button>
+                <h1 className="text-base font-medium text-slate-900 tracking-tight">PDF Editor</h1>
               </div>
             </div>
           </header>
 
-          {/* Dashboard Content */}
-          <div className="max-w-7xl mx-auto px-6 py-12">
-            {/* Quick Actions */}
-            <div className="mb-12">
-              <h2 className="text-3xl font-bold text-gray-800 mb-8">Get Started</h2>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {/* Open File */}
+          {/* Centered Content */}
+          <div className="flex-1 flex items-center justify-center px-6 py-16">
+            <div className="w-full max-w-2xl">
+
+              {/* Hero Section */}
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-light text-slate-900 mb-3 tracking-tight">
+                  Edit PDFs with <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 font-normal">ease</span>
+                </h2>
+                <p className="text-sm text-slate-500 font-light">
+                  Simple, secure, and private PDF editing in your browser
+                </p>
+              </div>
+
+              {/* Drag & Drop Zone - Main Focus */}
+              <div className="mb-8">
                 <label
                   htmlFor="pdf-upload"
-                  className="bg-white rounded-2xl border-2 border-gray-200 p-8 hover:border-blue-500 hover:shadow-xl transition-all cursor-pointer group"
+                  className={`block relative cursor-pointer ${
+                    isDragging ? 'scale-[1.02]' : ''
+                  }`}
+                  onDragOver={handleDragOver}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
                 >
-                  <div className="w-16 h-16 bg-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                  </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Open PDF</h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Edit and sign existing PDF documents
-                  </p>
-                  <div className="text-blue-500 font-semibold text-sm group-hover:translate-x-1 transition-transform inline-block">
-                    Browse files →
+                  <div className={`bg-white rounded-2xl border-2 border-dashed p-16 text-center transition-all duration-300 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 ${
+                    isDragging
+                      ? 'border-indigo-500 bg-indigo-50/50 shadow-2xl shadow-indigo-200/50'
+                      : 'border-slate-200 shadow-sm'
+                  }`}>
+                    <div className="w-14 h-14 mx-auto mb-5 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                      <svg className="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                    </div>
+                    <h3 className="text-base font-medium text-slate-900 mb-2">
+                      Drop your PDF here
+                    </h3>
+                    <p className="text-xs text-slate-400 mb-4">
+                      or click to browse
+                    </p>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs font-medium rounded-lg hover:from-indigo-700 hover:to-purple-700 transition-all shadow-md hover:shadow-lg">
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                      Open PDF
+                    </div>
                   </div>
                   <input
                     id="pdf-upload"
@@ -101,91 +124,39 @@ export default function Home() {
                     className="hidden"
                   />
                 </label>
+              </div>
 
-                {/* Create New */}
-                <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 hover:border-green-500 hover:shadow-xl transition-all cursor-pointer group">
-                  <div className="w-16 h-16 bg-green-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+              {/* Minimal Features */}
+              <div className="grid grid-cols-3 gap-8 pt-8 border-t border-slate-100/50">
+                <div className="text-center group">
+                  <div className="w-8 h-8 mx-auto mb-2.5 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg flex items-center justify-center group-hover:from-indigo-100 group-hover:to-purple-100 transition-colors">
+                    <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Create New</h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Start with a blank PDF document
-                  </p>
-                  <div className="text-green-500 font-semibold text-sm group-hover:translate-x-1 transition-transform inline-block">
-                    Coming soon →
-                  </div>
+                  <h3 className="text-xs font-medium text-slate-700 mb-1">Sign</h3>
+                  <p className="text-xs text-slate-400 font-light">Add signatures</p>
                 </div>
-
-                {/* Templates */}
-                <div className="bg-white rounded-2xl border-2 border-gray-200 p-8 hover:border-purple-500 hover:shadow-xl transition-all cursor-pointer group">
-                  <div className="w-16 h-16 bg-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
-                    <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z" />
+                <div className="text-center group">
+                  <div className="w-8 h-8 mx-auto mb-2.5 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg flex items-center justify-center group-hover:from-indigo-100 group-hover:to-purple-100 transition-colors">
+                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </div>
-                  <h3 className="text-xl font-bold text-gray-800 mb-2">Templates</h3>
-                  <p className="text-gray-600 text-sm mb-4">
-                    Choose from professional templates
-                  </p>
-                  <div className="text-purple-500 font-semibold text-sm group-hover:translate-x-1 transition-transform inline-block">
-                    Coming soon →
+                  <h3 className="text-xs font-medium text-slate-700 mb-1">Edit</h3>
+                  <p className="text-xs text-slate-400 font-light">Fill forms</p>
+                </div>
+                <div className="text-center group">
+                  <div className="w-8 h-8 mx-auto mb-2.5 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg flex items-center justify-center group-hover:from-indigo-100 group-hover:to-purple-100 transition-colors">
+                    <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
                   </div>
+                  <h3 className="text-xs font-medium text-slate-700 mb-1">Private</h3>
+                  <p className="text-xs text-slate-400 font-light">100% secure</p>
                 </div>
               </div>
-            </div>
 
-            {/* Drag & Drop Zone */}
-            <div className="mb-12">
-              <div
-                className={`bg-white rounded-2xl border-3 border-dashed p-16 text-center transition-all ${
-                  isDragging
-                    ? 'border-blue-500 bg-blue-50 scale-[1.02]'
-                    : 'border-gray-300 hover:border-gray-400'
-                }`}
-                onDragOver={handleDragOver}
-                onDragEnter={handleDragEnter}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-              >
-                <div className="w-24 h-24 mx-auto mb-6 bg-gray-100 rounded-full flex items-center justify-center">
-                  <svg className="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                  </svg>
-                </div>
-                <h3 className="text-2xl font-semibold text-gray-800 mb-2">
-                  Drop your PDF here
-                </h3>
-                <p className="text-gray-500">
-                  or click "Open PDF" above to browse files
-                </p>
-              </div>
-            </div>
-
-            {/* Features */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">✍️</span>
-                </div>
-                <h3 className="font-semibold text-gray-800 mb-2">Sign Documents</h3>
-                <p className="text-sm text-gray-600">Draw, type, or upload your signature</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">📝</span>
-                </div>
-                <h3 className="font-semibold text-gray-800 mb-2">Add Text & Annotations</h3>
-                <p className="text-sm text-gray-600">Highlight, comment, and edit text</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <span className="text-2xl">🔒</span>
-                </div>
-                <h3 className="font-semibold text-gray-800 mb-2">100% Private</h3>
-                <p className="text-sm text-gray-600">All editing happens in your browser</p>
-              </div>
             </div>
           </div>
         </div>

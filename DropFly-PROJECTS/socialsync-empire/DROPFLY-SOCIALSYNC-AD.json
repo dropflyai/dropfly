@@ -1,0 +1,49 @@
+{
+  "brand": {
+    "name": "DropFly",
+    "tagline": "Building elite applications with precision and excellence",
+    "colors": {
+      "primary": "#9333ea",
+      "secondary": "#3b82f6",
+      "accent": "#10b981"
+    },
+    "voice": "professional, innovative, empowering, fast"
+  },
+  "product": {
+    "name": "SocialSync Empire",
+    "description": "AI-Powered Social Media Management Platform",
+    "automation_level": "10/10",
+    "key_features": [
+      "AI script generation",
+      "Automated video creation",
+      "Multi-platform posting",
+      "Brand-aware content",
+      "Truly hands-free"
+    ]
+  },
+  "ad_script": {
+    "hook": "Spending 3 hours every single day creating social media content? Yeah... there's a better way.",
+    "script": "[VISUAL: Entrepreneur frustrated at desk, surrounded by content calendars and phone]\n\nLet me guess - you're either glued to Canva, stressing about captions, or watching your competitors blow up while you're stuck in the content creation trap.\n\n[VISUAL: Calendar showing 20+ hours spent on social media]\n\nThat's 20+ hours every week you'll never get back.\n\n[VISUAL: Screen transition - purple and blue energy burst]\n\nBut what if AI could do ALL of it?\n\n[VISUAL: SocialSync Empire dashboard appearing]\n\nIntroducing SocialSync Empire by DropFly - the world's first 10/10 automation social media platform.\n\n[VISUAL: Split screen showing the AI process with smooth animations]\n\nHere's how it works: The AI writes your script... creates your video... and posts it across TikTok, Instagram, YouTube, Facebook, Twitter, and LinkedIn.\n\n[VISUAL: Content automatically appearing on multiple platform mockups]\n\nCompletely hands-free. Zero manual work. Just results.\n\n[VISUAL: Entrepreneur now relaxed, phone showing growing analytics]\n\nWhile you're sleeping, building your business, or living your life - SocialSync is growing your brand 24/7.\n\n[VISUAL: DropFly logo with tagline]\n\nBuilt by DropFly, the elite AI development company trusted by thousands of entrepreneurs.",
+    "cta": "Ready to reclaim 20+ hours every week? Try SocialSync Empire free - link in bio. Your future self will thank you.",
+    "hashtags": [
+      "#SocialMediaAutomation",
+      "#AITools",
+      "#EntrepreneurLife",
+      "#ContentCreation",
+      "#SocialMediaMarketing",
+      "#ProductivityHacks",
+      "#AIForBusiness",
+      "#DropFly"
+    ],
+    "music_style": "upbeat electronic with building intensity - starts mysterious, becomes triumphant",
+    "target_duration": 50,
+    "visual_notes": "Use fast cuts and smooth transitions. Emphasize the before/after contrast - stressed entrepreneur vs. relaxed and successful. Show the AI automation as sleek, futuristic interface with purple/blue gradient overlays. Include motion graphics showing content flowing from one platform to another. End with confident, aspirational vibe showing the entrepreneur winning."
+  },
+  "generated_at": "2025-11-06T17:55:59.807Z",
+  "platforms": [
+    "tiktok",
+    "instagram",
+    "youtube"
+  ],
+  "target_audience": "Entrepreneurs, startup founders, content creators, small business owners aged 25-45"
+}

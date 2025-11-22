@@ -1,0 +1,17 @@
+{
+  "brand": {
+    "name": "DropFly"
+  },
+  "test_script": {
+    "hook": "Spending 3 hours a day on social media?",
+    "script": "You're spending 3 hours a day on social media... and your business is suffering for it.\n\nWhat if AI could do ALL of it?\n\nSocialSync Empire by DropFly - the world's first TRUE 10/10 automation platform.\n\nAI writes your scripts, creates videos, and posts to all platforms.\n\nCompletely hands-free. Zero manual work.\n\nReclaim your 20 hours this week.",
+    "cta": "Visit DropFly.com/SocialSync",
+    "hashtags": [
+      "SocialSyncEmpire",
+      "DropFly",
+      "AIAutomation"
+    ],
+    "duration": "8-10 seconds",
+    "note": "Shortened version for quick testing"
+  }
+}
