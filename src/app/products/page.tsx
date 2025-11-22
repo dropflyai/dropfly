@@ -152,8 +152,8 @@ export default function ProductsPage() {
         </div>
       </section>
 
-      {/* Maya AI Assistant */}
-      <section id="maya" className="relative py-20 px-4 sm:px-6 lg:px-8">
+      {/* VoiceFly Voice AI Platform */}
+      <section id="voicefly" className="relative py-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="bg-gradient-to-br from-blue-900/30 via-indigo-900/30 to-purple-900/30 backdrop-blur-xl rounded-2xl border border-blue-500/30 p-8 md:p-12">
             <div className="grid md:grid-cols-2 gap-12 items-center">
@@ -163,81 +163,95 @@ export default function ProductsPage() {
                   <div className="relative bg-black/50 backdrop-blur-xl rounded-xl p-8 border border-white/10">
                     <div className="flex items-center justify-center mb-6">
                       <div className="w-24 h-24 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-full flex items-center justify-center">
-                        <Mic className="w-12 h-12 text-white" />
+                        <Phone className="w-12 h-12 text-white" />
                       </div>
                     </div>
                     <div className="space-y-4">
                       <div className="bg-blue-900/50 rounded-lg p-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-blue-300">Natural Language Processing</span>
-                          <span className="text-xs text-blue-400">Advanced</span>
+                          <span className="text-sm text-blue-300">AI Voice Agents</span>
+                          <span className="text-xs text-blue-400">24/7</span>
                         </div>
                       </div>
                       <div className="bg-indigo-900/50 rounded-lg p-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-indigo-300">Voice Recognition</span>
-                          <span className="text-xs text-indigo-400">99.5%</span>
+                          <span className="text-sm text-indigo-300">SMS Marketing</span>
+                          <span className="text-xs text-indigo-400">Automated</span>
                         </div>
                       </div>
                       <div className="bg-purple-900/50 rounded-lg p-3">
                         <div className="flex items-center justify-between">
-                          <span className="text-sm text-purple-300">Multi-Language Support</span>
-                          <span className="text-xs text-purple-400">50+</span>
+                          <span className="text-sm text-purple-300">AI Research</span>
+                          <span className="text-xs text-purple-400">98% Cheaper</span>
+                        </div>
+                      </div>
+                      <div className="bg-pink-900/50 rounded-lg p-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-pink-300">Profit Margin</span>
+                          <span className="text-xs text-pink-400">85%</span>
                         </div>
                       </div>
                     </div>
                   </div>
                 </div>
               </div>
-              
+
               <div className="order-1 md:order-2">
                 <div className="inline-flex items-center mb-4">
                   <span className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-sm font-bold px-4 py-1 rounded-full">
-                    NEW
+                    VOICE AI
                   </span>
                 </div>
                 <h2 className="text-4xl font-bold text-white mb-6">
-                  Maya™ AI Assistant
+                  VoiceFly™ AI Platform
                 </h2>
                 <p className="text-xl text-gray-300 mb-6">
-                  Your personal AI assistant that automates everything - phone calls, appointments, emails, data entry, and daily tasks. Never miss an opportunity or fall behind on work again.
+                  Multi-tenant AI platform combining 24/7 voice agents, SMS marketing, AI research, and CRM automation. Perfect for beauty salons, dental offices, medical practices, and service businesses.
                 </p>
                 <ul className="space-y-4 mb-8">
                   <li className="flex items-start">
                     <Phone className="w-6 h-6 text-blue-400 mr-3 flex-shrink-0 mt-1" />
                     <div>
-                      <span className="text-white font-semibold">Smart Phone Management</span>
-                      <p className="text-gray-400 text-sm">Handles calls, takes messages, books appointments</p>
+                      <span className="text-white font-semibold">24/7 AI Voice Agents</span>
+                      <p className="text-gray-400 text-sm">Never miss a call - automated phone answering and appointment booking</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <Bot className="w-6 h-6 text-indigo-400 mr-3 flex-shrink-0 mt-1" />
+                    <MessageSquare className="w-6 h-6 text-indigo-400 mr-3 flex-shrink-0 mt-1" />
                     <div>
-                      <span className="text-white font-semibold">Email & Calendar Automation</span>
-                      <p className="text-gray-400 text-sm">Manages schedules, sends follow-ups, organizes tasks</p>
+                      <span className="text-white font-semibold">SMS Marketing Automation</span>
+                      <p className="text-gray-400 text-sm">Text campaigns, reminders, and customer engagement via Twilio</p>
                     </div>
                   </li>
                   <li className="flex items-start">
-                    <Users className="w-6 h-6 text-purple-400 mr-3 flex-shrink-0 mt-1" />
+                    <Bot className="w-6 h-6 text-purple-400 mr-3 flex-shrink-0 mt-1" />
                     <div>
-                      <span className="text-white font-semibold">Data Entry & Organization</span>
-                      <p className="text-gray-400 text-sm">Automates paperwork, updates CRM, maintains records</p>
+                      <span className="text-white font-semibold">AI Research & CRM</span>
+                      <p className="text-gray-400 text-sm">DeepSeek-R1 powered research at 98% lower cost than GPT-4</p>
+                    </div>
+                  </li>
+                  <li className="flex items-start">
+                    <DollarSign className="w-6 h-6 text-pink-400 mr-3 flex-shrink-0 mt-1" />
+                    <div>
+                      <span className="text-white font-semibold">Credit-Based Pricing</span>
+                      <p className="text-gray-400 text-sm">$99-399/month + pay-per-use credits with 85% margins</p>
                     </div>
                   </li>
                 </ul>
                 <div className="flex flex-col sm:flex-row gap-4">
-                  <Link 
-                    href="/products/maya"
+                  <Link
+                    href="/products/voicefly"
                     className="inline-flex items-center justify-center px-8 py-4 text-lg font-medium text-white bg-gradient-to-r from-blue-600 to-indigo-600 rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all"
                   >
-                    Learn More About Maya™
+                    Learn More About VoiceFly™
                     <ArrowRight className="ml-2 w-5 h-5" />
                   </Link>
-                  <Link 
-                    href="/products/maya"
+                  <Link
+                    href="https://voiceflyai.com"
+                    target="_blank"
                     className="px-8 py-4 text-lg font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all text-center"
                   >
-                    View Features
+                    Visit Live Platform
                   </Link>
                 </div>
               </div>
