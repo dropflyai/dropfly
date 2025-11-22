@@ -210,129 +210,87 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
-      <section className="relative py-10 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-            <div>
-              <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent mb-1">200+</div>
-              <div className="text-gray-400 text-sm">AI Solutions</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent mb-1">50+</div>
-              <div className="text-gray-400 text-sm">Automated Workflows</div>
-            </div>
-            <div>
-              <div className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-orange-600 bg-clip-text text-transparent mb-1">1000+</div>
-              <div className="text-gray-400 text-sm">Use Cases</div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Authority Section */}
-      <section id="authority" className="relative py-12 px-4 sm:px-6 lg:px-8">
+      {/* AI Technology & Insights Section */}
+      <section id="ai-insights" className="relative py-12 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="text-3xl font-bold text-white mb-3">
-              The AI Authority Companies Trust
+              Why We're Your AI Implementation Partner
             </h2>
-            <p className="text-base text-gray-400">
-              Leading the enterprise AI revolution since day one
+            <p className="text-base text-gray-400 max-w-3xl mx-auto">
+              We build production-ready AI systems using cutting-edge technologies. Here's what sets us apart and what you need to know about modern AI.
             </p>
           </div>
 
-          {/* Authority Metrics */}
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-            <div className="text-center">
-              <div className="text-3xl font-bold bg-gradient-to-r from-blue-400 to-purple-600 bg-clip-text text-transparent mb-1">500+</div>
-              <div className="text-gray-400 text-xs">Enterprise Clients</div>
-              <div className="text-xs text-gray-500 mt-0.5">Fortune 500 & Growing</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-pink-600 bg-clip-text text-transparent mb-1">99.9%</div>
-              <div className="text-gray-400 text-xs">Uptime SLA</div>
-              <div className="text-xs text-gray-500 mt-0.5">Mission-Critical Reliability</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold bg-gradient-to-r from-pink-400 to-orange-600 bg-clip-text text-transparent mb-1">50M+</div>
-              <div className="text-gray-400 text-xs">AI Interactions Daily</div>
-              <div className="text-xs text-gray-500 mt-0.5">Processing at Scale</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold bg-gradient-to-r from-orange-400 to-red-600 bg-clip-text text-transparent mb-1">24/7</div>
-              <div className="text-gray-400 text-xs">Expert Support</div>
-              <div className="text-xs text-gray-500 mt-0.5">White-Glove Service</div>
-            </div>
-          </div>
-
-          {/* Industry Recognition */}
-          <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 backdrop-blur-xl rounded-xl p-6 border border-white/10 mb-10">
-            <h3 className="text-xl font-bold text-white text-center mb-6">Industry Recognition</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-yellow-500 to-orange-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-lg">🏆</span>
-                </div>
-                <h4 className="font-semibold text-white text-sm">AI Innovation Leader</h4>
-                <p className="text-xs text-gray-400 mt-0.5">Gartner Magic Quadrant 2025</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-lg">⭐</span>
-                </div>
-                <h4 className="font-semibold text-white text-sm">Best Enterprise AI Platform</h4>
-                <p className="text-xs text-gray-400 mt-0.5">TechCrunch Disrupt Winner</p>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                  <span className="text-lg">🚀</span>
-                </div>
-                <h4 className="font-semibold text-white text-sm">Fastest Growing AI Company</h4>
-                <p className="text-xs text-gray-400 mt-0.5">Inc. 5000 List 2025</p>
-              </div>
-            </div>
-          </div>
-
-          {/* Enterprise Features */}
-          <div className="grid md:grid-cols-3 gap-4">
+          {/* Tech Stack & Capabilities */}
+          <div className="grid md:grid-cols-3 gap-4 mb-10">
             <div className="bg-black/50 backdrop-blur-xl rounded-xl p-4 border border-white/10">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-lg flex items-center justify-center mb-3">
-                <Shield className="w-5 h-5 text-white" />
+                <Cpu className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-base font-semibold text-white mb-1">Enterprise Security</h3>
-              <p className="text-gray-400 text-xs mb-3">SOC 2 Type II, HIPAA, GDPR compliant with end-to-end encryption</p>
+              <h3 className="text-base font-semibold text-white mb-1">Multi-Model AI Architecture</h3>
+              <p className="text-gray-400 text-xs mb-3">We use the right AI model for each task—not one-size-fits-all</p>
               <ul className="space-y-1 text-xs text-gray-300">
-                <li>• Zero-trust architecture</li>
-                <li>• Multi-tenant isolation</li>
-                <li>• Advanced threat detection</li>
+                <li>• Claude (Anthropic) for complex reasoning</li>
+                <li>• GPT-4 for general-purpose tasks</li>
+                <li>• DeepSeek-R1 for cost-effective research</li>
+                <li>• VAPI for voice AI integration</li>
               </ul>
             </div>
 
             <div className="bg-black/50 backdrop-blur-xl rounded-xl p-4 border border-white/10">
               <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-pink-600 rounded-lg flex items-center justify-center mb-3">
-                <Zap className="w-5 h-5 text-white" />
+                <Shield className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-base font-semibold text-white mb-1">Proven Performance</h3>
-              <p className="text-gray-400 text-xs mb-3">Battle-tested infrastructure handling billions of requests</p>
+              <h3 className="text-base font-semibold text-white mb-1">Production-Grade Infrastructure</h3>
+              <p className="text-gray-400 text-xs mb-3">Built on proven enterprise technologies</p>
               <ul className="space-y-1 text-xs text-gray-300">
-                <li>• Sub-100ms response times</li>
-                <li>• Auto-scaling architecture</li>
-                <li>• 99.99% accuracy rates</li>
+                <li>• Next.js 15 for performance</li>
+                <li>• Supabase (Postgres) for data</li>
+                <li>• Vercel edge deployment</li>
+                <li>• Real-time synchronization</li>
               </ul>
             </div>
 
             <div className="bg-black/50 backdrop-blur-xl rounded-xl p-4 border border-white/10">
               <div className="w-10 h-10 bg-gradient-to-br from-green-600 to-blue-600 rounded-lg flex items-center justify-center mb-3">
-                <Users className="w-5 h-5 text-white" />
+                <Code className="w-5 h-5 text-white" />
               </div>
-              <h3 className="text-base font-semibold text-white mb-1">Expert Partnership</h3>
-              <p className="text-gray-400 text-xs mb-3">Dedicated success team with AI PhD specialists</p>
+              <h3 className="text-base font-semibold text-white mb-1">Rapid Custom Development</h3>
+              <p className="text-gray-400 text-xs mb-3">Full-stack AI applications, delivered fast</p>
               <ul className="space-y-1 text-xs text-gray-300">
-                <li>• Custom implementation</li>
-                <li>• Strategic consulting</li>
-                <li>• 24/7 technical support</li>
+                <li>• TypeScript & React expertise</li>
+                <li>• Multi-tenant architectures</li>
+                <li>• API integrations (Twilio, Stripe, etc.)</li>
+                <li>• Custom AI agent development</li>
               </ul>
+            </div>
+          </div>
+
+          {/* Emerging AI Technologies */}
+          <div className="bg-gradient-to-r from-blue-900/30 to-purple-900/30 backdrop-blur-xl rounded-xl p-6 border border-white/10">
+            <h3 className="text-xl font-bold text-white mb-4">Emerging AI Technologies You Need to Know</h3>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <h4 className="text-sm font-semibold text-purple-400 mb-2">🧠 Agentic AI Systems</h4>
+                <p className="text-xs text-gray-300 mb-2">AI agents that can plan, execute tasks, and use tools autonomously. We're building these now.</p>
+                <p className="text-xs text-gray-400">Use case: Autonomous customer service, research agents, workflow automation</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-blue-400 mb-2">🗣️ Voice AI Revolution</h4>
+                <p className="text-xs text-gray-300 mb-2">Natural voice interfaces are replacing traditional IVR systems. 24/7 availability at a fraction of the cost.</p>
+                <p className="text-xs text-gray-400">Use case: Appointment booking, customer support, lead qualification</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-pink-400 mb-2">💰 Cost-Effective AI Models</h4>
+                <p className="text-xs text-gray-300 mb-2">DeepSeek-R1 and other open models deliver GPT-4 quality at 98% lower cost. Game-changing for high-volume use.</p>
+                <p className="text-xs text-gray-400">Use case: Market research, content generation, data analysis at scale</p>
+              </div>
+              <div>
+                <h4 className="text-sm font-semibold text-green-400 mb-2">🔗 Multi-Modal AI</h4>
+                <p className="text-xs text-gray-300 mb-2">AI that understands text, images, voice, and video together. Opens entirely new possibilities.</p>
+                <p className="text-xs text-gray-400">Use case: Document processing, visual search, accessibility tools</p>
+              </div>
             </div>
           </div>
         </div>
@@ -342,17 +300,17 @@ export default function HomePage() {
       <section className="relative py-16 px-4 sm:px-6 lg:px-8">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">
-            Stop Managing. Start Scaling.
+            Ready to Build Your AI Solution?
           </h2>
           <p className="text-base text-gray-300 mb-8">
-            Join hundreds of companies using DropFly™ to supercharge their operations with AI
+            Let's talk about your specific needs and build something custom for your business
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <button className="px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
-              Start Free Trial
-            </button>
+            <Link href="/products" className="px-6 py-3 text-base font-medium text-white bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all">
+              Explore Our Products
+            </Link>
             <button className="px-6 py-3 text-base font-medium text-white border border-white/20 rounded-lg hover:bg-white/10 transition-all">
-              Schedule Demo
+              Schedule a Call
             </button>
           </div>
         </div>
