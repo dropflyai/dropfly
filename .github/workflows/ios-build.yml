@@ -92,6 +92,10 @@ jobs:
           PP_NAME=$(/usr/libexec/PlistBuddy -c "Print :Name" profile.plist)
           echo "Provisioning Profile Name: $PP_NAME"
 
+          # Extract App ID
+          PP_APP_ID=$(/usr/libexec/PlistBuddy -c "Print :Entitlements:application-identifier" profile.plist)
+          echo "Provisioning Profile App ID: $PP_APP_ID"
+
           # Copy with UUID name
           cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision
 
