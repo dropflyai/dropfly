@@ -109,8 +109,17 @@ jobs:
           ./build-for-appstore.sh
 
       - name: Upload IPA
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: PDF-Doc-Sign-iOS
           path: DropFly-PROJECTS/pdf-editor/ios/App/build/*.ipa
           retention-days: 30
+
+      - name: Upload Build Logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-logs
+          path: DropFly-PROJECTS/pdf-editor/ios/App/build.log
+          retention-days: 7
