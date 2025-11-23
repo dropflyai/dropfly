@@ -12,6 +12,8 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          submodules: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -46,11 +48,30 @@ jobs:
           cd DropFly-PROJECTS/pdf-editor/ios/App
           pod install
 
+      - name: Verify Secrets
+        run: |
+          echo "Checking if secrets are set..."
+          if [ -z "${{ secrets.IOS_CERTIFICATE_P12 }}" ]; then
+            echo "❌ IOS_CERTIFICATE_P12 is not set!"
+            exit 1
+          fi
+          if [ -z "${{ secrets.IOS_CERTIFICATE_PASSWORD }}" ]; then
+            echo "❌ IOS_CERTIFICATE_PASSWORD is not set!"
+            exit 1
+          fi
+          if [ -z "${{ secrets.IOS_PROVISIONING_PROFILE }}" ]; then
+            echo "❌ IOS_PROVISIONING_PROFILE is not set!"
+            exit 1
+          fi
+          echo "✅ All secrets are set!"
+
       - name: Import Code-Signing Certificates
-        uses: apple-actions/import-codesign-certs@v2
+        uses: apple-actions/import-codesign-certs@v3
         with:
           p12-file-base64: ${{ secrets.IOS_CERTIFICATE_P12 }}
           p12-password: ${{ secrets.IOS_CERTIFICATE_PASSWORD }}
+          keychain: github-actions-build
+          keychain-password: ''
 
       - name: Download Provisioning Profile
         run: |
