@@ -78,6 +78,16 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "${{ secrets.IOS_PROVISIONING_PROFILE }}" | base64 --decode > ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision
 
+          # Extract UUID from provisioning profile
+          PP_UUID=$(grep -a -A1 '<key>UUID</key>' ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision | grep '<string>' | sed 's/.*<string>\(.*\)<\/string>.*/\1/')
+          echo "Provisioning Profile UUID: $PP_UUID"
+
+          # Copy with proper UUID name
+          cp ~/Library/MobileDevice/Provisioning\ Profiles/profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision
+
+          # Verify the profile
+          security cms -D -i ~/Library/MobileDevice/Provisioning\ Profiles/$PP_UUID.mobileprovision
+
       - name: Build iOS App
         run: |
           cd DropFly-PROJECTS/pdf-editor/ios/App
