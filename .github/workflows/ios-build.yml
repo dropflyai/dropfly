@@ -99,24 +99,10 @@ jobs:
           echo "Installed provisioning profiles:"
           ls -la ~/Library/MobileDevice/Provisioning\ Profiles/
 
-      - name: Build iOS App
+      - name: Build and Export iOS App
         run: |
           cd DropFly-PROJECTS/pdf-editor/ios/App
-          xcodebuild \
-            -workspace App.xcworkspace \
-            -scheme App \
-            -configuration Release \
-            -archivePath $PWD/build/App.xcarchive \
-            archive
-
-      - name: Export IPA
-        run: |
-          cd DropFly-PROJECTS/pdf-editor/ios/App
-          xcodebuild \
-            -exportArchive \
-            -archivePath $PWD/build/App.xcarchive \
-            -exportOptionsPlist exportOptions.plist \
-            -exportPath $PWD/build
+          ./build-for-appstore.sh
 
       - name: Upload IPA
         uses: actions/upload-artifact@v4

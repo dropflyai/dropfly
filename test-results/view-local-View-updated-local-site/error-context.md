@@ -1,0 +1,190 @@
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - navigation [ref=e5]:
+      - generic [ref=e7]:
+        - heading "DropFly™" [level=1] [ref=e9]
+        - generic [ref=e11]:
+          - link "Products" [ref=e12] [cursor=pointer]:
+            - /url: /products
+          - link "Solutions" [ref=e13] [cursor=pointer]:
+            - /url: "#solutions"
+          - link "Why DropFly™" [ref=e14] [cursor=pointer]:
+            - /url: /why-dropfly
+          - link "About" [ref=e15] [cursor=pointer]:
+            - /url: "#about"
+          - button "Sign In" [ref=e16]
+          - button "Get Started" [ref=e17]
+    - generic [ref=e19]:
+      - heading "Imagine Your Business. Supercharged by AI." [level=1] [ref=e20]:
+        - text: Imagine Your Business.
+        - text: Supercharged by AI.
+      - paragraph [ref=e21]: Dropfly builds AI teams for every department, so you scale faster, cut costs, and never miss an opportunity.
+      - generic [ref=e22]:
+        - link "Explore Products" [ref=e23] [cursor=pointer]:
+          - /url: /products
+          - text: Explore Products
+          - img [ref=e24]
+        - button "Schedule Demo" [ref=e26]
+    - generic [ref=e28]:
+      - generic [ref=e29]:
+        - heading "AI Solutions for Every Department" [level=2] [ref=e30]
+        - paragraph [ref=e31]: Custom AI agents that integrate seamlessly with your existing tools
+      - generic [ref=e32]:
+        - generic [ref=e33]:
+          - img [ref=e35]
+          - heading "Voice Agents" [level=3] [ref=e38]
+          - paragraph [ref=e39]: 24/7 intelligent voice support
+        - generic [ref=e40]:
+          - img [ref=e42]
+          - heading "Content Creation" [level=3] [ref=e46]
+          - paragraph [ref=e47]: Automated content generation
+        - generic [ref=e48]:
+          - img [ref=e50]
+          - heading "Medical Intake AI" [level=3] [ref=e52]
+          - paragraph [ref=e53]: HIPAA-compliant processing
+        - generic [ref=e54]:
+          - img [ref=e56]
+          - heading "Predictive Sales AI" [level=3] [ref=e58]
+          - paragraph [ref=e59]: AI-powered sales insights
+        - generic [ref=e60]:
+          - img [ref=e62]
+          - heading "CRM/API Integration" [level=3] [ref=e65]
+          - paragraph [ref=e66]: Seamless system connections
+        - generic [ref=e67]:
+          - img [ref=e69]
+          - heading "HR Automation" [level=3] [ref=e74]
+          - paragraph [ref=e75]: Streamline HR processes
+        - generic [ref=e76]:
+          - img [ref=e78]
+          - heading "Security & Compliance" [level=3] [ref=e80]
+          - paragraph [ref=e81]: Enterprise-grade protection
+        - generic [ref=e82]:
+          - img [ref=e84]
+          - heading "Document Processing" [level=3] [ref=e88]
+          - paragraph [ref=e89]: Intelligent document AI
+    - generic [ref=e91]:
+      - generic [ref=e92]:
+        - heading "How We Build Your AI Team" [level=2] [ref=e93]
+        - paragraph [ref=e94]: From consultation to scale, we handle everything
+      - generic [ref=e95]:
+        - generic [ref=e96]:
+          - generic [ref=e98]: "1"
+          - heading "Consult & Plan" [level=3] [ref=e99]
+          - paragraph [ref=e100]: We learn your business and custom map your needs
+        - generic [ref=e101]:
+          - generic [ref=e103]: "2"
+          - heading "Build & Launch" [level=3] [ref=e104]
+          - paragraph [ref=e105]: Tailored AI systems built, integrated and deployed
+        - generic [ref=e106]:
+          - generic [ref=e108]: "3"
+          - heading "Monitor & Optimize" [level=3] [ref=e109]
+          - paragraph [ref=e110]: Real-time monitoring. Continuously improving
+        - generic [ref=e111]:
+          - generic [ref=e113]: "4"
+          - heading "Scale & Expand" [level=3] [ref=e114]
+          - paragraph [ref=e115]: Add new solutions as you grow
+    - generic [ref=e117]:
+      - generic [ref=e118]:
+        - heading "Why We're Your AI Implementation Partner" [level=2] [ref=e119]
+        - paragraph [ref=e120]: We build production-ready AI systems using cutting-edge technologies. Here's what sets us apart and what you need to know about modern AI.
+      - generic [ref=e121]:
+        - generic [ref=e122]:
+          - img [ref=e124]
+          - heading "Multi-Model AI Architecture" [level=3] [ref=e127]
+          - paragraph [ref=e128]: We use the right AI model for each task—not one-size-fits-all
+          - list [ref=e129]:
+            - listitem [ref=e130]: • Claude (Anthropic) for complex reasoning
+            - listitem [ref=e131]: • GPT-4 for general-purpose tasks
+            - listitem [ref=e132]: • DeepSeek-R1 for cost-effective research
+            - listitem [ref=e133]: • VAPI for voice AI integration
+        - generic [ref=e134]:
+          - img [ref=e136]
+          - heading "Production-Grade Infrastructure" [level=3] [ref=e138]
+          - paragraph [ref=e139]: Built on proven enterprise technologies
+          - list [ref=e140]:
+            - listitem [ref=e141]: • Next.js 15 for performance
+            - listitem [ref=e142]: • Supabase (Postgres) for data
+            - listitem [ref=e143]: • Vercel edge deployment
+            - listitem [ref=e144]: • Real-time synchronization
+        - generic [ref=e145]:
+          - img [ref=e147]
+          - heading "Rapid Custom Development" [level=3] [ref=e150]
+          - paragraph [ref=e151]: Full-stack AI applications, delivered fast
+          - list [ref=e152]:
+            - listitem [ref=e153]: • TypeScript & React expertise
+            - listitem [ref=e154]: • Multi-tenant architectures
+            - listitem [ref=e155]: • API integrations (Twilio, Stripe, etc.)
+            - listitem [ref=e156]: • Custom AI agent development
+      - generic [ref=e157]:
+        - heading "Emerging AI Technologies You Need to Know" [level=3] [ref=e158]
+        - generic [ref=e159]:
+          - generic [ref=e160]:
+            - heading "🧠 Agentic AI Systems" [level=4] [ref=e161]
+            - paragraph [ref=e162]: AI agents that can plan, execute tasks, and use tools autonomously. We're building these now.
+            - paragraph [ref=e163]: "Use case: Autonomous customer service, research agents, workflow automation"
+          - generic [ref=e164]:
+            - heading "🗣️ Voice AI Revolution" [level=4] [ref=e165]
+            - paragraph [ref=e166]: Natural voice interfaces are replacing traditional IVR systems. 24/7 availability at a fraction of the cost.
+            - paragraph [ref=e167]: "Use case: Appointment booking, customer support, lead qualification"
+          - generic [ref=e168]:
+            - heading "💰 Cost-Effective AI Models" [level=4] [ref=e169]
+            - paragraph [ref=e170]: DeepSeek-R1 and other open models deliver GPT-4 quality at 98% lower cost. Game-changing for high-volume use.
+            - paragraph [ref=e171]: "Use case: Market research, content generation, data analysis at scale"
+          - generic [ref=e172]:
+            - heading "🔗 Multi-Modal AI" [level=4] [ref=e173]
+            - paragraph [ref=e174]: AI that understands text, images, voice, and video together. Opens entirely new possibilities.
+            - paragraph [ref=e175]: "Use case: Document processing, visual search, accessibility tools"
+    - generic [ref=e177]:
+      - heading "Ready to Build Your AI Solution?" [level=2] [ref=e178]
+      - paragraph [ref=e179]: Let's talk about your specific needs and build something custom for your business
+      - generic [ref=e180]:
+        - link "Explore Our Products" [ref=e181] [cursor=pointer]:
+          - /url: /products
+        - button "Schedule a Call" [ref=e182]
+    - contentinfo [ref=e183]:
+      - generic [ref=e184]:
+        - generic [ref=e185]:
+          - generic [ref=e186]:
+            - heading "DropFly™" [level=3] [ref=e187]
+            - paragraph [ref=e188]: Building AI teams for every department, so you scale faster, cut costs, and never miss an opportunity.
+          - generic [ref=e189]:
+            - heading "Products" [level=4] [ref=e190]
+            - list [ref=e191]:
+              - listitem [ref=e192]:
+                - link "All Products" [ref=e193] [cursor=pointer]:
+                  - /url: /products
+              - listitem [ref=e194]:
+                - link "Maya™ AI Assistant" [ref=e195] [cursor=pointer]:
+                  - /url: /products/maya
+              - listitem [ref=e196]:
+                - link "LeadFly AI" [ref=e197] [cursor=pointer]:
+                  - /url: https://leadflyai.com
+              - listitem [ref=e198]:
+                - link "LawFly™ Pro" [ref=e199] [cursor=pointer]:
+                  - /url: /products/lawfly
+              - listitem [ref=e200]:
+                - link "HomeFly™" [ref=e201] [cursor=pointer]:
+                  - /url: /products/homefly
+          - generic [ref=e202]:
+            - heading "Company" [level=4] [ref=e203]
+            - list [ref=e204]:
+              - listitem [ref=e205]:
+                - link "About" [ref=e206] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e207]:
+                - link "Blog" [ref=e208] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e209]:
+                - link "Careers" [ref=e210] [cursor=pointer]:
+                  - /url: "#"
+              - listitem [ref=e211]:
+                - link "Contact" [ref=e212] [cursor=pointer]:
+                  - /url: "#"
+        - paragraph [ref=e214]: © 2025 DropFly™. All rights reserved.
+  - button "Open Next.js Dev Tools" [ref=e220] [cursor=pointer]:
+    - img [ref=e221]
+  - alert [ref=e224]
+```

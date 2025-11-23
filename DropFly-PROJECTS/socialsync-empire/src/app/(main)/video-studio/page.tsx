@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useMemo } from 'react';
-import { Play, Sparkles, ChevronDown, Zap, Download, Share2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+import { Play, Sparkles, Download, Share2, ChevronLeft, ChevronRight, ChevronDown } from 'lucide-react';
 
 interface VideoEngine {
   id: string;
@@ -10,45 +10,48 @@ interface VideoEngine {
   icon: string;
   speed: string;
   quality: string;
-  pricePerSecond: number; // Actual API cost per second
 }
 
 const VIDEO_ENGINES: VideoEngine[] = [
   {
-    id: 'hailuo-02',
-    name: 'Minimax Hailuo 02',
-    description: 'High-dynamic, VFX-ready, fastest and most affordable',
+    id: 'minimax-video',
+    name: 'Minimax Video',
+    description: 'Fast, high-quality AI video generation',
     icon: '🚀',
-    speed: 'Ultra Fast',
+    speed: 'Fast',
     quality: 'High',
-    pricePerSecond: 0.028,
   },
   {
     id: 'runway-gen4-turbo',
     name: 'Runway Gen-4 Turbo',
-    description: 'Fastest high-dynamic video',
+    description: 'Ultra-fast professional video',
     icon: '⚡',
-    speed: 'Fast',
+    speed: 'Ultra Fast',
     quality: 'Very High',
-    pricePerSecond: 0.05,
   },
   {
     id: 'kling-2.1',
     name: 'Kling 2.1',
-    description: 'Motion-rich with advanced video control',
+    description: 'Motion-rich with advanced control',
     icon: '🎭',
     speed: 'Fast',
     quality: 'High',
-    pricePerSecond: 0.10,
   },
   {
-    id: 'runway-gen4-aleph',
-    name: 'Runway Gen-4 Aleph',
-    description: 'Highest fidelity, professional grade',
-    icon: '🎬',
+    id: 'luma-dream',
+    name: 'Luma Dream Machine',
+    description: 'Cinematic quality with realistic motion',
+    icon: '✨',
+    speed: 'Medium',
+    quality: 'Very High',
+  },
+  {
+    id: 'sora-2',
+    name: 'OpenAI Sora 2',
+    description: 'Photorealistic video generation',
+    icon: '🤖',
     speed: 'Standard',
     quality: 'Ultra High',
-    pricePerSecond: 0.15,
   },
   {
     id: 'veo-3.1',
@@ -57,83 +60,32 @@ const VIDEO_ENGINES: VideoEngine[] = [
     icon: '🎨',
     speed: 'Medium',
     quality: 'Very High',
-    pricePerSecond: 0.12,
-  },
-  {
-    id: 'luma-ray-2',
-    name: 'Luma Dream Machine',
-    description: 'Cinematic quality with realistic motion',
-    icon: '✨',
-    speed: 'Medium',
-    quality: 'Very High',
-    pricePerSecond: 0.08,
-  },
-  {
-    id: 'sora-2',
-    name: 'OpenAI Sora 2',
-    description: 'Photorealistic quality with synchronized dialogue',
-    icon: '🤖',
-    speed: 'Standard',
-    quality: 'Ultra High',
-    pricePerSecond: 0.30,
-  },
-  {
-    id: 'sora-2-pro',
-    name: 'OpenAI Sora 2 Pro',
-    description: 'Best quality, HD 1080p, advanced controls',
-    icon: '💎',
-    speed: 'Standard',
-    quality: 'Maximum',
-    pricePerSecond: 0.50,
   },
 ];
-
-// Calculate token cost with 70% profit over cost (70% markup)
-// Formula: (pricePerSecond * duration * 100) * 1.70
-// 1 token = $0.01, so multiply by 100 to convert dollars to tokens
-// Then multiply by 1.70 to add 70% profit (Price = Cost × 1.70)
-function calculateTokenCost(pricePerSecond: number, duration: number): number {
-  const dollarCost = pricePerSecond * duration;
-  const tokens = Math.ceil(dollarCost * 100);
-  const PROFIT_MARGIN_MULTIPLIER = 1.70; // 70% profit over cost
-  return Math.ceil(tokens * PROFIT_MARGIN_MULTIPLIER);
-}
 
 export default function VideoStudioPage() {
   const [prompt, setPrompt] = useState('');
   const [selectedEngine, setSelectedEngine] = useState<VideoEngine>(VIDEO_ENGINES[0]);
   const [showEngineMenu, setShowEngineMenu] = useState(false);
-  const [duration, setDuration] = useState(6);
-  const [resolution, setResolution] = useState('1080p');
-  const [aspectRatio, setAspectRatio] = useState('16:9');
+  const [duration, setDuration] = useState<5 | 10>(5);
   const [generating, setGenerating] = useState(false);
   const [generatedVideoUrl, setGeneratedVideoUrl] = useState('');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
 
-  // Calculate token cost dynamically based on selected engine and duration
-  const tokenCost = useMemo(() => {
-    return calculateTokenCost(selectedEngine.pricePerSecond, duration);
-  }, [selectedEngine, duration]);
+  // Fixed token cost for video generation
+  const tokenCost = 75;
 
   const handleGenerate = async () => {
     if (!prompt.trim()) return;
 
     setGenerating(true);
     try {
-      const response = await fetch('/api/ai/generate-video', {
+      const response = await fetch('/api/video/generate-simple', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          script: {
-            hook: prompt.substring(0, 100),
-            script: prompt,
-            cta: '',
-          },
-          engine: selectedEngine.id,
-          duration,
-          resolution,
-          aspectRatio,
-          tokenCost, // Dynamic cost based on engine and duration
+          prompt: prompt,
+          duration: duration,
         }),
       });
 
@@ -143,9 +95,10 @@ export default function VideoStudioPage() {
         throw new Error(data.error || 'Failed to generate video');
       }
 
-      setGeneratedVideoUrl(data.video_url);
+      setGeneratedVideoUrl(data.videoUrl);
     } catch (err) {
       console.error('Video generation failed:', err);
+      alert('Video generation failed. Please try again.');
     } finally {
       setGenerating(false);
     }
@@ -168,20 +121,20 @@ export default function VideoStudioPage() {
           {/* Prompt Input */}
           <div>
             <label className="block text-xs font-medium text-gray-400 mb-1.5">
-              Prompt
+              What do you want to create?
             </label>
             <textarea
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
-              placeholder="Describe the video..."
-              className="w-full h-20 px-2.5 py-2 bg-[var(--bg-elevated)] border border-[var(--bg-tertiary)] rounded-md text-xs text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-[var(--primary-500)] focus:ring-1 focus:ring-[var(--primary-500)] resize-none"
+              placeholder="Describe your video... (e.g., 'A chef cooking pasta in a modern kitchen')"
+              className="w-full h-24 px-2.5 py-2 bg-[var(--bg-elevated)] border border-[var(--bg-tertiary)] rounded-md text-xs text-[var(--text-primary)] placeholder-[var(--text-tertiary)] focus:outline-none focus:border-[var(--primary-500)] focus:ring-1 focus:ring-[var(--primary-500)] resize-none"
             />
           </div>
 
-          {/* Model Selector */}
+          {/* Engine Selector */}
           <div>
             <label className="block text-xs font-medium text-gray-400 mb-1.5">
-              Model
+              AI Engine
             </label>
             <div className="relative">
               <button
@@ -192,6 +145,7 @@ export default function VideoStudioPage() {
                   <span className="text-sm">{selectedEngine.icon}</span>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs font-medium truncate">{selectedEngine.name}</p>
+                    <p className="text-[10px] text-gray-500 truncate">{selectedEngine.description}</p>
                   </div>
                 </div>
                 <ChevronDown className={`w-3.5 h-3.5 text-gray-400 transition-transform flex-shrink-0 ${showEngineMenu ? 'rotate-180' : ''}`} />
@@ -217,6 +171,9 @@ export default function VideoStudioPage() {
                           <p className="text-xs font-medium truncate">
                             {engine.name}
                           </p>
+                          <p className="text-[10px] text-gray-500 truncate mb-0.5">
+                            {engine.description}
+                          </p>
                           <div className="flex gap-2 mt-0.5">
                             <span className="text-[10px] text-gray-500">⚡ {engine.speed}</span>
                             <span className="text-[10px] text-gray-500">🎨 {engine.quality}</span>
@@ -230,71 +187,47 @@ export default function VideoStudioPage() {
             </div>
           </div>
 
-          {/* Duration Slider */}
-          <div>
-            <div className="flex items-center justify-between mb-1.5">
-              <label className="text-xs font-medium text-gray-400">Duration</label>
-              <span className="text-xs text-white font-medium">{duration}s</span>
-            </div>
-            <input
-              type="range"
-              min="3"
-              max="10"
-              step="1"
-              value={duration}
-              onChange={(e) => setDuration(Number(e.target.value))}
-              className="w-full h-1.5 bg-[var(--bg-elevated)] rounded-full appearance-none cursor-pointer slider"
-              style={{
-                background: `linear-gradient(to right, var(--primary-500) 0%, var(--primary-500) ${((duration - 3) / 7) * 100}%, var(--bg-elevated) ${((duration - 3) / 7) * 100}%, var(--bg-elevated) 100%)`,
-              }}
-            />
-            <div className="flex justify-between text-[10px] text-gray-500 mt-1">
-              <span>3s</span>
-              <span>10s</span>
-            </div>
-          </div>
-
-          {/* Resolution */}
+          {/* Duration Selector */}
           <div>
             <label className="block text-xs font-medium text-gray-400 mb-1.5">
-              Resolution
+              Video Length
             </label>
             <div className="grid grid-cols-2 gap-1.5">
-              {['720p', '1080p', '2K', '4K'].map((res) => (
-                <button
-                  key={res}
-                  onClick={() => setResolution(res)}
-                  className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    resolution === res
-                      ? 'bg-[var(--primary-500)] text-black'
-                      : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--bg-tertiary)]'
-                  }`}
-                >
-                  {res}
-                </button>
-              ))}
+              <button
+                onClick={() => setDuration(5)}
+                className={`px-3 py-2.5 rounded-md text-xs font-medium transition-all ${
+                  duration === 5
+                    ? 'bg-[var(--primary-500)] text-white'
+                    : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--bg-tertiary)]'
+                }`}
+              >
+                5 seconds
+              </button>
+              <button
+                onClick={() => setDuration(10)}
+                className={`px-3 py-2.5 rounded-md text-xs font-medium transition-all ${
+                  duration === 10
+                    ? 'bg-[var(--primary-500)] text-white'
+                    : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--bg-tertiary)]'
+                }`}
+              >
+                10 seconds
+              </button>
             </div>
           </div>
 
-          {/* Aspect Ratio */}
-          <div>
-            <label className="block text-xs font-medium text-gray-400 mb-1.5">
-              Aspect Ratio
-            </label>
-            <div className="grid grid-cols-3 gap-1.5">
-              {['16:9', '9:16', '1:1'].map((ratio) => (
-                <button
-                  key={ratio}
-                  onClick={() => setAspectRatio(ratio)}
-                  className={`px-2 py-1.5 rounded-md text-xs font-medium transition-all ${
-                    aspectRatio === ratio
-                      ? 'bg-[var(--primary-500)] text-black'
-                      : 'bg-[var(--bg-elevated)] text-[var(--text-secondary)] hover:bg-[var(--bg-tertiary)] border border-[var(--bg-tertiary)]'
-                  }`}
-                >
-                  {ratio}
-                </button>
-              ))}
+          {/* Info Box */}
+          <div className="p-3 bg-blue-500/10 border border-blue-500/30 rounded-lg">
+            <div className="flex items-start gap-2">
+              <Sparkles className="w-4 h-4 text-blue-400 flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs font-medium text-blue-300 mb-1">Quick Tips</p>
+                <ul className="text-xs text-blue-200 space-y-1">
+                  <li>• Be specific about what you want</li>
+                  <li>• Describe the scene and action</li>
+                  <li>• Keep it simple and clear</li>
+                </ul>
+              </div>
             </div>
           </div>
 
@@ -324,7 +257,7 @@ export default function VideoStudioPage() {
             )}
           </button>
           <p className="text-center text-[10px] text-gray-500 mt-2 truncate">
-            {selectedEngine.name} • {duration}s • {resolution}
+            {selectedEngine.name} • {duration}s
           </p>
         </div>
       </div>
@@ -374,11 +307,11 @@ export default function VideoStudioPage() {
               <div className="flex items-center justify-center gap-4 text-xs text-gray-500">
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 bg-[var(--primary-500)] rounded-full"></div>
-                  <span>8 engines available</span>
+                  <span>AI-powered video</span>
                 </div>
                 <div className="flex items-center gap-1">
                   <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
-                  <span>Up to 4K resolution</span>
+                  <span>30-60 second generation</span>
                 </div>
               </div>
             </div>
@@ -411,7 +344,7 @@ export default function VideoStudioPage() {
               <div className="mt-4 flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium">Generated with {selectedEngine.name}</p>
-                  <p className="text-xs text-gray-400">{duration}s • {resolution} • {aspectRatio}</p>
+                  <p className="text-xs text-gray-400">{duration} seconds • 75 tokens used</p>
                 </div>
                 <button
                   onClick={() => {

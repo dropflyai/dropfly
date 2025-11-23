@@ -29,11 +29,8 @@ export default function ProductsPage() {
                 <Link href="/products" className="text-white px-3 py-2 text-sm font-medium">
                   Products
                 </Link>
-                <Link href="/#solutions" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
-                  Solutions
-                </Link>
-                <Link href="/#pricing" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
-                  Pricing
+                <Link href="/ai-insights" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
+                  The Edge
                 </Link>
                 <Link href="/#about" className="text-gray-300 hover:text-white px-3 py-2 text-sm font-medium transition-colors">
                   About
