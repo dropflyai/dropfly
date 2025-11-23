@@ -7,20 +7,15 @@ echo "🔧 Setting up code signing for App Store..."
 echo "Importing certificate..."
 security unlock-keychain -p "" github-actions-build.keychain-db 2>/dev/null || true
 
-# Install provisioning profile
-echo "Installing provisioning profile..."
+# Verify provisioning profile is installed
+echo "Verifying provisioning profile..."
 PP_PATH="$HOME/Library/MobileDevice/Provisioning Profiles"
-mkdir -p "$PP_PATH"
-
-# Find the UUID from the profile
-PP_UUID=$(security cms -D -i profile.mobileprovision | plutil -extract UUID raw -)
-echo "Profile UUID: $PP_UUID"
-
-# Copy with UUID name
-cp profile.mobileprovision "$PP_PATH/$PP_UUID.mobileprovision"
-
-# Verify installation
-ls -la "$PP_PATH"
+if [ -d "$PP_PATH" ]; then
+  echo "Installed provisioning profiles:"
+  ls -la "$PP_PATH"
+else
+  echo "⚠️ Warning: No provisioning profiles directory found"
+fi
 
 echo "🏗️ Building iOS app..."
 xcodebuild clean archive \
