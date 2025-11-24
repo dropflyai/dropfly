@@ -54,10 +54,7 @@ xcodebuild clean archive \
   -configuration Release \
   -archivePath build/App.xcarchive \
   -allowProvisioningUpdates \
-  CODE_SIGN_IDENTITY="Apple Distribution" \
-  CODE_SIGN_STYLE=Manual \
-  DEVELOPMENT_TEAM=G46B7YC46C \
-  PROVISIONING_PROFILE_SPECIFIER="PDF Doc Sign App Store" \
+  -destination 'generic/platform=iOS' \
   | tee build.log
 
 # 5. Export
