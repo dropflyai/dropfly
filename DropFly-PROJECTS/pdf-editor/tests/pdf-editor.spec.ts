@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
 
-test.describe('PDF Editor', () => {
+test.describe('PDF Doc Sign', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the app
     await page.goto('http://localhost:3020');
@@ -10,7 +10,7 @@ test.describe('PDF Editor', () => {
 
   test('should load the homepage', async ({ page }) => {
     // Check that the homepage elements are visible
-    await expect(page.locator('text=PDF Editor')).toBeVisible();
+    await expect(page.locator('text=PDF Doc Sign')).toBeVisible();
     await expect(page.locator('text=Edit PDFs with')).toBeVisible();
     await expect(page.locator('text=Drop your PDF here')).toBeVisible();
   });

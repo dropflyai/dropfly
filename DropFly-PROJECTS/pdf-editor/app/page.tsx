@@ -5,7 +5,7 @@ import dynamic from 'next/dynamic';
 
 const PDFEditor = dynamic(() => import('@/components/PDFEditorSimple'), {
   ssr: false,
-  loading: () => <div className="p-8 text-center">Loading PDF editor...</div>
+  loading: () => <div className="p-8 text-center">Loading PDF Doc Sign...</div>
 });
 
 export default function Home() {
@@ -62,7 +62,7 @@ export default function Home() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
                 </div>
-                <h1 className="text-base font-medium text-slate-900 tracking-tight">PDF Editor</h1>
+                <h1 className="text-base font-medium text-slate-900 tracking-tight">PDF Doc Sign</h1>
               </div>
             </div>
           </header>
@@ -128,32 +128,32 @@ export default function Home() {
 
               {/* Minimal Features */}
               <div className="grid grid-cols-3 gap-8 pt-8 border-t border-slate-100/50">
-                <div className="text-center group">
-                  <div className="w-8 h-8 mx-auto mb-2.5 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg flex items-center justify-center group-hover:from-indigo-100 group-hover:to-purple-100 transition-colors">
-                    <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                <div className="text-center">
+                  <div className="w-8 h-8 mx-auto mb-2.5 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                     </svg>
                   </div>
                   <h3 className="text-xs font-medium text-slate-700 mb-1">Sign</h3>
-                  <p className="text-xs text-slate-400 font-light">Add signatures</p>
+                  <p className="text-xs text-slate-900 font-normal leading-relaxed">Draw and place your signature anywhere on the document</p>
                 </div>
-                <div className="text-center group">
-                  <div className="w-8 h-8 mx-auto mb-2.5 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg flex items-center justify-center group-hover:from-indigo-100 group-hover:to-purple-100 transition-colors">
-                    <svg className="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                <div className="text-center">
+                  <div className="w-8 h-8 mx-auto mb-2.5 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-purple-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </div>
                   <h3 className="text-xs font-medium text-slate-700 mb-1">Edit</h3>
-                  <p className="text-xs text-slate-400 font-light">Fill forms</p>
+                  <p className="text-xs text-slate-900 font-normal leading-relaxed">Fill out forms and edit text fields with ease</p>
                 </div>
-                <div className="text-center group">
-                  <div className="w-8 h-8 mx-auto mb-2.5 bg-gradient-to-br from-indigo-50 to-purple-50 rounded-lg flex items-center justify-center group-hover:from-indigo-100 group-hover:to-purple-100 transition-colors">
-                    <svg className="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                <div className="text-center">
+                  <div className="w-8 h-8 mx-auto mb-2.5 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                   </div>
                   <h3 className="text-xs font-medium text-slate-700 mb-1">Private</h3>
-                  <p className="text-xs text-slate-400 font-light">100% secure</p>
+                  <p className="text-xs text-slate-900 font-normal leading-relaxed">All editing happens in your browser, nothing is uploaded</p>
                 </div>
               </div>
 

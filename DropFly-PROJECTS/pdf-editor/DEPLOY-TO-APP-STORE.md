@@ -38,7 +38,7 @@ git push -u origin main
 5. Use these details:
    - **Description**: PDF Doc Sign
    - **Bundle ID**: `com.dropfly.pdfeditor`
-   - **Capabilities**: (none needed for basic PDF editor)
+   - **Capabilities**: (none needed for basic PDF Doc Sign)
 6. Click **Continue** → **Register**
 
 #### 2.2 Create Distribution Certificate
