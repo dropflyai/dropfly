@@ -1791,9 +1791,9 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
             <div style={{ fontSize: '12px', color: '#64748b', lineHeight: '1.8', padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
               <strong style={{ color: '#475569', display: 'block', marginBottom: '6px' }}>How to use:</strong>
               • Click any highlighted field to type or edit<br />
-              • Use "Add Signature" to draw and place your signature<br />
+              • Use &quot;Add Signature&quot; to draw and place your signature<br />
               • Drag and resize signatures, then click ✓ to confirm<br />
-              • Click "Download PDF" to save your completed document
+              • Click &quot;Download PDF&quot; to save your completed document
             </div>
           </div>
         )}
