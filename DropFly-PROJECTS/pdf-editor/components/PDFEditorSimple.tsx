@@ -95,10 +95,13 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
   const [resizeStart, setResizeStart] = useState<{ x: number; y: number; width: number; height: number } | null>(null);
   const [selectedSignatureId, setSelectedSignatureId] = useState<string | null>(null);
   const [confirmedSignatureIds, setConfirmedSignatureIds] = useState<Set<string>>(new Set());
+  const [showDownloadModal, setShowDownloadModal] = useState(false);
+  const [downloadFilename, setDownloadFilename] = useState<string>('');
 
   const signatureCanvasRef = useRef<HTMLCanvasElement>(null);
   const signaturePadRef = useRef<SignaturePad | null>(null);
   const pdfContainerRef = useRef<HTMLDivElement>(null);
+  const justFinishedResizingRef = useRef<boolean>(false);
 
   useEffect(() => {
     console.log('Annotations updated:', annotations);
@@ -136,6 +139,13 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
     };
 
     const handleMouseUp = () => {
+      // Set flag to prevent immediate click after resize/drag
+      if (draggingId || resizingId) {
+        justFinishedResizingRef.current = true;
+        setTimeout(() => {
+          justFinishedResizingRef.current = false;
+        }, 100);
+      }
       setDraggingId(null);
       setResizingId(null);
       setResizeStart(null);
@@ -153,8 +163,17 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
 
   useEffect(() => {
     if (showSignatureModal && signatureCanvasRef.current) {
-      signaturePadRef.current = new SignaturePad(signatureCanvasRef.current, {
-        backgroundColor: 'rgba(255, 255, 255, 0)',  // Transparent background
+      const canvas = signatureCanvasRef.current;
+      const ctx = canvas.getContext('2d');
+
+      // Fill canvas with white background for visibility while drawing
+      if (ctx) {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+      }
+
+      signaturePadRef.current = new SignaturePad(canvas, {
+        backgroundColor: 'rgb(255, 255, 255)',  // White background for drawing
       });
     }
   }, [showSignatureModal]);
@@ -532,7 +551,7 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
         const args = ops.argsArray[i];
 
         // OPS.rectangle = 43 (re command in PDF)
-        if (fn === 43 && args.length >= 4) {
+        if (fn === 43 && args && args.length >= 4) {
           const [x, y, width, height] = args;
           rectangles.push({ x, y, width, height });
         }
@@ -759,6 +778,11 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
   };
 
   const handlePdfClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    // Ignore clicks during drag or resize operations, or immediately after
+    if (draggingId || resizingId || justFinishedResizingRef.current) {
+      return;
+    }
+
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -802,7 +826,36 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
       return;
     }
 
-    const imageData = signaturePadRef.current.toDataURL();
+    // Create a temporary canvas to extract signature with transparent background
+    const tempCanvas = document.createElement('canvas');
+    const sourceCanvas = signatureCanvasRef.current;
+    if (!sourceCanvas) return;
+
+    tempCanvas.width = sourceCanvas.width;
+    tempCanvas.height = sourceCanvas.height;
+    const tempCtx = tempCanvas.getContext('2d');
+    if (!tempCtx) return;
+
+    // Draw the signature from the source canvas
+    tempCtx.drawImage(sourceCanvas, 0, 0);
+
+    // Get image data and make white pixels transparent
+    const imageData = tempCtx.getImageData(0, 0, tempCanvas.width, tempCanvas.height);
+    const data = imageData.data;
+
+    for (let i = 0; i < data.length; i += 4) {
+      const r = data[i];
+      const g = data[i + 1];
+      const b = data[i + 2];
+
+      // If pixel is white or very close to white, make it transparent
+      if (r > 250 && g > 250 && b > 250) {
+        data[i + 3] = 0; // Set alpha to 0 (transparent)
+      }
+    }
+
+    tempCtx.putImageData(imageData, 0, 0);
+    const transparentImageData = tempCanvas.toDataURL('image/png');
 
     const newAnnotation: Annotation = {
       id: Date.now().toString(),
@@ -812,7 +865,7 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
       width: 200,
       height: 100,
       pageNumber: currentPage,
-      imageData,
+      imageData: transparentImageData,
     };
 
     console.log('Creating signature annotation:', newAnnotation);
@@ -936,6 +989,17 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
     setResizingId(null);
     setResizeHandle(null);
     setResizeStart(null);
+  };
+
+  const prepareDownload = () => {
+    // Set default filename and show modal
+    // Format: originalname-edited.pdf instead of edited-originalname.pdf
+    const nameParts = file.name.split('.');
+    const extension = nameParts.pop();
+    const baseName = nameParts.join('.');
+    const defaultName = `${baseName}-edited.${extension}`;
+    setDownloadFilename(defaultName);
+    setShowDownloadModal(true);
   };
 
   const downloadPDF = async () => {
@@ -1102,9 +1166,20 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `edited-${file.name}`;
+
+      // Use custom filename or generate default
+      if (downloadFilename) {
+        link.download = downloadFilename;
+      } else {
+        const nameParts = file.name.split('.');
+        const extension = nameParts.pop();
+        const baseName = nameParts.join('.');
+        link.download = `${baseName}-edited.${extension}`;
+      }
+
       link.click();
       URL.revokeObjectURL(url);
+      setShowDownloadModal(false);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Error generating PDF. Please try again.');
@@ -1150,7 +1225,7 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
         <div className="flex-1" />
 
         <button
-          onClick={downloadPDF}
+          onClick={prepareDownload}
           className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-200"
         >
           <span className="inline-flex items-center gap-2">
@@ -1598,40 +1673,102 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
                         }}
                       />
                     )}
-                    {/* Confirm button - only show if selected and not confirmed */}
+                    {/* Confirm and Delete icon buttons - only show if selected and not confirmed */}
                     {selectedSignatureId === ann.id && !confirmedSignatureIds.has(ann.id) && !draggingId && !resizingId && (
-                      <button
-                        onMouseDown={(e) => {
-                          e.stopPropagation();
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          e.preventDefault();
-                          console.log('🖱️ Confirm button clicked - Signature locked!');
+                      <>
+                        <button
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            console.log('🗑️ Delete button clicked - Removing signature!');
 
-                          setConfirmedSignatureIds(prev => new Set([...prev, ann.id]));
-                          setSelectedSignatureId(null);
-                        }}
-                        style={{
-                          position: 'absolute',
-                          top: -40,
-                          right: 0,
-                          padding: '8px 16px',
-                          backgroundColor: '#10b981',
-                          color: 'white',
-                          border: 'none',
-                          borderRadius: '8px',
-                          fontSize: '13px',
-                          fontWeight: '600',
-                          cursor: 'pointer',
-                          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
-                          whiteSpace: 'nowrap',
-                          zIndex: 10000,
-                          pointerEvents: 'auto',
-                        }}
-                      >
-                        ✓ Confirm Signature
-                      </button>
+                            setAnnotations(prev => prev.filter(a => a.id !== ann.id));
+                            setSelectedSignatureId(null);
+                          }}
+                          title="Delete signature"
+                          style={{
+                            position: 'absolute',
+                            top: -22,
+                            right: 22,
+                            width: 18,
+                            height: 18,
+                            backgroundColor: 'white',
+                            color: '#000',
+                            border: '1px solid #999',
+                            borderRadius: '50%',
+                            fontSize: '11px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                            zIndex: 10000,
+                            pointerEvents: 'auto',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.2s',
+                            filter: 'contrast(1.2)',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.15)';
+                            e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.25)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.15)';
+                          }}
+                        >
+                          🗑️
+                        </button>
+                        <button
+                          onMouseDown={(e) => {
+                            e.stopPropagation();
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            e.preventDefault();
+                            console.log('🖱️ Confirm button clicked - Signature locked!');
+
+                            setConfirmedSignatureIds(prev => new Set([...prev, ann.id]));
+                            setSelectedSignatureId(null);
+                          }}
+                          title="Confirm signature"
+                          style={{
+                            position: 'absolute',
+                            top: -22,
+                            right: 2,
+                            width: 18,
+                            height: 18,
+                            backgroundColor: 'white',
+                            color: '#000',
+                            border: '1px solid #999',
+                            borderRadius: '50%',
+                            fontSize: '11px',
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            boxShadow: '0 2px 4px rgba(0,0,0,0.15)',
+                            zIndex: 10000,
+                            pointerEvents: 'auto',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            transition: 'all 0.2s',
+                            filter: 'contrast(1.2)',
+                          }}
+                          onMouseEnter={(e) => {
+                            e.currentTarget.style.transform = 'scale(1.15)';
+                            e.currentTarget.style.boxShadow = '0 3px 6px rgba(0,0,0,0.25)';
+                          }}
+                          onMouseLeave={(e) => {
+                            e.currentTarget.style.transform = 'scale(1)';
+                            e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.15)';
+                          }}
+                        >
+                          ✓
+                        </button>
+                      </>
                     )}
                   </div>
                 )}
@@ -1652,11 +1789,11 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
               {formFields.length} fillable field{formFields.length > 1 ? 's' : ''} automatically detected. Just click and type!
             </div>
             <div style={{ fontSize: '12px', color: '#64748b', lineHeight: '1.8', padding: '12px', backgroundColor: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0' }}>
-              <strong style={{ color: '#475569', display: 'block', marginBottom: '6px' }}>How it works:</strong>
-              • Click inside any green field<br />
-              • Type your information<br />
-              • Old values are automatically replaced<br />
-              • Download to save your changes
+              <strong style={{ color: '#475569', display: 'block', marginBottom: '6px' }}>How to use:</strong>
+              • Click any highlighted field to type or edit<br />
+              • Use "Add Signature" to draw and place your signature<br />
+              • Drag and resize signatures, then click ✓ to confirm<br />
+              • Click "Download PDF" to save your completed document
             </div>
           </div>
         )}
@@ -1695,11 +1832,11 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
 
       {/* Signature Modal */}
       {showSignatureModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
-            <h3 className="text-xl font-semibold mb-4">Draw Your Signature</h3>
+        <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: 99999, backgroundColor: 'rgba(0, 0, 0, 0.15)' }}>
+          <div className="bg-white rounded-lg p-4 w-full mx-4 shadow-2xl border border-gray-300" style={{ maxWidth: '400px' }}>
+            <h3 className="text-base font-semibold mb-2 text-gray-800">Draw Your Signature</h3>
             <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
-              <canvas ref={signatureCanvasRef} width={700} height={200} className="w-full" />
+              <canvas ref={signatureCanvasRef} width={350} height={100} className="w-full" />
             </div>
             <div className="flex gap-3 mt-4">
               <button
@@ -1722,6 +1859,53 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
                 className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
               >
                 Add Signature
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Download Modal */}
+      {showDownloadModal && (
+        <div className="fixed inset-0 flex items-center justify-center" style={{ zIndex: 99999, backgroundColor: 'rgba(0, 0, 0, 0.3)' }}>
+          <div className="bg-white rounded-xl p-6 w-full mx-4 shadow-2xl border border-gray-300" style={{ maxWidth: '500px' }}>
+            <h3 className="text-lg font-semibold mb-4 text-gray-800">Download PDF</h3>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                File name:
+              </label>
+              <input
+                type="text"
+                value={downloadFilename}
+                onChange={(e) => setDownloadFilename(e.target.value)}
+                className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 text-base font-medium text-gray-900"
+                placeholder="Enter filename..."
+                autoFocus
+                spellCheck={false}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter') {
+                    downloadPDF();
+                  }
+                }}
+              />
+              <p className="mt-2 text-xs text-gray-500">
+                Your file will be saved to your default Downloads folder
+              </p>
+            </div>
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowDownloadModal(false)}
+                className="flex-1 px-4 py-2.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={downloadPDF}
+                className="flex-1 px-4 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg hover:from-indigo-700 hover:to-purple-700 font-medium shadow-lg transition-all"
+              >
+                Download
               </button>
             </div>
           </div>
