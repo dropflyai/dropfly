@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Document, Page, pdfjs } from 'react-pdf';
 import { PDFDocument, rgb } from 'pdf-lib';
 import SignaturePad from 'signature_pad';
+import { usePremium } from '@/contexts/PremiumContext';
 
 pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
@@ -68,6 +69,7 @@ interface TextItem {
 }
 
 export default function PDFEditorSimple({ file }: PDFEditorProps) {
+  const { setShowPaywall } = usePremium();
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [annotations, setAnnotations] = useState<Annotation[]>([]);
@@ -1219,6 +1221,21 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>
             Add Signature
+          </span>
+        </button>
+
+        <button
+          onClick={() => setShowPaywall(true)}
+          className="relative px-6 py-2.5 bg-white border-2 border-purple-200 text-purple-700 rounded-xl hover:bg-purple-50 hover:border-purple-300 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+        >
+          <span className="inline-flex items-center gap-2">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+            Send for Signature
+            <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold rounded-full">
+              PRO
+            </span>
           </span>
         </button>
 
