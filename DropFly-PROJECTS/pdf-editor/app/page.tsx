@@ -12,10 +12,20 @@ export default function Home() {
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file && file.type === 'application/pdf') {
-      setPdfFile(file);
+      // For iOS Capacitor compatibility, we need to ensure the file is fully readable
+      // Convert to Blob with arrayBuffer to ensure it's accessible
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+        const processedFile = new File([blob], file.name, { type: 'application/pdf' });
+        setPdfFile(processedFile);
+      } catch (error) {
+        console.error('Error processing PDF file:', error);
+        alert('Failed to load PDF. Please try again.');
+      }
     }
   };
 
@@ -40,14 +50,23 @@ export default function Home() {
     setIsDragging(false);
   };
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = async (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     setIsDragging(false);
 
     const file = e.dataTransfer.files?.[0];
     if (file && file.type === 'application/pdf') {
-      setPdfFile(file);
+      // For iOS Capacitor compatibility, process the file
+      try {
+        const arrayBuffer = await file.arrayBuffer();
+        const blob = new Blob([arrayBuffer], { type: 'application/pdf' });
+        const processedFile = new File([blob], file.name, { type: 'application/pdf' });
+        setPdfFile(processedFile);
+      } catch (error) {
+        console.error('Error processing PDF file:', error);
+        alert('Failed to load PDF. Please try again.');
+      }
     } else if (file) {
       alert('Please upload a PDF file');
     }
