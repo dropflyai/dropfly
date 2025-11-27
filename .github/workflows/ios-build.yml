@@ -125,3 +125,17 @@ jobs:
           name: build-logs
           path: DropFly-PROJECTS/pdf-editor/ios/App/build.log
           retention-days: 7
+
+      - name: Upload to TestFlight
+        if: success()
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APP_SPECIFIC_PASSWORD: ${{ secrets.APP_SPECIFIC_PASSWORD }}
+        run: |
+          cd DropFly-PROJECTS/pdf-editor/ios/App/build
+          xcrun altool --upload-app \
+            -f *.ipa \
+            -t ios \
+            -u "$APPLE_ID" \
+            -p "$APP_SPECIFIC_PASSWORD" \
+            --verbose

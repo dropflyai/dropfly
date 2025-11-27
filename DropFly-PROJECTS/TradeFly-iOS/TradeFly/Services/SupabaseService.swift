@@ -10,10 +10,8 @@ import Combine
 class SupabaseService: ObservableObject {
     static let shared = SupabaseService()
 
-    // TODO: Replace with your actual Supabase credentials
-    // Get these from: https://app.supabase.com/project/_/settings/api
-    private let supabaseURL = URL(string: "YOUR_SUPABASE_URL")!
-    private let supabaseKey = "YOUR_SUPABASE_ANON_KEY"
+    private let supabaseURL = URL(string: SupabaseConfig.url)!
+    private let supabaseKey = SupabaseConfig.anonKey
 
     private var client: SupabaseClient
     private var signalsCancellable: AnyCancellable?
