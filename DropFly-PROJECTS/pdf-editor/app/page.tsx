@@ -19,6 +19,10 @@ export default function Home() {
     }
   };
 
+  const handleReset = () => {
+    setPdfFile(null);
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -50,12 +54,12 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/30">
+    <main className="mobile-viewport bg-gradient-to-br from-indigo-50/30 via-white to-purple-50/30">
       {!pdfFile ? (
-        <div className="min-h-screen flex flex-col">
-          {/* Minimal Header */}
-          <header className="border-b border-slate-100/50 bg-white/70 backdrop-blur-md">
-            <div className="max-w-4xl mx-auto px-8 py-4 flex items-center justify-between">
+        <div className="mobile-viewport flex flex-col">
+          {/* Minimal Header with Safe Area */}
+          <header className="safe-area-top border-b border-slate-100/50 bg-white/70 backdrop-blur-md sticky top-0 z-50">
+            <div className="max-w-4xl mx-auto px-4 sm:px-8 py-3 sm:py-4 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center shadow-sm">
                   <svg className="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -68,15 +72,15 @@ export default function Home() {
           </header>
 
           {/* Centered Content */}
-          <div className="flex-1 flex items-center justify-center px-6 py-16">
+          <div className="flex-1 flex items-center justify-center px-4 sm:px-6 py-8 sm:py-16 safe-area-bottom">
             <div className="w-full max-w-2xl">
 
               {/* Hero Section */}
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-light text-slate-900 mb-3 tracking-tight">
+              <div className="text-center mb-8 sm:mb-12">
+                <h2 className="text-2xl sm:text-3xl font-light text-slate-900 mb-2 sm:mb-3 tracking-tight px-2">
                   Edit PDFs with <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-purple-600 font-normal">ease</span>
                 </h2>
-                <p className="text-sm text-slate-500 font-light">
+                <p className="text-sm text-slate-500 font-light px-2">
                   Simple, secure, and private PDF editing in your browser
                 </p>
               </div>
@@ -93,7 +97,7 @@ export default function Home() {
                   onDragLeave={handleDragLeave}
                   onDrop={handleDrop}
                 >
-                  <div className={`bg-white rounded-2xl border-2 border-dashed p-16 text-center transition-all duration-300 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 ${
+                  <div className={`bg-white rounded-2xl border-2 border-dashed p-8 sm:p-16 text-center transition-all duration-300 hover:border-indigo-300 hover:shadow-xl hover:shadow-indigo-100/50 ${
                     isDragging
                       ? 'border-indigo-500 bg-indigo-50/50 shadow-2xl shadow-indigo-200/50'
                       : 'border-slate-200 shadow-sm'
@@ -127,7 +131,7 @@ export default function Home() {
               </div>
 
               {/* Minimal Features */}
-              <div className="grid grid-cols-3 gap-8 pt-8 border-t border-slate-100/50">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 sm:gap-8 pt-6 sm:pt-8 border-t border-slate-100/50">
                 <div className="text-center">
                   <div className="w-8 h-8 mx-auto mb-2.5 bg-gradient-to-br from-indigo-100 to-purple-100 rounded-lg flex items-center justify-center">
                     <svg className="w-4 h-4 text-indigo-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -161,8 +165,8 @@ export default function Home() {
           </div>
         </div>
       ) : (
-        <div className="h-screen flex flex-col">
-          <PDFEditor file={pdfFile} />
+        <div className="mobile-viewport flex flex-col">
+          <PDFEditor file={pdfFile} onReset={handleReset} />
         </div>
       )}
     </main>

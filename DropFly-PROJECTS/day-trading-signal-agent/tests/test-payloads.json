@@ -1,0 +1,238 @@
+{
+  "test_signals": [
+    {
+      "name": "HIGH Quality - VWAP Reclaim LONG",
+      "description": "Perfect VWAP reclaim with strong volume and bullish EMAs",
+      "expected_quality": "HIGH",
+      "payload": {
+        "signal": "VWAP_RECLAIM_LONG",
+        "ticker": "NVDA",
+        "time": "1732546200000",
+        "price": 188.20,
+        "open": 188.00,
+        "high": 188.55,
+        "low": 187.85,
+        "close": 188.20,
+        "volume": 1250000,
+        "vwap": 187.90,
+        "ema9": 188.10,
+        "ema20": 187.70,
+        "ema50": 186.90,
+        "timeframe": "1"
+      }
+    },
+    {
+      "name": "HIGH Quality - ORB Breakout LONG",
+      "description": "Clean opening range breakout with volume spike",
+      "expected_quality": "HIGH",
+      "payload": {
+        "signal": "ORB_BREAKOUT_LONG",
+        "ticker": "AAPL",
+        "time": "1732546800000",
+        "price": 175.80,
+        "open": 175.40,
+        "high": 175.90,
+        "low": 175.35,
+        "close": 175.80,
+        "volume": 2100000,
+        "vwap": 175.60,
+        "ema9": 175.65,
+        "ema20": 175.50,
+        "ema50": 175.30,
+        "timeframe": "1"
+      }
+    },
+    {
+      "name": "HIGH Quality - VWAP Reject PUT",
+      "description": "Strong VWAP rejection with bearish EMAs",
+      "expected_quality": "HIGH",
+      "payload": {
+        "signal": "VWAP_REJECT_PUT",
+        "ticker": "TSLA",
+        "time": "1732547400000",
+        "price": 242.10,
+        "open": 242.50,
+        "high": 242.90,
+        "low": 242.05,
+        "close": 242.10,
+        "volume": 1800000,
+        "vwap": 242.80,
+        "ema9": 242.30,
+        "ema20": 242.90,
+        "ema50": 243.50,
+        "timeframe": "1"
+      }
+    },
+    {
+      "name": "MEDIUM Quality - EMA Trend LONG",
+      "description": "Partial EMA alignment, moderate volume",
+      "expected_quality": "MEDIUM",
+      "payload": {
+        "signal": "EMA_TREND_CONTINUATION_LONG",
+        "ticker": "META",
+        "time": "1732548000000",
+        "price": 335.50,
+        "open": 335.30,
+        "high": 335.70,
+        "low": 335.25,
+        "close": 335.50,
+        "volume": 950000,
+        "vwap": 335.20,
+        "ema9": 335.40,
+        "ema20": 335.10,
+        "ema50": 335.30,
+        "timeframe": "1"
+      }
+    },
+    {
+      "name": "LOW Quality - ORB Breakout LONG (below VWAP)",
+      "description": "Breaking ORH but below VWAP - weak setup",
+      "expected_quality": "LOW",
+      "payload": {
+        "signal": "ORB_BREAKOUT_LONG",
+        "ticker": "SPY",
+        "time": "1732548600000",
+        "price": 450.20,
+        "open": 450.00,
+        "high": 450.25,
+        "low": 449.95,
+        "close": 450.20,
+        "volume": 800000,
+        "vwap": 450.80,
+        "ema9": 450.10,
+        "ema20": 450.30,
+        "ema50": 450.50,
+        "timeframe": "1"
+      }
+    },
+    {
+      "name": "MEDIUM Quality - HOD Breakout LONG",
+      "description": "HOD break with acceptable volume, EMAs neutral",
+      "expected_quality": "MEDIUM",
+      "payload": {
+        "signal": "HOD_BREAKOUT_LONG",
+        "ticker": "QQQ",
+        "time": "1732549200000",
+        "price": 385.90,
+        "open": 385.60,
+        "high": 385.95,
+        "low": 385.55,
+        "close": 385.90,
+        "volume": 1100000,
+        "vwap": 385.50,
+        "ema9": 385.70,
+        "ema20": 385.60,
+        "ema50": 385.70,
+        "timeframe": "1"
+      }
+    },
+    {
+      "name": "HIGH Quality - LOD Break PUT",
+      "description": "Clean LOD breakdown with strong volume and bearish trend",
+      "expected_quality": "HIGH",
+      "payload": {
+        "signal": "LOD_BREAK_PUT",
+        "ticker": "NVDA",
+        "time": "1732549800000",
+        "price": 186.50,
+        "open": 186.90,
+        "high": 187.10,
+        "low": 186.45,
+        "close": 186.50,
+        "volume": 1600000,
+        "vwap": 187.20,
+        "ema9": 186.80,
+        "ema20": 187.30,
+        "ema50": 187.90,
+        "timeframe": "1"
+      }
+    },
+    {
+      "name": "LOW Quality - VWAP Reclaim (weak volume)",
+      "description": "VWAP reclaim but no volume confirmation",
+      "expected_quality": "LOW",
+      "payload": {
+        "signal": "VWAP_RECLAIM_LONG",
+        "ticker": "AAPL",
+        "time": "1732550400000",
+        "price": 175.25,
+        "open": 175.10,
+        "high": 175.30,
+        "low": 175.05,
+        "close": 175.25,
+        "volume": 650000,
+        "vwap": 175.20,
+        "ema9": 175.15,
+        "ema20": 175.10,
+        "ema50": 175.00,
+        "timeframe": "1"
+      }
+    },
+    {
+      "name": "MEDIUM Quality - ORB Breakdown PUT",
+      "description": "ORB breakdown with moderate setup",
+      "expected_quality": "MEDIUM",
+      "payload": {
+        "signal": "ORB_BREAKDOWN_PUT",
+        "ticker": "META",
+        "time": "1732551000000",
+        "price": 334.10,
+        "open": 334.40,
+        "high": 334.50,
+        "low": 334.05,
+        "close": 334.10,
+        "volume": 1050000,
+        "vwap": 334.50,
+        "ema9": 334.25,
+        "ema20": 334.40,
+        "ema50": 334.60,
+        "timeframe": "1"
+      }
+    },
+    {
+      "name": "HIGH Quality - 5min EMA Trend LONG",
+      "description": "Perfect EMA alignment on 5-minute chart",
+      "expected_quality": "HIGH",
+      "payload": {
+        "signal": "EMA_TREND_CONTINUATION_LONG",
+        "ticker": "TSLA",
+        "time": "1732551600000",
+        "price": 244.50,
+        "open": 244.00,
+        "high": 244.75,
+        "low": 243.90,
+        "close": 244.50,
+        "volume": 2500000,
+        "vwap": 243.80,
+        "ema9": 244.20,
+        "ema20": 243.50,
+        "ema50": 242.90,
+        "timeframe": "5"
+      }
+    }
+  ],
+  "curl_examples": {
+    "high_quality_long": "curl -X POST YOUR_N8N_WEBHOOK_URL -H 'Content-Type: application/json' -d '{\"signal\":\"VWAP_RECLAIM_LONG\",\"ticker\":\"NVDA\",\"time\":\"1732546200000\",\"price\":188.20,\"open\":188.00,\"high\":188.55,\"low\":187.85,\"close\":188.20,\"volume\":1250000,\"vwap\":187.90,\"ema9\":188.10,\"ema20\":187.70,\"ema50\":186.90,\"timeframe\":\"1\"}'",
+    "high_quality_put": "curl -X POST YOUR_N8N_WEBHOOK_URL -H 'Content-Type: application/json' -d '{\"signal\":\"VWAP_REJECT_PUT\",\"ticker\":\"TSLA\",\"time\":\"1732547400000\",\"price\":242.10,\"open\":242.50,\"high\":242.90,\"low\":242.05,\"close\":242.10,\"volume\":1800000,\"vwap\":242.80,\"ema9\":242.30,\"ema20\":242.90,\"ema50\":243.50,\"timeframe\":\"1\"}'",
+    "low_quality": "curl -X POST YOUR_N8N_WEBHOOK_URL -H 'Content-Type: application/json' -d '{\"signal\":\"ORB_BREAKOUT_LONG\",\"ticker\":\"SPY\",\"time\":\"1732548600000\",\"price\":450.20,\"open\":450.00,\"high\":450.25,\"low\":449.95,\"close\":450.20,\"volume\":800000,\"vwap\":450.80,\"ema9\":450.10,\"ema20\":450.30,\"ema50\":450.50,\"timeframe\":\"1\"}'"
+  },
+  "usage_instructions": {
+    "description": "Use these test payloads to test your n8n workflow without waiting for real market signals",
+    "steps": [
+      "1. Ensure your n8n workflow is Active",
+      "2. Copy your n8n webhook URL",
+      "3. Replace 'YOUR_N8N_WEBHOOK_URL' in the curl examples above",
+      "4. Run the curl command in your terminal",
+      "5. Check n8n execution history to see the workflow run",
+      "6. Verify you received the alert on Telegram/Discord",
+      "7. Review the AI evaluation quality rating"
+    ],
+    "testing_tips": [
+      "Test all quality levels (HIGH, MEDIUM, LOW) to verify AI evaluation is working",
+      "Test different signal types to ensure all 7 setups are handled correctly",
+      "Verify entry/stop/target levels make sense for each signal",
+      "Check that LOW quality signals are filtered out (if filter is enabled)",
+      "Test both 1-min and 5-min timeframes"
+    ]
+  }
+}

@@ -10,6 +10,7 @@ pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/b
 
 interface PDFEditorProps {
   file: File;
+  onReset?: () => void;
 }
 
 interface Annotation {
@@ -68,7 +69,7 @@ interface TextItem {
   pageNumber: number;
 }
 
-export default function PDFEditorSimple({ file }: PDFEditorProps) {
+export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
   const { setShowPaywall } = usePremium();
   const [numPages, setNumPages] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -181,17 +182,22 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
   }, [showSignatureModal]);
 
   const onDocumentLoadSuccess = async ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-    // Automatically extract form fields on load (like Adobe Fill & Sign)
-    const extractedFields = await extractFormFields();
+    try {
+      setNumPages(numPages);
+      // Automatically extract form fields on load (like Adobe Fill & Sign)
+      const extractedFields = await extractFormFields();
 
-    // If no fields found with pdf-lib, try pdf.js annotation detection
-    if (extractedFields.length === 0) {
-      console.log('No AcroForm fields found, trying pdf.js annotation detection...');
-      await extractAnnotationsWithPdfJs();
+      // If no fields found with pdf-lib, try pdf.js annotation detection
+      if (extractedFields.length === 0) {
+        console.log('No AcroForm fields found, trying pdf.js annotation detection...');
+        await extractAnnotationsWithPdfJs();
+      }
+
+      setShowFormFields(true);
+    } catch (error) {
+      console.error('Error loading PDF:', error);
+      alert('There was an error loading your PDF. Please try a different file or go back and try again.');
     }
-
-    setShowFormFields(true);
   };
 
   const extractAllText = async () => {
@@ -1189,50 +1195,67 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
   };
 
   return (
-    <div className="flex h-screen flex-col">
-      {/* Toolbar */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex gap-4 items-center flex-wrap shadow-sm">
+    <div className="flex mobile-viewport flex-col">
+      {/* Toolbar with Safe Area */}
+      <div className="safe-area-top bg-white border-b border-gray-200 px-3 sm:px-6 py-3 sm:py-4 flex gap-2 sm:gap-4 items-center flex-wrap shadow-sm sticky top-0 z-40">
+        {/* Back Button */}
+        {onReset && (
+          <button
+            onClick={onReset}
+            className="px-3 py-2.5 bg-gray-50 text-gray-700 rounded-xl hover:bg-gray-100 border border-gray-200 transition-all duration-200 flex items-center gap-2"
+            title="Back to home"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            <span className="hidden sm:inline text-sm font-semibold">Back</span>
+          </button>
+        )}
+
         <button
           onClick={() => setSelectedTool('text')}
-          className={`px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
+          className={`px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 ${
             selectedTool === 'text'
               ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40'
               : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
           }`}
         >
-          <span className="inline-flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span className="inline-flex items-center gap-1 sm:gap-2">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
             </svg>
-            Add Text
+            <span className="hidden sm:inline">Add Text</span>
+            <span className="sm:hidden">Text</span>
           </span>
         </button>
 
         <button
           onClick={() => setSelectedTool('signature')}
-          className={`px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
+          className={`px-3 sm:px-5 py-2.5 text-xs sm:text-sm font-semibold rounded-xl transition-all duration-200 ${
             selectedTool === 'signature'
               ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40'
               : 'bg-gray-50 text-gray-700 hover:bg-gray-100 border border-gray-200'
           }`}
         >
-          <span className="inline-flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span className="inline-flex items-center gap-1 sm:gap-2">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
             </svg>
-            Add Signature
+            <span className="hidden sm:inline">Add Signature</span>
+            <span className="sm:hidden">Sign</span>
           </span>
         </button>
 
+        {/* Hide PRO button on mobile to save space */}
         <button
           onClick={() => setShowPaywall(true)}
-          className="relative px-6 py-2.5 bg-white border-2 border-purple-200 text-purple-700 rounded-xl hover:bg-purple-50 hover:border-purple-300 text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200"
+          className="hidden sm:block relative px-4 sm:px-6 py-2.5 bg-white border-2 border-purple-200 text-purple-700 rounded-xl hover:bg-purple-50 hover:border-purple-300 text-xs sm:text-sm font-semibold shadow-sm hover:shadow-md transition-all duration-200"
         >
           <span className="inline-flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
             </svg>
-            Send for Signature
+            <span className="hidden sm:inline">Send for Signature</span>
             <span className="absolute -top-1 -right-1 px-1.5 py-0.5 bg-gradient-to-r from-amber-400 to-orange-500 text-white text-xs font-bold rounded-full">
               PRO
             </span>
@@ -1243,26 +1266,43 @@ export default function PDFEditorSimple({ file }: PDFEditorProps) {
 
         <button
           onClick={prepareDownload}
-          className="px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-200"
+          className="px-3 sm:px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl hover:from-indigo-700 hover:to-purple-700 text-xs sm:text-sm font-semibold shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all duration-200"
         >
-          <span className="inline-flex items-center gap-2">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <span className="inline-flex items-center gap-1 sm:gap-2">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
             </svg>
-            Download
+            <span className="hidden sm:inline">Download</span>
+            <span className="sm:hidden">Save</span>
           </span>
         </button>
       </div>
 
       {/* PDF Viewer */}
-      <div className="flex-1 overflow-auto bg-gray-200 p-8">
+      <div className="flex-1 overflow-auto bg-gray-200 p-3 sm:p-8 safe-area-bottom">
         <div
           ref={pdfContainerRef}
           className="relative bg-white shadow-2xl mx-auto w-fit"
           onClick={handlePdfClick}
           style={{ cursor: selectedTool === 'signature' || selectedTool === 'text' ? 'crosshair' : 'default' }}
         >
-          <Document file={file} onLoadSuccess={onDocumentLoadSuccess}>
+          <Document
+            file={file}
+            onLoadSuccess={onDocumentLoadSuccess}
+            onLoadError={(error) => {
+              console.error('PDF load error:', error);
+              alert('Failed to load PDF. The file may be corrupted or incompatible. Please try another file.');
+              if (onReset) onReset();
+            }}
+            loading={
+              <div className="flex items-center justify-center p-20">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
+                  <p className="text-gray-600">Loading PDF...</p>
+                </div>
+              </div>
+            }
+          >
             <div style={{ pointerEvents: 'none' }}>
               <Page
                 pageNumber={currentPage}

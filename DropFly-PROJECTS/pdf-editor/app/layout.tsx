@@ -16,6 +16,13 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "PDF Doc Sign - Sign & Edit PDFs",
   description: "Simple, secure, and private PDF signing and editing in your browser",
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false,
+    viewportFit: "cover", // Critical for iOS notch support
+  },
 };
 
 export default function RootLayout({

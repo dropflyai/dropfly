@@ -1,0 +1,254 @@
+//@version=5
+strategy("Day Trading Signal Agent v1.0", overlay=true, max_bars_back=500)
+
+// ============================================================================
+// INPUTS & CONFIGURATION
+// ============================================================================
+
+// Webhook URL - Configure this in your alert settings
+webhook_url = input.string("YOUR_N8N_WEBHOOK_URL", title="Webhook URL", group="Configuration")
+
+// Time Settings
+session_start = input.session("0930-0935", title="Opening Range Session", group="Time Settings")
+market_hours = input.session("0930-1600", title="Market Hours", group="Time Settings")
+
+// Indicator Settings
+ema9_length = input.int(9, title="EMA 9 Length", group="Indicators")
+ema20_length = input.int(20, title="EMA 20 Length", group="Indicators")
+ema50_length = input.int(50, title="EMA 50 Length", group="Indicators")
+volume_ma_length = input.int(20, title="Volume MA Length", group="Indicators")
+volume_threshold = input.float(1.2, title="Volume Threshold Multiplier", group="Indicators")
+
+// Signal Settings
+enable_long_signals = input.bool(true, title="Enable LONG Signals", group="Signal Settings")
+enable_put_signals = input.bool(true, title="Enable PUT Signals", group="Signal Settings")
+
+// ============================================================================
+// INDICATORS CALCULATION
+// ============================================================================
+
+// VWAP
+vwap_value = ta.vwap(close)
+
+// EMAs
+ema9 = ta.ema(close, ema9_length)
+ema20 = ta.ema(close, ema20_length)
+ema50 = ta.ema(close, ema50_length)
+
+// Volume
+volume_ma = ta.sma(volume, volume_ma_length)
+volume_spike = volume > (volume_ma * volume_threshold)
+
+// Opening Range (First 5 minutes)
+var float orh = na  // Opening Range High
+var float orl = na  // Opening Range Low
+in_opening_range = not na(time(timeframe.period, session_start))
+
+if in_opening_range
+    orh := na(orh) ? high : math.max(orh, high)
+    orl := na(orl) ? low : math.min(orl, low)
+else if not in_opening_range[1]
+    orh := orh
+    orl := orl
+
+// High/Low of Day
+var float hod = na
+var float lod = na
+is_new_day = ta.change(time("D"))
+
+if is_new_day
+    hod := high
+    lod := low
+else
+    hod := na(hod) ? high : math.max(hod, high)
+    lod := na(lod) ? low : math.min(lod, low)
+
+// Premarket High/Low (Manual - set before market open)
+// Note: In practice, you'd update these manually or use a data provider
+var float pmh = na
+var float pml = na
+
+// ============================================================================
+// TREND & MOMENTUM ANALYSIS
+// ============================================================================
+
+// EMA Trend
+bullish_ema = ema9 > ema20 and ema20 > ema50
+bearish_ema = ema9 < ema20 and ema20 < ema50
+ema_turning_up = ta.crossover(ema9, ema20) or (ema9 > ema20 and ema9[1] <= ema20[1])
+ema_turning_down = ta.crossunder(ema9, ema20) or (ema9 < ema20 and ema9[1] >= ema20[1])
+
+// Price vs VWAP
+above_vwap = close > vwap_value
+below_vwap = close < vwap_value
+was_below_vwap = ta.barssince(below_vwap) <= 10
+was_above_vwap = ta.barssince(above_vwap) <= 10
+
+// Candle Analysis
+green_candle = close > open
+red_candle = close < open
+strong_green = green_candle and (close - open) > (high - low) * 0.6
+strong_red = red_candle and (open - close) > (high - low) * 0.6
+
+// ============================================================================
+// SIGNAL DETECTION LOGIC
+// ============================================================================
+
+// ----------------------------------------------------------------------------
+// LONG SIGNAL 1: ORB Breakout Long
+// ----------------------------------------------------------------------------
+orb_long_condition = enable_long_signals and
+     not na(orh) and
+     close > orh and
+     green_candle and
+     above_vwap and
+     volume_spike and
+     (ema9 > ema20 or ema_turning_up)
+
+if orb_long_condition and not orb_long_condition[1]
+    alert('{"signal":"ORB_BREAKOUT_LONG","ticker":"' + syminfo.ticker + '","time":"' + str.tostring(time) + '","price":' + str.tostring(close) + ',"open":' + str.tostring(open) + ',"high":' + str.tostring(high) + ',"low":' + str.tostring(low) + ',"close":' + str.tostring(close) + ',"volume":' + str.tostring(volume) + ',"vwap":' + str.tostring(vwap_value) + ',"ema9":' + str.tostring(ema9) + ',"ema20":' + str.tostring(ema20) + ',"ema50":' + str.tostring(ema50) + ',"timeframe":"' + timeframe.period + '"}', alert.freq_once_per_bar)
+    strategy.entry("ORB Long", strategy.long)
+
+// ----------------------------------------------------------------------------
+// LONG SIGNAL 2: VWAP Reclaim Long
+// ----------------------------------------------------------------------------
+vwap_reclaim_long_condition = enable_long_signals and
+     was_below_vwap and
+     close > vwap_value and
+     green_candle and
+     volume_spike and
+     ema_turning_up
+
+if vwap_reclaim_long_condition and not vwap_reclaim_long_condition[1]
+    alert('{"signal":"VWAP_RECLAIM_LONG","ticker":"' + syminfo.ticker + '","time":"' + str.tostring(time) + '","price":' + str.tostring(close) + ',"open":' + str.tostring(open) + ',"high":' + str.tostring(high) + ',"low":' + str.tostring(low) + ',"close":' + str.tostring(close) + ',"volume":' + str.tostring(volume) + ',"vwap":' + str.tostring(vwap_value) + ',"ema9":' + str.tostring(ema9) + ',"ema20":' + str.tostring(ema20) + ',"ema50":' + str.tostring(ema50) + ',"timeframe":"' + timeframe.period + '"}', alert.freq_once_per_bar)
+    strategy.entry("VWAP Reclaim Long", strategy.long)
+
+// ----------------------------------------------------------------------------
+// LONG SIGNAL 3: EMA Trend Continuation Long
+// ----------------------------------------------------------------------------
+ema_trend_long_condition = enable_long_signals and
+     bullish_ema and
+     above_vwap and
+     green_candle and
+     close > ema9 and
+     volume_spike and
+     close > close[1]
+
+if ema_trend_long_condition and not ema_trend_long_condition[1]
+    alert('{"signal":"EMA_TREND_CONTINUATION_LONG","ticker":"' + syminfo.ticker + '","time":"' + str.tostring(time) + '","price":' + str.tostring(close) + ',"open":' + str.tostring(open) + ',"high":' + str.tostring(high) + ',"low":' + str.tostring(low) + ',"close":' + str.tostring(close) + ',"volume":' + str.tostring(volume) + ',"vwap":' + str.tostring(vwap_value) + ',"ema9":' + str.tostring(ema9) + ',"ema20":' + str.tostring(ema20) + ',"ema50":' + str.tostring(ema50) + ',"timeframe":"' + timeframe.period + '"}', alert.freq_once_per_bar)
+    strategy.entry("EMA Trend Long", strategy.long)
+
+// ----------------------------------------------------------------------------
+// LONG SIGNAL 4: HOD Breakout Long
+// ----------------------------------------------------------------------------
+hod_breakout_long_condition = enable_long_signals and
+     not na(hod) and
+     close > hod[1] and
+     green_candle and
+     above_vwap and
+     volume_spike and
+     bullish_ema
+
+if hod_breakout_long_condition and not hod_breakout_long_condition[1]
+    alert('{"signal":"HOD_BREAKOUT_LONG","ticker":"' + syminfo.ticker + '","time":"' + str.tostring(time) + '","price":' + str.tostring(close) + ',"open":' + str.tostring(open) + ',"high":' + str.tostring(high) + ',"low":' + str.tostring(low) + ',"close":' + str.tostring(close) + ',"volume":' + str.tostring(volume) + ',"vwap":' + str.tostring(vwap_value) + ',"ema9":' + str.tostring(ema9) + ',"ema20":' + str.tostring(ema20) + ',"ema50":' + str.tostring(ema50) + ',"timeframe":"' + timeframe.period + '"}', alert.freq_once_per_bar)
+    strategy.entry("HOD Breakout Long", strategy.long)
+
+// ----------------------------------------------------------------------------
+// PUT SIGNAL 5: ORB Breakdown Put
+// ----------------------------------------------------------------------------
+orb_put_condition = enable_put_signals and
+     not na(orl) and
+     close < orl and
+     red_candle and
+     below_vwap and
+     volume_spike and
+     (ema9 < ema20 or ema_turning_down)
+
+if orb_put_condition and not orb_put_condition[1]
+    alert('{"signal":"ORB_BREAKDOWN_PUT","ticker":"' + syminfo.ticker + '","time":"' + str.tostring(time) + '","price":' + str.tostring(close) + ',"open":' + str.tostring(open) + ',"high":' + str.tostring(high) + ',"low":' + str.tostring(low) + ',"close":' + str.tostring(close) + ',"volume":' + str.tostring(volume) + ',"vwap":' + str.tostring(vwap_value) + ',"ema9":' + str.tostring(ema9) + ',"ema20":' + str.tostring(ema20) + ',"ema50":' + str.tostring(ema50) + ',"timeframe":"' + timeframe.period + '"}', alert.freq_once_per_bar)
+    strategy.entry("ORB Put", strategy.short)
+
+// ----------------------------------------------------------------------------
+// PUT SIGNAL 6: VWAP Reject Put
+// ----------------------------------------------------------------------------
+vwap_reject_put_condition = enable_put_signals and
+     was_above_vwap and
+     close < vwap_value and
+     red_candle and
+     volume_spike and
+     ema_turning_down
+
+if vwap_reject_put_condition and not vwap_reject_put_condition[1]
+    alert('{"signal":"VWAP_REJECT_PUT","ticker":"' + syminfo.ticker + '","time":"' + str.tostring(time) + '","price":' + str.tostring(close) + ',"open":' + str.tostring(open) + ',"high":' + str.tostring(high) + ',"low":' + str.tostring(low) + ',"close":' + str.tostring(close) + ',"volume":' + str.tostring(volume) + ',"vwap":' + str.tostring(vwap_value) + ',"ema9":' + str.tostring(ema9) + ',"ema20":' + str.tostring(ema20) + ',"ema50":' + str.tostring(ema50) + ',"timeframe":"' + timeframe.period + '"}', alert.freq_once_per_bar)
+    strategy.entry("VWAP Reject Put", strategy.short)
+
+// ----------------------------------------------------------------------------
+// PUT SIGNAL 7: LOD Break Put
+// ----------------------------------------------------------------------------
+lod_break_put_condition = enable_put_signals and
+     not na(lod) and
+     close < lod[1] and
+     red_candle and
+     below_vwap and
+     volume_spike and
+     bearish_ema
+
+if lod_break_put_condition and not lod_break_put_condition[1]
+    alert('{"signal":"LOD_BREAK_PUT","ticker":"' + syminfo.ticker + '","time":"' + str.tostring(time) + '","price":' + str.tostring(close) + ',"open":' + str.tostring(open) + ',"high":' + str.tostring(high) + ',"low":' + str.tostring(low) + ',"close":' + str.tostring(close) + ',"volume":' + str.tostring(volume) + ',"vwap":' + str.tostring(vwap_value) + ',"ema9":' + str.tostring(ema9) + ',"ema20":' + str.tostring(ema20) + ',"ema50":' + str.tostring(ema50) + ',"timeframe":"' + timeframe.period + '"}', alert.freq_once_per_bar)
+    strategy.entry("LOD Break Put", strategy.short)
+
+// ============================================================================
+// PLOTTING
+// ============================================================================
+
+// Plot VWAP
+plot(vwap_value, title="VWAP", color=color.blue, linewidth=2)
+
+// Plot EMAs
+plot(ema9, title="EMA 9", color=color.rgb(255, 153, 0), linewidth=1)
+plot(ema20, title="EMA 20", color=color.rgb(255, 255, 0), linewidth=1)
+plot(ema50, title="EMA 50", color=color.rgb(255, 255, 255), linewidth=1)
+
+// Plot Opening Range
+plot(orh, title="ORH", color=color.green, style=plot.style_stepline, linewidth=1)
+plot(orl, title="ORL", color=color.red, style=plot.style_stepline, linewidth=1)
+
+// Plot HOD/LOD
+plot(hod, title="HOD", color=color.rgb(0, 255, 0, 70), style=plot.style_circles, linewidth=2)
+plot(lod, title="LOD", color=color.rgb(255, 0, 0, 70), style=plot.style_circles, linewidth=2)
+
+// Background color for opening range session
+bgcolor(in_opening_range ? color.new(color.yellow, 95) : na, title="Opening Range")
+
+// ============================================================================
+// SIGNAL VISUALIZATION
+// ============================================================================
+
+// Plot signal markers
+plotshape(orb_long_condition, title="ORB Long", style=shape.triangleup, location=location.belowbar, color=color.green, size=size.small)
+plotshape(vwap_reclaim_long_condition, title="VWAP Reclaim", style=shape.circle, location=location.belowbar, color=color.aqua, size=size.small)
+plotshape(ema_trend_long_condition, title="EMA Trend Long", style=shape.square, location=location.belowbar, color=color.lime, size=size.tiny)
+plotshape(hod_breakout_long_condition, title="HOD Break", style=shape.diamond, location=location.belowbar, color=color.rgb(0, 255, 127), size=size.small)
+
+plotshape(orb_put_condition, title="ORB Put", style=shape.triangledown, location=location.abovebar, color=color.red, size=size.small)
+plotshape(vwap_reject_put_condition, title="VWAP Reject", style=shape.circle, location=location.abovebar, color=color.orange, size=size.small)
+plotshape(lod_break_put_condition, title="LOD Break", style=shape.diamond, location=location.abovebar, color=color.rgb(255, 0, 127), size=size.small)
+
+// ============================================================================
+// NOTES
+// ============================================================================
+//
+// Setup Instructions:
+// 1. Add this indicator to each ticker chart (NVDA, AAPL, META, TSLA, SPY, QQQ)
+// 2. Set timeframe to 1-minute or 5-minute
+// 3. Configure webhook URL in settings
+// 4. Create alerts for each signal type
+// 5. In alert settings, use "Webhook URL" and set to your n8n endpoint
+// 6. Message should contain: {{strategy.order.alert_message}}
+//
+// Recommended Chart Settings:
+// - Timeframe: 1-min or 5-min
+// - Session: Regular Trading Hours (9:30 AM - 4:00 PM ET)
+// - Extended Hours: Off (unless explicitly tracking premarket)
+//
+// ============================================================================
