@@ -1307,6 +1307,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
             <div style={{ pointerEvents: 'none' }}>
               <Page
                 pageNumber={currentPage}
+                width={Math.min(window.innerWidth - 48, 800)}
                 renderTextLayer={false}
                 renderAnnotationLayer={false}
                 onRenderSuccess={(page) => {
