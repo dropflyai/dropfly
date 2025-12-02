@@ -33,6 +33,18 @@ export default function Home() {
     setPdfFile(null);
   };
 
+  const handleTestW9 = async () => {
+    try {
+      const response = await fetch('/test-w9.pdf');
+      const blob = await response.blob();
+      const file = new File([blob], 'test-w9.pdf', { type: 'application/pdf' });
+      setPdfFile(file);
+    } catch (error) {
+      console.error('Error loading test W9:', error);
+      alert('Failed to load test PDF');
+    }
+  };
+
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -87,6 +99,12 @@ export default function Home() {
                 </div>
                 <h1 className="text-base font-medium text-slate-900 tracking-tight">PDF Doc Sign</h1>
               </div>
+              <button
+                onClick={handleTestW9}
+                className="px-3 py-1.5 text-xs font-medium bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                Test W9
+              </button>
             </div>
           </header>
 

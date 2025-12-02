@@ -6,7 +6,8 @@ import { PDFDocument, rgb } from 'pdf-lib';
 import SignaturePad from 'signature_pad';
 import { usePremium } from '@/contexts/PremiumContext';
 
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+// iOS WebKit fix: Use HTTPS CDN for worker
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.min.mjs`;
 
 interface PDFEditorProps {
   file: File;
