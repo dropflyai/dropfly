@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 @main
 struct TradeFlyApp: App {
@@ -22,10 +23,9 @@ struct TradeFlyApp: App {
                     .environmentObject(supabase)
             } else if appState.isOnboarding {
                 // Show onboarding if first time
-                OnboardingFlow(onComplete: {
-                    appState.completeOnboarding()
-                })
-                .environmentObject(userSettings)
+                OnboardingFlow()
+                    .environmentObject(appState)
+                    .environmentObject(userSettings)
             } else {
                 // Show main app
                 ContentView()
@@ -58,6 +58,7 @@ class AppState: ObservableObject {
     enum Tab {
         case home
         case signals
+        case markets
         case learn
         case trades
         case settings

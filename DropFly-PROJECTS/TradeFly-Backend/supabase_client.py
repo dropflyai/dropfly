@@ -42,16 +42,15 @@ class SupabaseClient:
                 "take_profit_1": signal.take_profit_1,
                 "take_profit_2": signal.take_profit_2,
                 "vwap": signal.vwap,
-                "ema9": signal.ema9,
-                "ema20": signal.ema20,
-                "ema50": signal.ema50,
+                "ema_9": signal.ema9,  # Database uses underscore format
+                "ema_20": signal.ema20,  # Database uses underscore format
+                # Note: ema50 not in database schema, omitting
                 "volume": signal.volume,
                 "avg_volume": signal.avg_volume,
                 "ai_reasoning": signal.ai_reasoning,
                 "confidence_score": signal.confidence_score,
                 "risk_factors": signal.risk_factors,
-                "related_news": signal.related_news,  # NEW - Stock-specific news
-                "market_news": signal.market_news,    # NEW - Market-wide news
+                # Note: related_news and market_news not in original schema, might need migration
                 "timeframe": signal.timeframe,
                 "is_active": signal.is_active,
                 "created_at": signal.timestamp.isoformat()

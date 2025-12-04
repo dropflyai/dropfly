@@ -15,6 +15,9 @@ struct HomeView: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
+                    // Market Status Banner
+                    MarketStatusBanner()
+
                     // Today's Progress Card
                     ProgressCard(
                         currentProfit: todayProfit,
@@ -35,6 +38,9 @@ struct HomeView: View {
                     Spacer()
                 }
                 .padding()
+            }
+            .refreshable {
+                signalService.fetchSignals()
             }
             .navigationTitle("TradeFly AI")
             .toolbar {

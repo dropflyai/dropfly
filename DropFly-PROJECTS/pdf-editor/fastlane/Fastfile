@@ -1,0 +1,27 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and export IPA for Transporter upload"
+  lane :export_ipa do
+    # Build the archive
+    gym(
+      workspace: "ios/App/App.xcworkspace",
+      scheme: "App",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "PDFDocSign.ipa",
+      clean: true,
+      export_options: {
+        method: "app-store",
+        teamID: "G46B7YC46C",
+        signingStyle: "automatic",
+        uploadSymbols: true,
+        uploadBitcode: false
+      }
+    )
+
+    UI.success("✅ IPA exported successfully to ./build/PDFDocSign.ipa")
+    UI.success("📦 You can now upload this IPA using Transporter")
+  end
+end

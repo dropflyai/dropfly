@@ -25,6 +25,25 @@ class SignalQuality(str, Enum):
     LOW = "LOW"
 
 
+class AssetType(str, Enum):
+    """Asset type classification"""
+    STOCK = "stock"
+    CRYPTO = "crypto"
+
+
+def detect_asset_type(ticker: str) -> AssetType:
+    """
+    Detect if a ticker is a stock or crypto based on naming convention.
+    Crypto tickers typically end with -USD, -USDT, -BTC, etc.
+    """
+    ticker_upper = ticker.upper()
+    crypto_suffixes = ('-USD', '-USDT', '-BTC', '-ETH', '-BUSD')
+
+    if any(ticker_upper.endswith(suffix) for suffix in crypto_suffixes):
+        return AssetType.CRYPTO
+    return AssetType.STOCK
+
+
 class MarketData(BaseModel):
     """Real-time market data for a ticker"""
     ticker: str
@@ -43,6 +62,7 @@ class MarketData(BaseModel):
 class TradingSignal(BaseModel):
     """Complete trading signal with AI analysis"""
     ticker: str
+    asset_type: AssetType  # NEW: Classify as stock or crypto
     signal_type: SignalType
     quality: SignalQuality
     timestamp: datetime

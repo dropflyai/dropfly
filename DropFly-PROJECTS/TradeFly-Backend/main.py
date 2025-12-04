@@ -20,25 +20,26 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 # Auto-detect market data provider
-if settings.use_yahoo_finance:
-    from market_data_yahoo import YahooMarketDataService as MarketDataService
+if settings.polygon_api_key and not settings.use_yahoo_finance:
+    from market_data_polygon import PolygonMarketDataService
+    logger.info("📊 Using Polygon.io (Real-time accurate data)")
+    market_service = PolygonMarketDataService(settings.polygon_api_key)
+elif settings.use_yahoo_finance:
+    from market_data_yahoo import YahooMarketDataService
     logger.info("📊 Using Yahoo Finance (FREE, no API keys needed)")
-elif settings.polygon_api_key:
-    logger.info("📊 Using Polygon.io Market Data")
-    # We'll need to create a Polygon wrapper
-    from market_data import MarketDataService  # Placeholder
+    market_service = YahooMarketDataService()
 else:
     from market_data import MarketDataService
     logger.info("📊 Using Alpaca Market Data")
+    market_service = MarketDataService()
 
 from signal_detector import SignalDetector
 from ai_analyzer import AIAnalyzer
 from supabase_client import SupabaseClient
 from news_service import NewsService
-from models import TradingSignal, SignalType, SignalQuality
+from models import TradingSignal, SignalType, SignalQuality, AssetType, detect_asset_type, GPT5AnalysisResponse
 
-# Global services
-market_service = MarketDataService()
+# Global services (market_service already initialized above based on provider)
 news_service = NewsService()  # News & catalyst monitoring
 detector = SignalDetector(market_service)
 ai_analyzer = AIAnalyzer(market_service, news_service)  # Now includes news analysis
@@ -131,12 +132,29 @@ async def scan_for_signals():
             detected_signals = detector.detect_signals(ticker)
 
             for signal_data in detected_signals:
-                # Use GPT-5 to analyze the signal (now includes news)
-                logger.info(f"🤖 Analyzing {ticker} - {signal_data['signal_type']}...")
-                analysis = await ai_analyzer.analyze_signal(signal_data)
+                asset_type = detect_asset_type(ticker)
 
-                # Only save HIGH and MEDIUM quality signals
-                if analysis.quality in [SignalQuality.HIGH, SignalQuality.MEDIUM]:
+                # TEMP: Bypass AI for crypto until GPT-5 access is enabled
+                if asset_type == AssetType.CRYPTO:
+                    logger.info(f"💰 CRYPTO SIGNAL DETECTED: {ticker} - {signal_data['signal_type']} (bypassing AI)")
+                    should_save = True
+                    # Create dummy analysis for crypto
+                    analysis = GPT5AnalysisResponse(
+                        quality=SignalQuality.MEDIUM,
+                        confidence_score=75,
+                        reasoning=f"Crypto signal detected: {signal_data['pattern_detected']}",
+                        risk_factors=["Crypto volatility"],
+                        entry_recommendation=signal_data['market_data'].price,
+                        stop_loss_recommendation=signal_data['market_data'].price * 0.98,
+                        take_profit_recommendation=signal_data['market_data'].price * 1.02
+                    )
+                else:
+                    # For stocks: Use GPT-5 AI analysis
+                    logger.info(f"🤖 Analyzing {ticker} - {signal_data['signal_type']}...")
+                    analysis = await ai_analyzer.analyze_signal(signal_data)
+                    should_save = analysis.quality in [SignalQuality.HIGH, SignalQuality.MEDIUM]
+
+                if should_save:
                     # Create TradingSignal object
                     data = signal_data['market_data']
                     avg_volume = market_service.get_average_volume(ticker)
@@ -147,6 +165,7 @@ async def scan_for_signals():
 
                     trading_signal = TradingSignal(
                         ticker=ticker,
+                        asset_type=detect_asset_type(ticker),
                         signal_type=SignalType(signal_data['signal_type']),
                         quality=analysis.quality,
                         timestamp=data.timestamp,
@@ -232,6 +251,109 @@ async def trigger_scan():
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.get("/market-status")
+async def get_market_status():
+    """Get current market status and major indices"""
+    try:
+        from datetime import datetime, time
+        import pytz
+
+        # Get current time in Eastern Time (US markets)
+        eastern = pytz.timezone('US/Eastern')
+        now = datetime.now(eastern)
+        current_time = now.time()
+
+        # Market hours (NYSE/NASDAQ)
+        pre_market_start = time(4, 0)   # 4:00 AM ET
+        market_open = time(9, 30)        # 9:30 AM ET
+        market_close = time(16, 0)       # 4:00 PM ET
+        after_hours_end = time(20, 0)    # 8:00 PM ET
+
+        # Determine market status
+        is_weekend = now.weekday() >= 5  # Saturday=5, Sunday=6
+
+        if is_weekend:
+            status = "closed"
+            status_text = "Markets Closed (Weekend)"
+            next_change = None
+        elif current_time < pre_market_start:
+            status = "closed"
+            status_text = "Pre-Market Opens"
+            next_change = datetime.combine(now.date(), pre_market_start, eastern).isoformat()
+        elif current_time < market_open:
+            status = "pre_market"
+            status_text = "Pre-Market • Opens"
+            next_change = datetime.combine(now.date(), market_open, eastern).isoformat()
+        elif current_time < market_close:
+            status = "open"
+            status_text = "Markets Open • Closes"
+            next_change = datetime.combine(now.date(), market_close, eastern).isoformat()
+        elif current_time < after_hours_end:
+            status = "after_hours"
+            status_text = "After Hours • Ends"
+            next_change = datetime.combine(now.date(), after_hours_end, eastern).isoformat()
+        else:
+            status = "closed"
+            status_text = "Markets Closed"
+            # Next change is pre-market tomorrow
+            from datetime import timedelta
+            tomorrow = now + timedelta(days=1)
+            next_change = datetime.combine(tomorrow.date(), pre_market_start, eastern).isoformat()
+
+        # Get index prices (SPY, QQQ, BTC)
+        indices = {}
+        try:
+            spy_data = market_service.get_latest_data("SPY")
+            if spy_data:
+                spy_prev_close = spy_data.get('prev_close', spy_data.get('close', 0))
+                spy_current = spy_data.get('close', 0)
+                spy_change = ((spy_current - spy_prev_close) / spy_prev_close * 100) if spy_prev_close else 0
+                indices['SPY'] = {
+                    "price": spy_current,
+                    "change_percent": round(spy_change, 2)
+                }
+        except:
+            indices['SPY'] = {"price": 0, "change_percent": 0}
+
+        try:
+            qqq_data = market_service.get_latest_data("QQQ")
+            if qqq_data:
+                qqq_prev_close = qqq_data.get('prev_close', qqq_data.get('close', 0))
+                qqq_current = qqq_data.get('close', 0)
+                qqq_change = ((qqq_current - qqq_prev_close) / qqq_prev_close * 100) if qqq_prev_close else 0
+                indices['QQQ'] = {
+                    "price": qqq_current,
+                    "change_percent": round(qqq_change, 2)
+                }
+        except:
+            indices['QQQ'] = {"price": 0, "change_percent": 0}
+
+        try:
+            btc_data = market_service.get_latest_data("BTC-USD")
+            if btc_data:
+                btc_prev_close = btc_data.get('prev_close', btc_data.get('close', 0))
+                btc_current = btc_data.get('close', 0)
+                btc_change = ((btc_current - btc_prev_close) / btc_prev_close * 100) if btc_prev_close else 0
+                indices['BTC'] = {
+                    "price": btc_current,
+                    "change_percent": round(btc_change, 2)
+                }
+        except:
+            indices['BTC'] = {"price": 0, "change_percent": 0}
+
+        return {
+            "status": status,
+            "status_text": status_text,
+            "is_open": status == "open",
+            "next_change": next_change,
+            "indices": indices,
+            "timestamp": now.isoformat()
+        }
+    except Exception as e:
+        logger.error(f"Error getting market status: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @app.get("/health")
 async def health_check():
     """Detailed health check"""
@@ -314,6 +436,101 @@ async def get_market_news_endpoint(hours_back: int = 6):
         }
     except Exception as e:
         logger.error(f"Error fetching market news: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/price/{ticker}")
+async def get_current_price(ticker: str):
+    """
+    Get current real-time price and basic data for a ticker
+    Used by iOS app for live price updates
+    """
+    try:
+        data = market_service.get_latest_data(ticker)
+        if not data:
+            raise HTTPException(status_code=404, detail=f"No data available for {ticker}")
+
+        return {
+            "ticker": ticker,
+            "price": data.price,
+            "timestamp": data.timestamp.isoformat(),
+            "open": data.open,
+            "high": data.high,
+            "low": data.low,
+            "volume": data.volume,
+            "vwap": data.vwap,
+            "ema9": data.ema9,
+            "ema20": data.ema20,
+            "ema50": data.ema50
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching price for {ticker}: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/candles/{ticker}")
+async def get_candle_data(
+    ticker: str,
+    interval: str = "1m",
+    limit: int = 100
+):
+    """
+    Get candlestick data for charting
+    Used by iOS app for AdvancedChartView
+
+    Args:
+        ticker: Stock symbol
+        interval: Time interval (1m, 5m, 15m, 1h, 1d)
+        limit: Number of candles to return (default 100)
+    """
+    try:
+        import yfinance as yf
+        from datetime import datetime, timedelta
+
+        # Map intervals to yfinance periods
+        period_map = {
+            "1m": "1d",
+            "5m": "5d",
+            "15m": "5d",
+            "1h": "1mo",
+            "1d": "1y"
+        }
+
+        period = period_map.get(interval, "1d")
+
+        ticker_obj = yf.Ticker(ticker)
+        hist = ticker_obj.history(period=period, interval=interval)
+
+        if hist.empty:
+            raise HTTPException(status_code=404, detail=f"No candle data available for {ticker}")
+
+        # Convert to list of candles
+        candles = []
+        for timestamp, row in hist.iterrows():
+            candles.append({
+                "timestamp": timestamp.isoformat(),
+                "open": float(row['Open']),
+                "high": float(row['High']),
+                "low": float(row['Low']),
+                "close": float(row['Close']),
+                "volume": int(row['Volume'])
+            })
+
+        # Return last 'limit' candles
+        candles = candles[-limit:]
+
+        return {
+            "ticker": ticker,
+            "interval": interval,
+            "candle_count": len(candles),
+            "candles": candles
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error fetching candles for {ticker}: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

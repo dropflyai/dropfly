@@ -58,9 +58,9 @@ class AIAnalyzer:
             # Get expert trading system prompt
             expert_system = get_expert_system_prompt()
 
-            # Call GPT-5 with expert system and live context
+            # Call GPT-5 - OpenAI's latest model
             response = self.client.chat.completions.create(
-                model="gpt-5",  # Latest GPT-5 model
+                model="gpt-5",  # GPT-5 model
                 messages=[
                     {
                         "role": "system",

@@ -30,7 +30,26 @@ platform :ios do
   desc "Build and upload to TestFlight"
   lane :beta do
     increment_build_number
-    build_app(scheme: "TradeFly")
+
+    # Use automatic code signing
+    update_code_signing_settings(
+      use_automatic_signing: true,
+      team_id: "G46B7YC46C",
+      path: "TradeFly.xcodeproj"
+    )
+
+    build_app(
+      scheme: "TradeFly",
+      export_method: "app-store",
+      xcargs: "-allowProvisioningUpdates",
+      disable_xcpretty: true,
+      export_options: {
+        method: "app-store",
+        teamID: "G46B7YC46C",
+        signingStyle: "automatic",
+        uploadSymbols: true
+      }
+    )
     upload_to_testflight(
       skip_waiting_for_build_processing: true
     )

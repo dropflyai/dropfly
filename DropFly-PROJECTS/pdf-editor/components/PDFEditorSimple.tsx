@@ -1304,20 +1304,18 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
               </div>
             }
           >
-            <div style={{ pointerEvents: 'none' }}>
-              <Page
-                pageNumber={currentPage}
-                width={Math.min(window.innerWidth - 48, 800)}
-                renderTextLayer={false}
-                renderAnnotationLayer={false}
-                onRenderSuccess={(page) => {
-                  console.log('Page rendered:', page);
-                  const scale = page.width / page.originalWidth;
-                  console.log('Calculated scale:', scale);
-                  setPageScale(scale);
-                }}
-              />
-            </div>
+            <Page
+              pageNumber={currentPage}
+              width={Math.min(window.innerWidth - 48, 800)}
+              renderTextLayer={false}
+              renderAnnotationLayer={false}
+              onRenderSuccess={(page) => {
+                console.log('Page rendered:', page);
+                const scale = page.width / page.originalWidth;
+                console.log('Calculated scale:', scale);
+                setPageScale(scale);
+              }}
+            />
           </Document>
 
           {/* Render Annotations */}
@@ -1383,9 +1381,9 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     style={{
                       width: '100%',
                       height: '100%',
-                      border: '1px solid rgba(99, 102, 241, 0.3)',
+                      border: '2px solid rgba(99, 102, 241, 0.4)',
                       outline: 'none',
-                      backgroundColor: 'transparent',
+                      backgroundColor: 'rgba(99, 102, 241, 0.05)',
                       fontSize: `${Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.55)}px`,
                       color: '#000000',
                       fontWeight: ann.groupId ? '600' : 'normal',

@@ -5,7 +5,7 @@ Detects patterns: ORB, VWAP reclaim/reject, EMA trends, HOD/LOD breaks
 import logging
 from typing import Optional, List
 from datetime import datetime, timedelta
-from models import MarketData, SignalType
+from models import MarketData, SignalType, detect_asset_type, AssetType
 from market_data import MarketDataService
 
 logger = logging.getLogger(__name__)
@@ -59,20 +59,29 @@ class SignalDetector:
         Criteria:
         - Price was below VWAP recently
         - Price now above VWAP
-        - Volume above average
-        - EMAs aligned bullishly
+        - Volume above average (relaxed for crypto)
+        - EMAs aligned bullishly (relaxed for crypto)
         """
         # Check if price is above VWAP (with small buffer)
         if data.price <= data.vwap * 1.001:
             return None
 
-        # Check EMA alignment (bullish)
-        if not (data.ema9 > data.ema20 and data.ema20 > data.ema50):
+        # Detect if crypto for relaxed rules
+        is_crypto = detect_asset_type(data.ticker) == AssetType.CRYPTO
+
+        # Check EMA alignment (bullish) - RELAXED for crypto (only need 2 of 3 aligned)
+        if is_crypto:
+            ema_bullish = (data.ema9 > data.ema20) or (data.ema20 > data.ema50)
+        else:
+            ema_bullish = (data.ema9 > data.ema20 and data.ema20 > data.ema50)
+
+        if not ema_bullish:
             return None
 
-        # Check volume
+        # Check volume - RELAXED for crypto (only need average volume, not 1.2x)
         avg_volume = self.market_service.get_average_volume(data.ticker)
-        if avg_volume == 0 or data.volume < avg_volume * 1.2:
+        volume_threshold = avg_volume * 0.8 if is_crypto else avg_volume * 1.2
+        if avg_volume == 0 or data.volume < volume_threshold:
             return None
 
         return {
@@ -117,28 +126,38 @@ class SignalDetector:
         Detect EMA trend continuation (all EMAs aligned, price above all)
 
         Criteria:
-        - EMA9 > EMA20 > EMA50 (bullish alignment)
+        - EMA9 > EMA20 > EMA50 (bullish alignment) - RELAXED for crypto
         - Price above EMA9
         - Strong momentum
         """
-        # Check perfect EMA alignment
-        if not (data.ema9 > data.ema20 > data.ema50):
+        # Detect if crypto for relaxed rules
+        is_crypto = detect_asset_type(data.ticker) == AssetType.CRYPTO
+
+        # Check EMA alignment - RELAXED for crypto (only need 9 > 20 OR price above 9)
+        if is_crypto:
+            ema_aligned = (data.ema9 > data.ema20) or (data.price > data.ema9 * 1.002)
+        else:
+            ema_aligned = (data.ema9 > data.ema20 > data.ema50)
+
+        if not ema_aligned:
             return None
 
-        # Price must be above EMA9
-        if data.price <= data.ema9:
+        # Price must be above EMA9 (or very close for crypto)
+        price_threshold = data.ema9 * 0.998 if is_crypto else data.ema9
+        if data.price <= price_threshold:
             return None
 
-        # Check spacing between EMAs (trending, not consolidating)
+        # Check spacing between EMAs (trending, not consolidating) - RELAXED for crypto
         ema_spread = (data.ema9 - data.ema50) / data.ema50
-        if ema_spread < 0.005:  # Less than 0.5% spread
+        min_spread = 0.002 if is_crypto else 0.005  # Crypto: 0.2% spread, Stocks: 0.5%
+        if ema_spread < min_spread:
             return None
 
         return {
             "ticker": data.ticker,
             "signal_type": SignalType.EMA_TREND_LONG,
             "market_data": data,
-            "pattern_detected": f"EMA Trend: Perfect alignment with price ${data.price:.2f} > EMA9 ${data.ema9:.2f} > EMA20 ${data.ema20:.2f} > EMA50 ${data.ema50:.2f}"
+            "pattern_detected": f"EMA Trend: Price ${data.price:.2f} > EMA9 ${data.ema9:.2f} > EMA20 ${data.ema20:.2f} > EMA50 ${data.ema50:.2f}"
         }
 
     def _check_orb_breakout(self, data: MarketData) -> Optional[dict]:

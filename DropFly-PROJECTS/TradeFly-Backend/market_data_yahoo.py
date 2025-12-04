@@ -23,17 +23,18 @@ class YahooMarketDataService:
     def get_latest_data(self, ticker: str) -> MarketData:
         """
         Get latest 1-minute bar data from Yahoo Finance
+        Works 24/7 for crypto, extended hours for stocks
 
         Args:
-            ticker: Stock symbol (e.g., "AAPL")
+            ticker: Stock symbol (e.g., "AAPL") or crypto (e.g., "BTC-USD")
 
         Returns:
             MarketData object with latest price and indicators
         """
         try:
-            # Download 1-minute data for today
+            # Download 1-minute data - use 2 days to ensure we get data even after hours
             stock = yf.Ticker(ticker)
-            df = stock.history(period="1d", interval="1m")
+            df = stock.history(period="2d", interval="1m", prepost=True)
 
             if df.empty:
                 logger.warning(f"No data for {ticker}")
