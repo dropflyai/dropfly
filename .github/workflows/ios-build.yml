@@ -34,21 +34,17 @@ jobs:
           cd DropFly-PROJECTS/pdf-editor
           npm run build
 
-      - name: Sync Capacitor
-        run: |
-          cd DropFly-PROJECTS/pdf-editor
-          npx cap sync ios
-
       - name: Setup Ruby for CocoaPods
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.0'
           bundler-cache: true
+          working-directory: DropFly-PROJECTS/pdf-editor/ios/App
 
-      - name: Install CocoaPods dependencies
+      - name: Sync Capacitor
         run: |
-          cd DropFly-PROJECTS/pdf-editor/ios/App
-          pod install
+          cd DropFly-PROJECTS/pdf-editor
+          npx cap sync ios
 
       - name: Verify Secrets
         run: |
