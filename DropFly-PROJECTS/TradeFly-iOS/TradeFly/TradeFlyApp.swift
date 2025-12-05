@@ -18,7 +18,7 @@ struct TradeFlyApp: App {
     var body: some Scene {
         WindowGroup {
             if !supabase.isAuthenticated {
-                // Show auth screen if not logged in
+                // Show login if not authenticated
                 AuthView()
                     .environmentObject(supabase)
             } else if appState.isOnboarding {

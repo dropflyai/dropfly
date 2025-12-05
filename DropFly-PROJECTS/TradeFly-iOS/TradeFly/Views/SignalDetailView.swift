@@ -120,6 +120,44 @@ struct TradeDetailsSection: View {
             Text("📊 Trade Details")
                 .font(.headline)
 
+            // Signal Strength & Win Probability
+            HStack(spacing: 16) {
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Signal Strength")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    HStack {
+                        Text("\(Int(signal.signalStrength))%")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(signal.signalStrength >= 80 ? .green : signal.signalStrength >= 60 ? .orange : .red)
+
+                        ProgressView(value: signal.signalStrength / 100)
+                            .tint(signal.signalStrength >= 80 ? .green : signal.signalStrength >= 60 ? .orange : .red)
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Win Probability")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+
+                    HStack {
+                        Text("\(Int(signal.successProbability))%")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(signal.successProbability >= 70 ? .green : signal.successProbability >= 55 ? .orange : .red)
+
+                        ProgressView(value: signal.successProbability / 100)
+                            .tint(signal.successProbability >= 70 ? .green : signal.successProbability >= 55 ? .orange : .red)
+                    }
+                }
+            }
+            .padding()
+            .background(Color(.systemGray6))
+            .cornerRadius(10)
+
             VStack(spacing: 12) {
                 DetailRow(label: "Entry", value: signal.entry.formatted)
                 DetailRow(label: "Stop Loss", value: "$\(String(format: "%.2f", signal.stopLoss)) (-\(String(format: "%.1f", ((signal.price - signal.stopLoss) / signal.price * 100)))%)")
@@ -310,24 +348,76 @@ struct QualityCheckRow: View {
 // MARK: - Historical Performance Section
 struct HistoricalPerformanceSection: View {
     let signal: TradingSignal
+    @State private var performance: SignalTypePerformance?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text("📊 Historical Performance")
                 .font(.headline)
 
-            Text("This setup type wins 68% of the time with avg gain of +11.2%")
-                .font(.subheadline)
-                .foregroundColor(.secondary)
+            if let perf = performance {
+                VStack(alignment: .leading, spacing: 8) {
+                    HStack {
+                        Text("Win Rate:")
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text(String(format: "%.0f%%", perf.winRate))
+                            .fontWeight(.semibold)
+                            .foregroundColor(perf.winRate >= 60 ? .green : .orange)
+                    }
+
+                    HStack {
+                        Text("Avg Gain:")
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text(String(format: "%+.1f%%", perf.avgGain))
+                            .fontWeight(.semibold)
+                            .foregroundColor(perf.avgGain > 0 ? .green : .red)
+                    }
+
+                    HStack {
+                        Text("Sample Size:")
+                            .foregroundColor(.secondary)
+                        Spacer()
+                        Text("\(perf.totalSignals) signals")
+                            .fontWeight(.semibold)
+                    }
+                }
                 .padding()
                 .background(Color(.systemGray6))
                 .cornerRadius(10)
+            } else {
+                Text("Loading performance data...")
+                    .font(.subheadline)
+                    .foregroundColor(.secondary)
+                    .padding()
+                    .background(Color(.systemGray6))
+                    .cornerRadius(10)
+            }
         }
         .padding()
         .background(Color(.systemBackground))
         .cornerRadius(15)
         .shadow(color: .black.opacity(0.05), radius: 3, x: 0, y: 1)
+        .task {
+            await fetchPerformance()
+        }
     }
+
+    private func fetchPerformance() async {
+        do {
+            let perf = try await SupabaseService.shared.fetchSignalTypePerformance(signalType: signal.signalType)
+            performance = perf
+        } catch {
+            print("Failed to fetch signal performance: \(error)")
+        }
+    }
+}
+
+struct SignalTypePerformance {
+    let winRate: Double
+    let avgGain: Double
+    let totalSignals: Int
 }
 
 // MARK: - Risk Factors Section
@@ -569,7 +659,4 @@ struct EducationalTermView: View {
     }
 }
 
-#Preview {
-    SignalDetailView(signal: TradingSignal.sample)
-        .environmentObject(SignalService())
-}
+// Preview removed - previewSample only available in DEBUG builds

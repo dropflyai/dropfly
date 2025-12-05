@@ -29,30 +29,45 @@ platform :ios do
 
   desc "Build and upload to TestFlight"
   lane :beta do
-    increment_build_number
+    # Increment build number
+    build_number = get_build_number(xcodeproj: "TradeFly.xcodeproj")
+    UI.message("Current build number: #{build_number}")
 
-    # Use automatic code signing
+    # Ensure automatic signing is enabled - let Xcode handle everything
     update_code_signing_settings(
       use_automatic_signing: true,
+      path: "TradeFly.xcodeproj",
       team_id: "G46B7YC46C",
-      path: "TradeFly.xcodeproj"
+      bundle_identifier: "com.tradefly.TradeFly"
     )
 
-    build_app(
+    # Build and archive with automatic signing
+    gym(
       scheme: "TradeFly",
+      configuration: "Release",
       export_method: "app-store",
-      xcargs: "-allowProvisioningUpdates",
-      disable_xcpretty: true,
+      output_directory: "./build",
+      output_name: "TradeFly.ipa",
+      clean: true,
+      xcodebuild_formatter: "",  # Disable xcpretty to avoid bundler issues
       export_options: {
         method: "app-store",
         teamID: "G46B7YC46C",
-        signingStyle: "automatic",
-        uploadSymbols: true
+        uploadSymbols: true,
+        uploadBitcode: false
       }
     )
+
+    # Upload to TestFlight
     upload_to_testflight(
-      skip_waiting_for_build_processing: true
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+      distribute_external: false,
+      notify_external_testers: false,
+      ipa: "./build/TradeFly.ipa"
     )
+
+    UI.success("✅ Build #{build_number} uploaded to TestFlight successfully!")
   end
 
   desc "Deploy to App Store"

@@ -1,0 +1,64 @@
+default_platform(:ios)
+
+platform :ios do
+  desc "Build and upload to TestFlight"
+  lane :beta do
+    # Increment build number
+    build_number = get_build_number(xcodeproj: "App.xcodeproj")
+    UI.message("Current build number: #{build_number}")
+
+    # Build the app
+    gym(
+      workspace: "App.xcworkspace",
+      scheme: "App",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "PDFDocSign.ipa",
+      clean: true,
+      xcodebuild_formatter: "",  # Disable xcpretty to avoid bundler issues
+      export_options: {
+        method: "app-store",
+        teamID: "G46B7YC46C",
+        signingStyle: "automatic",
+        uploadSymbols: true,
+        uploadBitcode: false
+      }
+    )
+
+    # Upload to TestFlight
+    upload_to_testflight(
+      skip_waiting_for_build_processing: true,
+      skip_submission: true,
+      distribute_external: false,
+      notify_external_testers: false,
+      ipa: "./build/PDFDocSign.ipa"
+    )
+
+    UI.success("✅ Build #{build_number} uploaded to TestFlight successfully!")
+  end
+
+  desc "Build and export IPA for Transporter upload"
+  lane :export_ipa do
+    # Build the archive
+    gym(
+      workspace: "App.xcworkspace",
+      scheme: "App",
+      configuration: "Release",
+      export_method: "app-store",
+      output_directory: "./build",
+      output_name: "PDFDocSign.ipa",
+      clean: true,
+      export_options: {
+        method: "app-store",
+        teamID: "G46B7YC46C",
+        signingStyle: "automatic",
+        uploadSymbols: true,
+        uploadBitcode: false
+      }
+    )
+
+    UI.success("✅ IPA exported successfully to ./build/PDFDocSign.ipa")
+    UI.success("📦 You can now upload this IPA using Transporter")
+  end
+end

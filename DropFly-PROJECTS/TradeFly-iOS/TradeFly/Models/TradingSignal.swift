@@ -24,6 +24,9 @@ struct TradingSignal: Identifiable, Codable {
     let target: Double
     let targetPercentage: Double
     let timeframe: String
+    let assetType: AssetType
+    let signalStrength: Double // 0-100
+    let successProbability: Double // 0-100
 
     var formattedTimestamp: String {
         let formatter = DateFormatter()
@@ -114,6 +117,18 @@ enum TradeIdea: String, Codable {
     case skip = "SKIP"
 }
 
+enum AssetType: String, Codable {
+    case stock = "STOCK"
+    case crypto = "CRYPTO"
+
+    var displayName: String {
+        switch self {
+        case .stock: return "Stocks"
+        case .crypto: return "Crypto"
+        }
+    }
+}
+
 struct PriceRange: Codable {
     let low: Double
     let high: Double
@@ -123,9 +138,10 @@ struct PriceRange: Codable {
     }
 }
 
-// MARK: - Sample Data for Testing
+// MARK: - Preview Sample (for SwiftUI previews only)
+#if DEBUG
 extension TradingSignal {
-    static let sample = TradingSignal(
+    static let previewSample = TradingSignal(
         id: UUID().uuidString,
         ticker: "NVDA",
         signalType: .vwapReclaimLong,
@@ -143,50 +159,10 @@ extension TradingSignal {
         stopLoss: 187.80,
         target: 188.20 * 1.12,
         targetPercentage: 12.0,
-        timeframe: "1min"
+        timeframe: "1min",
+        assetType: .stock,
+        signalStrength: 92.0,
+        successProbability: 78.0
     )
-
-    static let samples: [TradingSignal] = [
-        sample,
-        TradingSignal(
-            id: UUID().uuidString,
-            ticker: "AAPL",
-            signalType: .orbBreakoutLong,
-            quality: .high,
-            timestamp: Date().addingTimeInterval(-600),
-            price: 175.80,
-            vwap: 175.60,
-            ema9: 175.65,
-            ema20: 175.50,
-            ema50: 175.30,
-            volume: 2100000,
-            context: "Clean opening range breakout with volume spike",
-            idea: .call,
-            entry: PriceRange(low: 175.70, high: 175.90),
-            stopLoss: 175.40,
-            target: 175.80 * 1.10,
-            targetPercentage: 10.0,
-            timeframe: "1min"
-        ),
-        TradingSignal(
-            id: UUID().uuidString,
-            ticker: "TSLA",
-            signalType: .vwapRejectPut,
-            quality: .medium,
-            timestamp: Date().addingTimeInterval(-1200),
-            price: 242.10,
-            vwap: 242.80,
-            ema9: 242.30,
-            ema20: 242.90,
-            ema50: 243.50,
-            volume: 1800000,
-            context: "VWAP rejection with moderate volume, EMAs partially aligned",
-            idea: .put,
-            entry: PriceRange(low: 242.00, high: 242.20),
-            stopLoss: 242.90,
-            target: 242.10 * 0.90,
-            targetPercentage: 10.0,
-            timeframe: "1min"
-        )
-    ]
 }
+#endif

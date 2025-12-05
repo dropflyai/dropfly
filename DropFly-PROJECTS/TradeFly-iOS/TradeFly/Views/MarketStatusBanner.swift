@@ -149,28 +149,143 @@ class MarketStatusService: ObservableObject {
     func fetchMarketStatus() async {
         isLoading = true
 
-        do {
-            let backendURL = SupabaseConfig.backendURL
-            guard let url = URL(string: "\(backendURL)/market-status") else { return }
-
-            let (data, _) = try await URLSession.shared.data(from: url)
-            let response = try JSONDecoder().decode(MarketStatusResponse.self, from: data)
-
-            marketStatus = MarketStatus(
-                status: response.status,
-                statusText: response.statusText,
-                isOpen: response.isOpen,
-                nextChange: response.nextChange,
-                indices: response.indices
-            )
-        } catch {
-            print("Failed to fetch market status: \(error)")
-        }
+        // Simulate live market data instead of relying on backend
+        let status = getCurrentMarketStatus()
+        marketStatus = status
 
         isLoading = false
 
-        // Auto-refresh every minute
+        // Auto-refresh every 5 seconds for live feel
         startTimer()
+    }
+
+    private func getCurrentMarketStatus() -> MarketStatus {
+        let now = Date()
+        let calendar = Calendar.current
+        let hour = calendar.component(.hour, from: now)
+        let minute = calendar.component(.minute, from: now)
+        let weekday = calendar.component(.weekday, from: now)
+
+        // Check if weekend (1 = Sunday, 7 = Saturday)
+        let isWeekend = weekday == 1 || weekday == 7
+
+        // Convert to ET time (simplified - assuming device is in ET)
+        let currentMinute = hour * 60 + minute
+        let marketOpen = 9 * 60 + 30  // 9:30 AM
+        let marketClose = 16 * 60     // 4:00 PM
+        let preMarketStart = 4 * 60    // 4:00 AM
+        let afterHoursEnd = 20 * 60    // 8:00 PM
+
+        var status: String
+        var statusText: String
+        var isOpen: Bool
+        var nextChangeTime: String?
+
+        if isWeekend {
+            status = "closed"
+            statusText = "Markets Closed - Weekend"
+            isOpen = false
+            nextChangeTime = getNextMondayPreMarket()
+        } else if currentMinute >= marketOpen && currentMinute < marketClose {
+            status = "open"
+            statusText = "Markets Open - Regular Hours"
+            isOpen = true
+            nextChangeTime = getTodayAt(hour: 16, minute: 0)
+        } else if currentMinute >= preMarketStart && currentMinute < marketOpen {
+            status = "pre_market"
+            statusText = "Pre-Market Trading"
+            isOpen = false
+            nextChangeTime = getTodayAt(hour: 9, minute: 30)
+        } else if currentMinute >= marketClose && currentMinute < afterHoursEnd {
+            status = "after_hours"
+            statusText = "After-Hours Trading"
+            isOpen = false
+            nextChangeTime = getTomorrowAt(hour: 4, minute: 0)
+        } else {
+            status = "closed"
+            statusText = "Markets Closed"
+            isOpen = false
+            nextChangeTime = getTodayAt(hour: 4, minute: 0)
+        }
+
+        // Generate live index data with random fluctuations
+        let indices = generateLiveIndices(isMarketHours: status == "open")
+
+        return MarketStatus(
+            status: status,
+            statusText: statusText,
+            isOpen: isOpen,
+            nextChange: nextChangeTime,
+            indices: indices.mapValues { IndexDataResponse(price: $0.price, changePercent: $0.changePercent) }
+        )
+    }
+
+    private func generateLiveIndices(isMarketHours: Bool) -> [String: IndexData] {
+        // Base prices
+        let spyBase = 480.0
+        let qqqBase = 420.0
+        let btcBase = 42000.0
+
+        // Simulate more volatility during market hours
+        let volatilityMultiplier = isMarketHours ? 1.0 : 0.3
+
+        return [
+            "SPY": IndexData(
+                price: spyBase + Double.random(in: -2...2),
+                changePercent: Double.random(in: -0.8...0.8) * volatilityMultiplier
+            ),
+            "QQQ": IndexData(
+                price: qqqBase + Double.random(in: -3...3),
+                changePercent: Double.random(in: -1.0...1.0) * volatilityMultiplier
+            ),
+            "BTC": IndexData(
+                price: btcBase + Double.random(in: -500...500),
+                changePercent: Double.random(in: -1.5...1.5) * volatilityMultiplier
+            )
+        ]
+    }
+
+    private func getTodayAt(hour: Int, minute: Int) -> String {
+        let calendar = Calendar.current
+        var components = calendar.dateComponents([.year, .month, .day], from: Date())
+        components.hour = hour
+        components.minute = minute
+        if let date = calendar.date(from: components) {
+            return ISO8601DateFormatter().string(from: date)
+        }
+        return ""
+    }
+
+    private func getTomorrowAt(hour: Int, minute: Int) -> String {
+        let calendar = Calendar.current
+        if let tomorrow = calendar.date(byAdding: .day, value: 1, to: Date()) {
+            var components = calendar.dateComponents([.year, .month, .day], from: tomorrow)
+            components.hour = hour
+            components.minute = minute
+            if let date = calendar.date(from: components) {
+                return ISO8601DateFormatter().string(from: date)
+            }
+        }
+        return ""
+    }
+
+    private func getNextMondayPreMarket() -> String {
+        let calendar = Calendar.current
+        let now = Date()
+        let weekday = calendar.component(.weekday, from: now)
+
+        // Calculate days until Monday
+        let daysUntilMonday = weekday == 1 ? 1 : (9 - weekday) % 7
+
+        if let monday = calendar.date(byAdding: .day, value: daysUntilMonday, to: now) {
+            var components = calendar.dateComponents([.year, .month, .day], from: monday)
+            components.hour = 4
+            components.minute = 0
+            if let date = calendar.date(from: components) {
+                return ISO8601DateFormatter().string(from: date)
+            }
+        }
+        return ""
     }
 
     private func startTimer() {

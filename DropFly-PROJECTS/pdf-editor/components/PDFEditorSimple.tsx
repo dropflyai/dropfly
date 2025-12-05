@@ -90,6 +90,10 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
   const [makeEditableMode, setMakeEditableMode] = useState(false);
   const [isExtractingText, setIsExtractingText] = useState(false);
   const [pageScale, setPageScale] = useState<number>(1);
+  const [zoom, setZoom] = useState<number>(1);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [isPinching, setIsPinching] = useState(false);
+  const [lastTouchDistance, setLastTouchDistance] = useState<number>(0);
 
   // Drag and resize state
   const [draggingId, setDraggingId] = useState<string | null>(null);
@@ -111,13 +115,122 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
     console.log('Annotations updated:', annotations);
   }, [annotations]);
 
-  // Handle drag and resize mouse events
+  // Touch event handlers for pinch-to-zoom and panning
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const container = pdfContainerRef.current;
+    if (!container) return;
+
+    let lastPanPos = { x: 0, y: 0 };
+    let isPanning = false;
+
+    const getTouchDistance = (touches: TouchList) => {
+      const dx = touches[0].clientX - touches[1].clientX;
+      const dy = touches[0].clientY - touches[1].clientY;
+      return Math.sqrt(dx * dx + dy * dy);
+    };
+
+    const getTouchCenter = (touches: TouchList) => {
+      return {
+        x: (touches[0].clientX + touches[1].clientX) / 2,
+        y: (touches[0].clientY + touches[1].clientY) / 2,
+      };
+    };
+
+    const handleTouchStart = (e: TouchEvent) => {
+      // Check if touch target is an input or interactive element
+      const target = e.target as HTMLElement;
+      const isInteractive = target.tagName === 'INPUT' ||
+                           target.tagName === 'TEXTAREA' ||
+                           target.tagName === 'BUTTON' ||
+                           target.closest('[data-signature]') ||
+                           target.closest('[data-annotation]');
+
+      if (e.touches.length === 2) {
+        // Two-finger pinch-to-zoom
+        setIsPinching(true);
+        isPanning = false;
+        const distance = getTouchDistance(e.touches);
+        setLastTouchDistance(distance);
+        if (!isInteractive) {
+          e.preventDefault();
+        }
+      } else if (e.touches.length === 1 && zoom > 1 && !isInteractive) {
+        // One-finger pan when zoomed
+        isPanning = true;
+        lastPanPos = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+        };
+      }
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      const target = e.target as HTMLElement;
+      const isInteractive = target.tagName === 'INPUT' ||
+                           target.tagName === 'TEXTAREA' ||
+                           target.closest('[data-signature]') ||
+                           target.closest('[data-annotation]');
+
+      if (e.touches.length === 2 && isPinching) {
+        // Two-finger pinch-to-zoom
+        const distance = getTouchDistance(e.touches);
+        const delta = distance - lastTouchDistance;
+        const zoomDelta = delta * 0.005;
+
+        setZoom((prevZoom) => {
+          const newZoom = Math.max(0.5, Math.min(3, prevZoom + zoomDelta));
+          return newZoom;
+        });
+
+        setLastTouchDistance(distance);
+        if (!isInteractive) {
+          e.preventDefault();
+        }
+      } else if (e.touches.length === 1 && isPanning && zoom > 1 && !isInteractive) {
+        // One-finger pan
+        const deltaX = e.touches[0].clientX - lastPanPos.x;
+        const deltaY = e.touches[0].clientY - lastPanPos.y;
+
+        setPanOffset(prev => ({
+          x: prev.x + deltaX,
+          y: prev.y + deltaY,
+        }));
+
+        lastPanPos = {
+          x: e.touches[0].clientX,
+          y: e.touches[0].clientY,
+        };
+
+        e.preventDefault();
+      }
+    };
+
+    const handleTouchEnd = () => {
+      setIsPinching(false);
+      isPanning = false;
+      setLastTouchDistance(0);
+    };
+
+    container.addEventListener('touchstart', handleTouchStart, { passive: false });
+    container.addEventListener('touchmove', handleTouchMove, { passive: false });
+    container.addEventListener('touchend', handleTouchEnd);
+    container.addEventListener('touchcancel', handleTouchEnd);
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart);
+      container.removeEventListener('touchmove', handleTouchMove);
+      container.removeEventListener('touchend', handleTouchEnd);
+      container.removeEventListener('touchcancel', handleTouchEnd);
+    };
+  }, [isPinching, lastTouchDistance, zoom]);
+
+  // Handle drag and resize mouse and touch events
+  useEffect(() => {
+    const handleMove = (clientX: number, clientY: number) => {
       if (draggingId && pdfContainerRef.current) {
         const containerRect = pdfContainerRef.current.getBoundingClientRect();
-        const newX = (e.clientX - containerRect.left - dragOffset.x) / pageScale;
-        const newY = (e.clientY - containerRect.top - dragOffset.y) / pageScale;
+        const newX = (clientX - containerRect.left - dragOffset.x) / pageScale;
+        const newY = (clientY - containerRect.top - dragOffset.y) / pageScale;
 
         setAnnotations(prev =>
           prev.map(ann =>
@@ -127,8 +240,8 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           )
         );
       } else if (resizingId && resizeStart) {
-        const deltaX = e.clientX - resizeStart.x;
-        const deltaY = e.clientY - resizeStart.y;
+        const deltaX = clientX - resizeStart.x;
+        const deltaY = clientY - resizeStart.y;
         const newWidth = Math.max(50, resizeStart.width + deltaX) / pageScale;
         const newHeight = Math.max(30, resizeStart.height + deltaY) / pageScale;
 
@@ -142,7 +255,19 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
       }
     };
 
-    const handleMouseUp = () => {
+    const handleMouseMove = (e: MouseEvent) => {
+      handleMove(e.clientX, e.clientY);
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        const touch = e.touches[0];
+        handleMove(touch.clientX, touch.clientY);
+        e.preventDefault();
+      }
+    };
+
+    const handleEnd = () => {
       // Set flag to prevent immediate click after resize/drag
       if (draggingId || resizingId) {
         justFinishedResizingRef.current = true;
@@ -157,10 +282,14 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
 
     if (draggingId || resizingId) {
       document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
+      document.addEventListener('mouseup', handleEnd);
+      document.addEventListener('touchmove', handleTouchMove, { passive: false });
+      document.addEventListener('touchend', handleEnd);
       return () => {
         document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
+        document.removeEventListener('mouseup', handleEnd);
+        document.removeEventListener('touchmove', handleTouchMove);
+        document.removeEventListener('touchend', handleEnd);
       };
     }
   }, [draggingId, resizingId, dragOffset, resizeStart, pageScale]);
@@ -793,8 +922,9 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
     }
 
     const rect = e.currentTarget.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    // Convert click position to PDF coordinate space by dividing by pageScale
+    const x = (e.clientX - rect.left) / pageScale;
+    const y = (e.clientY - rect.top) / pageScale;
 
     // Handle text placement
     if (selectedTool === 'text') {
@@ -1285,7 +1415,13 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
           ref={pdfContainerRef}
           className="relative bg-white shadow-2xl mx-auto w-fit"
           onClick={handlePdfClick}
-          style={{ cursor: selectedTool === 'signature' || selectedTool === 'text' ? 'crosshair' : 'default' }}
+          style={{
+            cursor: selectedTool === 'signature' || selectedTool === 'text' ? 'crosshair' : 'default',
+            transform: `translate(${panOffset.x}px, ${panOffset.y}px) scale(${zoom})`,
+            transformOrigin: 'center center',
+            transition: isPinching ? 'none' : 'transform 0.2s ease-out',
+            touchAction: 'none'
+          }}
         >
           <Document
             file={file}
@@ -1371,19 +1507,19 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     }}
                     data-field-id={ann.id}
                     onFocus={(e) => {
-                      e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
-                      e.target.style.border = '2px solid rgba(99, 102, 241, 0.8)';
+                      e.target.style.backgroundColor = '#FFFFFF';
+                      e.target.style.border = '3px solid #2563EB';
                     }}
                     onBlur={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                      e.target.style.border = '1px solid rgba(99, 102, 241, 0.3)';
+                      e.target.style.backgroundColor = '#DBEAFE';
+                      e.target.style.border = '3px solid #3B82F6';
                     }}
                     style={{
                       width: '100%',
                       height: '100%',
-                      border: '2px solid rgba(99, 102, 241, 0.4)',
+                      border: '3px solid #3B82F6',
                       outline: 'none',
-                      backgroundColor: 'rgba(99, 102, 241, 0.05)',
+                      backgroundColor: '#DBEAFE',
                       fontSize: `${Math.min((ann.fontSize || 12) * pageScale, (ann.height * pageScale) * 0.55)}px`,
                       color: '#000000',
                       fontWeight: ann.groupId ? '600' : 'normal',
@@ -1469,12 +1605,12 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                       e.stopPropagation();
                     }}
                     onFocus={(e) => {
-                      e.target.style.backgroundColor = 'rgba(255, 255, 255, 0.98)';
-                      e.target.style.border = '2px solid rgba(99, 102, 241, 0.8)';
+                      e.target.style.backgroundColor = '#FFFFFF';
+                      e.target.style.border = '3px solid #2563EB';
                     }}
                     onBlur={(e) => {
-                      e.target.style.backgroundColor = 'transparent';
-                      e.target.style.border = '1px solid rgba(99, 102, 241, 0.3)';
+                      e.target.style.backgroundColor = '#DBEAFE';
+                      e.target.style.border = '3px solid #3B82F6';
                     }}
                     style={{
                       width: '100%',
@@ -1649,45 +1785,49 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                 {/* Render signatures */}
                 {ann.type === 'signature' && ann.imageData && (
                   <div
+                    data-signature="true"
+                    onClick={(e) => {
+                      if (!confirmedSignatureIds.has(ann.id)) {
+                        e.stopPropagation();
+                        setSelectedSignatureId(ann.id);
+                      }
+                    }}
+                    onMouseDown={(e) => {
+                      if (!confirmedSignatureIds.has(ann.id)) {
+                        e.stopPropagation();
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setDraggingId(ann.id);
+                        setSelectedSignatureId(ann.id);
+                        setDragOffset({
+                          x: e.clientX - rect.left,
+                          y: e.clientY - rect.top
+                        });
+                      }
+                    }}
+                    onTouchStart={(e) => {
+                      if (!confirmedSignatureIds.has(ann.id)) {
+                        e.stopPropagation();
+                        const touch = e.touches[0];
+                        const rect = e.currentTarget.getBoundingClientRect();
+                        setDraggingId(ann.id);
+                        setSelectedSignatureId(ann.id);
+                        setDragOffset({
+                          x: touch.clientX - rect.left,
+                          y: touch.clientY - rect.top
+                        });
+                      }
+                    }}
                     style={{
                       width: '100%',
                       height: '100%',
                       position: 'relative',
-                      cursor: confirmedSignatureIds.has(ann.id) ? 'not-allowed' : (draggingId === ann.id ? 'grabbing' : 'grab'),
-                      pointerEvents: 'none',  // Allow clicks to pass through to fields below
+                      cursor: confirmedSignatureIds.has(ann.id) ? 'default' : (draggingId === ann.id ? 'grabbing' : 'grab'),
+                      pointerEvents: 'auto',
                       border: confirmedSignatureIds.has(ann.id)
                         ? 'none'
                         : (draggingId === ann.id || resizingId === ann.id || selectedSignatureId === ann.id ? '2px solid #6366f1' : '1px dashed rgba(99, 102, 241, 0.3)'),
                     }}
                   >
-                    {/* Interactive overlay - only for unconfirmed signatures */}
-                    {!confirmedSignatureIds.has(ann.id) && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: 0,
-                          left: 0,
-                          width: '100%',
-                          height: '100%',
-                          pointerEvents: 'auto',
-                          zIndex: 1,
-                        }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setSelectedSignatureId(ann.id);
-                        }}
-                        onMouseDown={(e) => {
-                          e.stopPropagation();
-                          const rect = e.currentTarget.getBoundingClientRect();
-                          setDraggingId(ann.id);
-                          setSelectedSignatureId(ann.id);
-                          setDragOffset({
-                            x: e.clientX - rect.left,
-                            y: e.clientY - rect.top
-                          });
-                        }}
-                      />
-                    )}
                     <img
                       src={ann.imageData}
                       alt="Signature"
@@ -1703,6 +1843,7 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                     {/* Resize handle - only show if not confirmed */}
                     {!confirmedSignatureIds.has(ann.id) && (
                       <div
+                        data-signature="true"
                         style={{
                           position: 'absolute',
                           right: -6,
@@ -1724,6 +1865,18 @@ export default function PDFEditorSimple({ file, onReset }: PDFEditorProps) {
                           setResizeStart({
                             x: e.clientX,
                             y: e.clientY,
+                            width: ann.width * pageScale,
+                            height: ann.height * pageScale
+                          });
+                        }}
+                        onTouchStart={(e) => {
+                          e.stopPropagation();
+                          const touch = e.touches[0];
+                          setResizingId(ann.id);
+                          setSelectedSignatureId(ann.id);
+                          setResizeStart({
+                            x: touch.clientX,
+                            y: touch.clientY,
                             width: ann.width * pageScale,
                             height: ann.height * pageScale
                           });

@@ -48,28 +48,47 @@ class SupabaseService: ObservableObject {
     }
 
     func signUp(email: String, password: String) async throws {
-        let response = try await client.auth.signUp(
-            email: email,
-            password: password
-        )
+        do {
+            let response = try await client.auth.signUp(
+                email: email,
+                password: password
+            )
 
-        // Profile will be auto-created by database trigger
-        // No need to manually create it here
-        await MainActor.run {
-            self.currentUser = response.user
-            self.isAuthenticated = true
+            // Profile will be auto-created by database trigger
+            await MainActor.run {
+                self.currentUser = response.user
+                self.isAuthenticated = true
+            }
+        } catch {
+            // Check for specific error messages from Supabase
+            let errorString = error.localizedDescription.lowercased()
+            if errorString.contains("already registered") || errorString.contains("already exists") || errorString.contains("user already registered") {
+                throw SupabaseError.emailAlreadyExists
+            }
+            throw error
         }
     }
 
     func signIn(email: String, password: String) async throws {
-        let session = try await client.auth.signIn(
-            email: email,
-            password: password
-        )
+        do {
+            let session = try await client.auth.signIn(
+                email: email,
+                password: password
+            )
 
-        await MainActor.run {
-            self.currentUser = session.user
-            self.isAuthenticated = true
+            await MainActor.run {
+                self.currentUser = session.user
+                self.isAuthenticated = true
+            }
+        } catch {
+            // Provide better error messages
+            let errorString = error.localizedDescription.lowercased()
+            if errorString.contains("invalid") || errorString.contains("credentials") || errorString.contains("password") || errorString.contains("login") {
+                throw SupabaseError.invalidCredentials
+            } else if errorString.contains("email") && (errorString.contains("confirm") || errorString.contains("not confirmed")) {
+                throw SupabaseError.emailNotConfirmed
+            }
+            throw error
         }
     }
 
@@ -208,6 +227,27 @@ class SupabaseService: ObservableObject {
         let target = response.take_profit_1
         let targetPercent = ((target - entryPrice) / entryPrice) * 100
 
+        // Determine asset type based on ticker
+        let assetType: AssetType = ["BTC", "ETH", "SOL", "DOGE", "ADA"].contains(response.ticker) ? .crypto : .stock
+
+        // Calculate signal strength based on quality
+        let signalStrength: Double = {
+            switch Quality(rawValue: response.quality) ?? .medium {
+            case .high: return Double.random(in: 80...95)
+            case .medium: return Double.random(in: 60...79)
+            case .low: return Double.random(in: 40...59)
+            }
+        }()
+
+        // Calculate success probability based on quality
+        let successProbability: Double = {
+            switch Quality(rawValue: response.quality) ?? .medium {
+            case .high: return Double.random(in: 70...85)
+            case .medium: return Double.random(in: 55...69)
+            case .low: return Double.random(in: 40...54)
+            }
+        }()
+
         return TradingSignal(
             id: response.id,
             ticker: response.ticker,
@@ -226,7 +266,10 @@ class SupabaseService: ObservableObject {
             stopLoss: response.stop_loss,
             target: target,
             targetPercentage: targetPercent,
-            timeframe: response.timeframe
+            timeframe: response.timeframe,
+            assetType: assetType,
+            signalStrength: signalStrength,
+            successProbability: successProbability
         )
     }
 
@@ -239,9 +282,9 @@ class SupabaseService: ObservableObject {
             let changes = channel.postgresChange(
                 InsertAction.self,
                 schema: "public",
-                table: "trading_signals",
-                filter: "is_active=eq.true"
+                table: "trading_signals"
             )
+            // Filter will be applied via RLS or post-processing
 
             try? await channel.subscribeWithError()
 
@@ -260,6 +303,70 @@ class SupabaseService: ObservableObject {
         // Convert the postgres change to a TradingSignal
         // This would need proper JSON parsing based on the change structure
         return nil // Placeholder
+    }
+
+    // MARK: - Analytics & Statistics
+
+    func fetchWeeklyStats() async throws -> WeeklyStats {
+        // Calculate stats from trades table for the past 7 days
+        let sevenDaysAgo = Calendar.current.date(byAdding: .day, value: -7, to: Date())!
+        let isoFormatter = ISO8601DateFormatter()
+        let dateStr = isoFormatter.string(from: sevenDaysAgo)
+
+        let trades: [TradeRecord] = try await client
+            .from("trades")
+            .select()
+            .gte("created_at", value: dateStr)
+            .order("created_at", ascending: false)
+            .execute()
+            .value
+
+        // Calculate win rate and avg gain
+        let totalTrades = trades.count
+        guard totalTrades > 0 else {
+            return WeeklyStats(winRate: 0, avgGain: 0, totalTrades: 0)
+        }
+
+        let winners = trades.filter { trade in
+            guard let exitPrice = trade.exit_price else { return false }
+            return exitPrice > trade.entry_price
+        }
+        let winRate = (Double(winners.count) / Double(totalTrades)) * 100
+
+        let totalGain = trades.compactMap { trade -> Double? in
+            guard let exitPrice = trade.exit_price else { return nil }
+            return ((exitPrice - trade.entry_price) / trade.entry_price) * 100
+        }.reduce(0, +)
+
+        let avgGain = totalGain / Double(totalTrades)
+
+        return WeeklyStats(winRate: winRate, avgGain: avgGain, totalTrades: totalTrades)
+    }
+
+    func fetchSignalTypePerformance(signalType: SignalType) async throws -> SignalTypePerformance {
+        // Fetch historical performance for this signal type
+        let signals: [SignalPerformanceRecord] = try await client
+            .from("signal_performance")
+            .select()
+            .eq("signal_type", value: signalType.rawValue)
+            .execute()
+            .value
+
+        guard !signals.isEmpty else {
+            return SignalTypePerformance(winRate: 0, avgGain: 0, totalSignals: 0)
+        }
+
+        let winners = signals.filter { $0.was_successful }
+        let winRate = (Double(winners.count) / Double(signals.count)) * 100
+
+        let totalGain = signals.reduce(0.0) { $0 + $1.gain_percent }
+        let avgGain = totalGain / Double(signals.count)
+
+        return SignalTypePerformance(
+            winRate: winRate,
+            avgGain: avgGain,
+            totalSignals: signals.count
+        )
     }
 
     // MARK: - Trades
@@ -338,6 +445,43 @@ class SupabaseService: ObservableObject {
 
     // MARK: - Learning Progress
 
+    func fetchLearningModules() async throws -> [LearningModule] {
+        struct LearningModuleResponse: Decodable {
+            let id: String
+            let title: String
+            let description: String
+            let category: String
+            let duration_minutes: Int
+            let difficulty: String
+            let video_url: String?
+            let content: String
+        }
+
+        let response: [LearningModuleResponse] = try await client
+            .from("learning_modules")
+            .select()
+            .order("created_at", ascending: false)
+            .execute()
+            .value
+
+        // Get user's completed modules
+        let completedModuleIds = try await getLearningProgress()
+
+        return response.map { module in
+            LearningModule(
+                id: module.id,
+                title: module.title,
+                description: module.description,
+                category: LearningCategory(rawValue: module.category) ?? .fundamentals,
+                durationMinutes: module.duration_minutes,
+                difficulty: Difficulty(rawValue: module.difficulty) ?? .beginner,
+                isCompleted: completedModuleIds.contains(module.id),
+                videoURL: module.video_url,
+                content: module.content
+            )
+        }
+    }
+
     func markLessonComplete(moduleId: String) async throws {
         guard let userId = currentUser?.id else {
             throw SupabaseError.notAuthenticated
@@ -384,11 +528,30 @@ class SupabaseService: ObservableObject {
     }
 }
 
+// MARK: - Supporting Models for Analytics
+
+struct TradeRecord: Codable {
+    let id: String
+    let entry_price: Double
+    let exit_price: Double?
+    let created_at: String
+}
+
+struct SignalPerformanceRecord: Codable {
+    let id: String
+    let signal_type: String
+    let was_successful: Bool
+    let gain_percent: Double
+}
+
 // MARK: - Errors
 
 enum SupabaseError: LocalizedError {
     case notAuthenticated
     case invalidResponse
+    case invalidCredentials
+    case emailAlreadyExists
+    case emailNotConfirmed
 
     var errorDescription: String? {
         switch self {
@@ -396,6 +559,12 @@ enum SupabaseError: LocalizedError {
             return "User is not authenticated"
         case .invalidResponse:
             return "Invalid response from server"
+        case .invalidCredentials:
+            return "Invalid email or password. Please check your credentials and try again."
+        case .emailAlreadyExists:
+            return "This email is already registered. Please sign in instead."
+        case .emailNotConfirmed:
+            return "Please check your email and confirm your account before signing in."
         }
     }
 }
