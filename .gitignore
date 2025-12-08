@@ -53,3 +53,4 @@ tmp/
 # Large video files
 DropFly-PROJECTS/optic-studios/public/videos/*.mp4
 DropFly-PROJECTS/pdf-editor-ios/
+DropFly-PROJECTS/*/
