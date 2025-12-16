@@ -1,4 +1,9 @@
 # DropFly OS App Builder
 
-## Project Directory
-Default working directory: `/Users/rioallen/Documents/dropfly-os-app-builder`
+## Project Overview
+
+## Architecture
+
+## Development Guidelines
+
+## AI Assistant Instructions
