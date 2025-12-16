@@ -121,6 +121,72 @@ If it does not exist and a new automation path is discovered:
 
 ---
 
+## Automation Preference Hierarchy
+
+**Mandatory ordering from strongest to weakest automation.**
+
+The agent MUST select the highest available level of automation.
+
+### Hierarchy (Strongest → Weakest)
+
+1. **Native Automation** — existing scripts, CI workflows, runbooks already in the repository
+2. **CLI Tools** — official or stable command-line tools (e.g., `supabase`, `gh`, `npx`)
+3. **MCP / SDK / API Automation** — programmatic interfaces, MCP servers, SDKs
+4. **Headless Browser Automation** — Playwright, Chromium-based automation
+5. **One-Off Scripts** — Python, Node, shell scripts created for this specific task
+6. **Manual Steps** — LAST RESORT ONLY
+
+### Selection Rules
+
+- The agent MUST select the highest available level.
+- **Manual steps are INVALID** if any higher-level automation exists.
+- If manual steps are proposed, the agent MUST justify why all higher levels are impossible.
+- When a new automation is created (level 5), it MUST be documented in `Engineering/Automations/` for future reuse.
+
+### Enforcement During Preflight
+
+Before proposing any workflow, the agent MUST:
+- Consult `Engineering/Automations/AutomationIndex.md`
+- Check for existing automation recipes in `Engineering/Solutions/`
+- Explicitly state which automation level is being used and why
+- If proposing manual steps, prove no automation exists
+
+### Regression Logging
+
+If the agent proposes manual steps for a task that previously had automation:
+- This MUST be logged as a regression in `Engineering/Solutions/Regressions.md`
+- The correct automation path MUST be re-applied
+- The failure to consult prior automation MUST be documented as a governance violation
+
+### Upgrade Path
+
+If the agent discovers a higher-level automation is possible:
+- Propose the upgrade
+- Document the new automation
+- Deprecate the lower-level approach
+
+---
+
+## Why Manual Is a Failure Mode
+
+**Manual workflows are technical debt, not solutions.**
+
+Every manual step:
+- Must be repeated
+- Can be forgotten
+- Introduces human error
+- Does not compound learning
+- Cannot be verified automatically
+
+Manual steps are acceptable only when:
+- Automation is structurally impossible (e.g., legal review, human judgment calls)
+- All automation attempts have been exhausted and documented
+- A restoration path to automation is defined
+
+Proposing manual steps without justification is a governance violation.
+
+---
+
 ## Mandatory Behavior: Capture and Remember
 
 If a tool decision prevents a loop (example: "always use Chromium in Playwright here"), you must:
