@@ -36,27 +36,49 @@ For every task:
 - [ ] If multiple modes apply: declare primary + list secondary modes
 - [ ] Confirm the strictest applicable rules will be applied
 
-### B) Problem & Constraints (Required)
+### B) Artifact Classification Gate (Required)
+
+**This gate must pass before planning, verification, or implementation.**
+
+Reference: `Engineering/OutputContracts.md` — Artifact Type Declaration
+
+- [ ] Explicitly declare artifact type: **Full Document | Fragment | Component | Script | Automation | Test**
+- [ ] Confirm navigation strategy aligns with declared artifact type
+- [ ] Confirm CSS strategy aligns with declared artifact type
+- [ ] Confirm verification approach aligns with declared artifact type
+
+**Gate Rules:**
+- If artifact type is missing → **planning is invalid**
+- If artifact type conflicts with navigation or verification strategy → **planning must stop**
+- If artifact type is inferred or implied without explicit declaration → **gate fails**
+
+**Correction Required:**
+- You MUST correct artifact classification before proceeding to implementation or verification.
+
+**Rationale:**
+This gate prevents fragment/document confusion by forcing explicit classification before any architectural or testing decisions are made. Without this gate, fragments can be mistakenly treated as standalone documents, leading to broken navigation tests, incorrect CSS scoping, and invalid verification strategies.
+
+### C) Problem & Constraints (Required)
 - [ ] Restate the goal in one sentence
 - [ ] List hard constraints (security, performance, budget, deadlines, tooling)
 - [ ] Identify impacted systems/files
 
-### C) Consult Institutional Memory (Required)
+### D) Consult Institutional Memory (Required)
 - [ ] Search `Engineering/Solutions/SolutionIndex.md` for relevant entries
 - [ ] Search `Engineering/Solutions/Regressions.md` for known loops
 - [ ] Confirm `Engineering/Solutions/ToolAuthority.md` rules apply (time/date, UI, logs, DB)
 
-### D) Automation Availability (Required)
+### E) Automation Availability (Required)
 - [ ] Search `Engineering/Automations/AutomationIndex.md`
 - [ ] If an automation exists, commit to using it
 - [ ] If automation is missing but feasible, plan to create it and add it to the index
 
-### E) Verification Plan (Required)
+### F) Verification Plan (Required)
 - [ ] Identify the exact verification commands/tests to run
 - [ ] If UI is involved: plan Playwright verification (Chromium default)
 - [ ] Define the evidence artifacts expected (logs, outputs, screenshots, traces)
 
-### F) Cleanup Plan (Required)
+### G) Cleanup Plan (Required)
 - [ ] Identify likely cleanup targets (dead code, unused files, deps)
 - [ ] Confirm deletion will follow `Engineering/Cleanup.md` governance
 
