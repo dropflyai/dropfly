@@ -31,12 +31,40 @@ For every task:
 
 ## Preflight Checklist (Before Any Implementation)
 
-### A) Mode Declaration (Required)
+### A) Product Target Declaration Gate (Required)
+
+**This gate must execute FIRST, before mode, artifact type, planning, or verification selection.**
+
+Declare exactly ONE product target for this task:
+
+- [ ] **Product Target:** WEB_SAAS | IOS_APP | ANDROID_APP | API_ONLY | AGENT_ONLY | INTERNAL_TOOL
+
+**Gate Rules:**
+
+- Exactly ONE product target is **required** per task.
+- If multiple targets exist in the repository, all non-declared targets are **OUT OF SCOPE** for this task.
+- Architecture, tooling, verification, and automation choices MUST align with the declared product target.
+- If product target is missing or ambiguous → **planning is BLOCKED**.
+- Historical or abandoned product targets (e.g., old mobile apps, deprecated APIs) do **NOT apply** unless explicitly declared for this task.
+
+**Enforcement:**
+
+- You MUST restate the product target when beginning implementation.
+- Mode selection MUST align with product target (e.g., WEB_SAAS → MODE: APP; API_ONLY → MODE: API).
+- Verification tooling MUST match product target (e.g., WEB_SAAS → Playwright/Chromium; IOS_APP → XCTest/Simulator).
+- Architectural patterns from other product targets MUST NOT leak into the current task.
+
+**Rationale:**
+
+This gate prevents cross-platform assumption leakage in repositories containing multiple product targets (Web SaaS + iOS + API). Without explicit product targeting, the agent may apply the wrong engineering mode, choose incorrect verification tools (browser tests for mobile apps), assume the wrong runtime environment, or mix architectural patterns across platforms. Explicit product targeting makes mode selection, verification strategy, and tooling choices deterministic.
+
+### B) Mode Declaration (Required)
 - [ ] Declare: **Engineering Mode: <MODE>**
 - [ ] If multiple modes apply: declare primary + list secondary modes
 - [ ] Confirm the strictest applicable rules will be applied
+- [ ] Confirm mode aligns with declared Product Target
 
-### B) Artifact Classification Gate (Required)
+### C) Artifact Classification Gate (Required)
 
 **This gate must pass before planning, verification, or implementation.**
 
@@ -58,27 +86,28 @@ Reference: `Engineering/OutputContracts.md` — Artifact Type Declaration
 **Rationale:**
 This gate prevents fragment/document confusion by forcing explicit classification before any architectural or testing decisions are made. Without this gate, fragments can be mistakenly treated as standalone documents, leading to broken navigation tests, incorrect CSS scoping, and invalid verification strategies.
 
-### C) Problem & Constraints (Required)
+### D) Problem & Constraints (Required)
 - [ ] Restate the goal in one sentence
 - [ ] List hard constraints (security, performance, budget, deadlines, tooling)
 - [ ] Identify impacted systems/files
 
-### D) Consult Institutional Memory (Required)
+### E) Consult Institutional Memory (Required)
 - [ ] Search `Engineering/Solutions/SolutionIndex.md` for relevant entries
 - [ ] Search `Engineering/Solutions/Regressions.md` for known loops
 - [ ] Confirm `Engineering/Solutions/ToolAuthority.md` rules apply (time/date, UI, logs, DB)
 
-### E) Automation Availability (Required)
+### F) Automation Availability (Required)
 - [ ] Search `Engineering/Automations/AutomationIndex.md`
 - [ ] If an automation exists, commit to using it
 - [ ] If automation is missing but feasible, plan to create it and add it to the index
 
-### F) Verification Plan (Required)
+### G) Verification Plan (Required)
 - [ ] Identify the exact verification commands/tests to run
 - [ ] If UI is involved: plan Playwright verification (Chromium default)
 - [ ] Define the evidence artifacts expected (logs, outputs, screenshots, traces)
+- [ ] Confirm verification tooling aligns with declared Product Target
 
-### G) Cleanup Plan (Required)
+### H) Cleanup Plan (Required)
 - [ ] Identify likely cleanup targets (dead code, unused files, deps)
 - [ ] Confirm deletion will follow `Engineering/Cleanup.md` governance
 
