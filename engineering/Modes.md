@@ -165,6 +165,39 @@ If multiple modes apply:
 
 ---
 
+## Primary Mode Authority Rule
+
+Every task MUST have exactly **one primary Engineering Mode**.
+
+### Authority Hierarchy
+- The **primary mode** governs:
+  - verification requirements
+  - architectural constraints
+  - scope boundaries
+  - acceptance criteria
+- **Secondary modes** may inform implementation details but may NOT override primary mode constraints.
+
+### Selection Rule
+If multiple modes appear applicable:
+- The most **user-facing** or **production-impacting** mode takes precedence as primary.
+- All others are secondary.
+
+### Precedence Order (Highest → Lowest)
+1. **APP** — if users interact with it
+2. **API** — if systems depend on it
+3. **AGENTIC** — if it executes autonomously
+4. **LIB** — if it is consumed as a package
+5. **MONOREPO** — applies when managing multiple subsystems; does not override subsystem modes
+
+### Non-Negotiable
+- You may NOT declare two primary modes.
+- Declaring "primary: APP, API" is a violation.
+- Declaring "primary: APP; secondary: API" is valid only if the work is user-facing and also exposes an API layer.
+
+If you cannot determine a single primary mode, STOP and request clarification.
+
+---
+
 ## Mode Enforcement
 
 If a decision conflicts with the selected mode:
