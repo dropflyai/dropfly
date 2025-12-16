@@ -22,6 +22,7 @@ If an output does not satisfy the applicable contract, the work is not done.
 
 Every engineering output MUST:
 
+- Declare Artifact Type (see below)
 - Be structured, not conversational
 - Be reproducible by another engineer
 - Reference evidence where claims are made
@@ -29,6 +30,45 @@ Every engineering output MUST:
 - Explicitly state assumptions (or state "none")
 
 If any of the above are missing, the output is invalid.
+
+---
+
+## Artifact Type Declaration
+
+**REQUIRED for all outputs.**
+
+Before planning or implementation, you MUST explicitly classify the artifact type.
+
+### Valid Artifact Types
+
+- **Full Document** — standalone entry point, directly navigable (e.g., `/index.html`, `/dashboard.html`)
+- **Fragment** — router-injected partial, not directly navigable, requires routing context
+- **Component** — reusable UI or logic module, consumed by documents or fragments
+- **Script** — executable code, automation, or utility
+- **Automation** — workflow, CI/CD pipeline, or orchestration logic
+- **Test** — verification artifact (unit, integration, UI, etc.)
+
+### Artifact Type Governs
+
+The declared artifact type determines:
+
+- **Navigation strategy** — how users or systems access it
+- **CSS strategy** — scoped, global, or injected styling
+- **Test entry point** — what URL or interface to verify
+- **Verification scope** — what constitutes complete validation
+- **Cleanup boundaries** — what files and dependencies are in scope
+
+### Enforcement
+
+- Outputs without an explicit artifact type declaration are **invalid**.
+- Treating a Fragment as a Full Document is a **structural error**.
+- Planning navigation or tests without declaring artifact type is **forbidden**.
+
+If the artifact type is ambiguous, STOP and request clarification.
+
+### Why This Exists
+
+This rule prevents architectural and testing errors caused by treating different artifact types (documents, fragments, components, scripts) as interchangeable. Fragment vs document confusion leads to incorrect routing assumptions, broken navigation tests, and CSS scope violations. Explicit artifact type declaration makes verification and routing behavior deterministic and ensures cleanup boundaries are correct.
 
 ---
 
