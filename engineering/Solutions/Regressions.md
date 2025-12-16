@@ -95,4 +95,83 @@ Over time, this file should grow while failures disappear.
 
 ---
 
+## Governance Violations (Auto-Log)
+
+**Mandatory self-reporting of Engineering Brain rule violations.**
+
+The agent MUST log governance violations when detected or corrected.
+
+### What Qualifies as a Governance Violation
+
+A governance violation occurs when the agent:
+- Declares multiple primary modes (violates `Engineering/Modes.md`)
+- Proceeds without explicit artifact type declaration (violates `Engineering/OutputContracts.md`)
+- Plans verification strategy misaligned with declared artifact type
+- Proposes manual verification where automated verification exists
+- Makes assumptions without retrieving repo evidence (file existence, dependencies, structure)
+- Makes navigation or routing assumptions later corrected by user or evidence
+- Skips preflight checklist steps (violates `Engineering/Checklist.md`)
+- Bypasses automation when automation exists (violates `Engineering/Automations/`)
+
+### When Logging Is Required
+
+Logging is **mandatory** when:
+- A violation is detected mid-task and corrected
+- A user corrects an architectural or planning error
+- A verification strategy must be revised due to artifact type mismatch
+- An assumption is proven incorrect by evidence
+- A governance rule is bypassed and later enforced
+
+### Required Entry Format
+
+Each governance violation entry MUST include:
+
+**### <Violation Title>**
+- **Date/Time:** YYYY-MM-DD HH:MM
+- **Task/Context:** Brief description of what was being attempted
+- **Rule Violated:** Which Engineering Brain rule was broken (with file reference)
+- **Why It Happened:** Root cause (assumption, incomplete preflight, misread requirements)
+- **Corrective Action Taken:** What was done to fix the violation
+- **Preventative Rule/Pattern Added:** Link to updated SolutionIndex, Recipe, or Golden Path
+
+Incomplete entries are invalid.
+
+### Consultation Requirement
+
+During preflight, the agent MUST:
+- Search this section for governance violations matching the current task type
+- Apply preventative patterns from previous violations
+- If a similar violation has occurred previously, apply the logged preventative rule immediately
+
+### Escalation Rule
+
+If the same governance violation occurs **more than twice**:
+- A mandatory constraint MUST be added to `Engineering/Solutions/SolutionIndex.md`
+- The constraint becomes a hard gate in the relevant checklist
+- Further violations are treated as system corruption
+
+---
+
+## Failure Is Data
+
+**Governance violations are not shame. They are signal.**
+
+Every violation logged here:
+- Prevents future repetition
+- Hardens the system against a specific failure mode
+- Improves institutional memory
+- Reduces user burden to correct the same error repeatedly
+
+The goal is not perfection. The goal is **learning that compounds**.
+
+Over time:
+- Common violations disappear
+- Rare edge cases emerge
+- Patterns strengthen
+- Failure becomes rarer
+
+A system that logs its failures is a system that improves.
+
+---
+
 **Regression memory is binding and enforced.**
