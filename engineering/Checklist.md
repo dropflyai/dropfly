@@ -119,6 +119,40 @@ If the work discovered or confirmed a repeatable solution:
 
 ---
 
+## Verification Semantics
+
+**Mandatory: defines what verification MUST and MUST NOT assert.**
+
+Verification exists to prove correctness, not to duplicate cleanup or enforce style.
+
+### Verification MUST Assert
+
+- **User-visible correctness** — does the feature work as intended?
+- **Successful state transitions** — do interactions produce expected states?
+- **Runtime stability** — does the system remain stable under normal and edge conditions?
+- **Absence of console errors** — are there runtime exceptions or failures in browser/terminal logs?
+- **Absence of uncaught exceptions** — does the code fail safely or crash?
+- **Correctness of outputs under defined inputs** — given X, does the system produce Y?
+
+### Verification MUST NOT Assert
+
+- **Stylistic cleanup already enforced by Cleanup.md** — do not verify code style in tests
+- **Absence of debug logs once removed from the codebase** — cleanup is not verification
+- **Redundant conditions that do not increase confidence** — avoid noise assertions
+- **Implementation details that are not user-visible or contractually relevant** — avoid coupling tests to internal structure unless required
+
+### Additional Requirements
+
+- Prefer failure signals with **high informational value** (errors, crashes, broken states)
+- Avoid assertions that couple tests tightly to internal structure unless required
+- Tests should **increase confidence, not noise**
+
+### Why This Exists
+
+This rule prevents brittle, redundant, or meaningless verification by separating cleanup hygiene from runtime correctness. Conflating the two leads to flaky tests that fail on stylistic changes rather than functional regressions, creating verification drift where tests become maintenance burdens instead of confidence builders. Clear verification semantics ensure tests focus on what matters: does the system work correctly?
+
+---
+
 ## Stop Conditions (Mandatory)
 
 You must stop and report failure if:
