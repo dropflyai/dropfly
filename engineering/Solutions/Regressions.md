@@ -152,6 +152,51 @@ If the same governance violation occurs **more than twice**:
 
 ---
 
+## Logged Violations
+
+### Time/Effort Estimates in Preflight Plans
+- **Date/Time:** 2025-12-16 15:27
+- **Task/Context:** Trading Signals page preflight planning
+- **Rule Violated:** Included time estimates in plan output (no explicit rule exists yet; identified by user correction)
+- **Why It Happened:** No explicit prohibition in current OutputContracts.md; assumed estimates aid user planning
+- **Corrective Action Taken:** Removed all time/effort estimates from plan sections
+- **Preventative Rule/Pattern Added:** Do not include time estimates in preflight or final plans unless explicitly requested
+
+---
+
+## Justified Violation Entry Template
+
+**For GEAR: HOTFIX or systemic bypasses that warrant logging.**
+
+Use this template when a governance rule was bypassed with justification:
+
+### <Violation Title>
+- **Date/Time:** YYYY-MM-DD HH:MM
+- **Context:** Brief description of what was being attempted
+- **Product Target:** WEB_SAAS | WEB_APP | MOBILE_IOS | MOBILE_ANDROID | API_SERVICE | AGENT_SYSTEM | LIBRARY | SCRIPT
+- **Execution Gear:** EXPLORE | BUILD | SHIP | HOTFIX
+- **Rule bypassed:** Which Engineering Brain rule was broken (with file reference)
+- **Why justified:** Why it was necessary (time constraint, emergency, technical impossibility)
+- **Risk introduced:** P0 | P1 | P2 | P3 (what could go wrong)
+- **Preventative change:** Link to updated SolutionIndex, Recipe, or Golden Path (if systemic)
+- **Follow-up plan:** How/when the bypass will be corrected (if deferred work)
+
+### Logging Rules
+
+**DO log if:**
+- GEAR: HOTFIX violation that reveals a systemic gap
+- Repeated violation (same rule bypassed 2+ times)
+- Violation that changes future behavior or adds a preventative pattern
+
+**DO NOT log if:**
+- GEAR: EXPLORE violation (unless insight is permanent)
+- One-off justified bypass with no systemic implications
+- Violation already logged and no new information
+
+**No spam logging.** This file should grow slowly and deliberately, not rapidly.
+
+---
+
 ## Failure Is Data
 
 **Governance violations are not shame. They are signal.**

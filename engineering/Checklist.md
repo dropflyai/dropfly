@@ -22,64 +22,84 @@ If any required item is not satisfied, the task is not complete.
 ## How to Use
 
 For every task:
-1) Select **Process Level** (determines which gates apply)
-2) Run **Preflight** before writing code
-3) Run **Execution** while implementing
-4) Run **Completion Gate** before declaring done
-5) If a task fails the gate, continue work until it passes
+0) **Declare Product Target + Execution Gear** (determines which gates apply)
+1) Run **Gear-Specific Checklist** (see below)
+2) If a task fails the gate, continue work until it passes
 
 ---
 
-## Process Level Selection (FIRST STEP)
+## STEP 0: Declare Product Target + Execution Gear (REQUIRED)
 
-**Mandatory: Select exactly ONE process level before any other gates.**
+**Mandatory: Must be declared before any other gates.**
 
-Reference: `Engineering/ProcessLevels.md`
+Reference: `Engineering/Modes.md`
 
-- [ ] **Process Level:** L0_EXPLORE | L1_BUILD | L2_SHIP | L3_HOTFIX
+### Product Target Declaration
+- [ ] **Product Target:** WEB_SAAS | WEB_APP | MOBILE_IOS | MOBILE_ANDROID | API_SERVICE | AGENT_SYSTEM | LIBRARY | SCRIPT | UNKNOWN
 
-### Selection Guidance
-- **L0 EXPLORE** — prototypes, spikes, throwaway experiments
-- **L1 BUILD** — normal feature development (default)
-- **L2 SHIP** — production releases, customer-facing changes
-- **L3 HOTFIX** — emergency fixes, critical incidents
+**Rules:**
+- If Product Target is **UNKNOWN** → STOP and ask for clarification
+- Product Target drives verification, security, and automation expectations
+- Product Target ≠ Engineering Mode (orthogonal concepts)
+- **DO NOT assume WEB_SAAS** unless explicitly declared or inferred from evidence
 
-**The selected Process Level determines which Preflight, Execution, and Completion gates apply.**
+### Execution Gear Declaration
+- [ ] **Execution Gear:** EXPLORE | BUILD | SHIP | HOTFIX
 
-See `ProcessLevels.md` for allowed shortcuts and requirements per level.
+**Selection Guidance:**
+- **EXPLORE** — prototypes, spikes, experiments, throwaway code
+- **BUILD** — real feature development (default for production-bound work)
+- **SHIP** — production release, customer-facing deployment
+- **HOTFIX** — emergency production fix, critical incident response
+
+**The selected Execution Gear determines which gates apply below.**
 
 ---
 
-## Preflight Checklist (Before Any Implementation)
+## GEAR: EXPLORE Checklist
 
-**Note:** Some gates may be skipped based on Process Level. Consult `ProcessLevels.md` for allowed shortcuts.
+**For prototypes, spikes, experiments.**
 
-### A) Product Target Declaration Gate (Required)
+### Required
+- [ ] Declare: **Engineering Mode: <MODE>**
+- [ ] Restate the goal in one sentence
+- [ ] Evidence for any claims made (no guessing)
 
-**This gate must execute FIRST, before mode, artifact type, planning, or verification selection.**
+### Optional (Recommended)
+- [ ] Product Target declaration (if non-obvious)
+- [ ] Artifact Type declaration (if code will be reused)
 
-Declare exactly ONE product target for this task:
+### Verification
+- Manual verification allowed
+- No automated test requirement
+- Console errors should still be absent
 
-- [ ] **Product Target:** WEB_SAAS | IOS_APP | ANDROID_APP | API_ONLY | AGENT_ONLY | INTERNAL_TOOL
+### Notes
+- No regression logging required unless insight is permanent
+- If prototype becomes production code, re-evaluate under BUILD or SHIP
 
-**Gate Rules:**
+---
 
-- Exactly ONE product target is **required** per task.
-- If multiple targets exist in the repository, all non-declared targets are **OUT OF SCOPE** for this task.
-- Architecture, tooling, verification, and automation choices MUST align with the declared product target.
-- If product target is missing or ambiguous → **planning is BLOCKED**.
-- Historical or abandoned product targets (e.g., old mobile apps, deprecated APIs) do **NOT apply** unless explicitly declared for this task.
+## GEAR: BUILD Checklist
 
-**Enforcement:**
+**For normal feature development.**
 
-- You MUST restate the product target when beginning implementation.
-- Mode selection MUST align with product target (e.g., WEB_SAAS → MODE: APP; API_ONLY → MODE: API).
-- Verification tooling MUST match product target (e.g., WEB_SAAS → Playwright/Chromium; IOS_APP → XCTest/Simulator).
-- Architectural patterns from other product targets MUST NOT leak into the current task.
+### Preflight (Before Implementation)
 
-**Rationale:**
+#### A) Product Target (Required)
+- [ ] **Product Target declared** (see STEP 0)
+- [ ] Confirm Product Target aligns with tooling/verification strategy
 
-This gate prevents cross-platform assumption leakage in repositories containing multiple product targets (Web SaaS + iOS + API). Without explicit product targeting, the agent may apply the wrong engineering mode, choose incorrect verification tools (browser tests for mobile apps), assume the wrong runtime environment, or mix architectural patterns across platforms. Explicit product targeting makes mode selection, verification strategy, and tooling choices deterministic.
+#### B) Mode Declaration (Required)
+- [ ] Declare: **Engineering Mode: <MODE>**
+- [ ] If multiple modes apply: declare primary + list secondary modes
+- [ ] Confirm mode aligns with Product Target
+
+#### C) Artifact Classification (Required)
+- [ ] Explicitly declare artifact type: **Full Document | Fragment | Component | Script | Automation | Test**
+- [ ] Confirm navigation strategy aligns with artifact type
+- [ ] Confirm CSS strategy aligns with artifact type
+- [ ] Confirm verification approach aligns with artifact type
 
 ### B) Mode Declaration (Required)
 - [ ] Declare: **Engineering Mode: <MODE>**
@@ -235,6 +255,93 @@ You must stop and report failure if:
 - [ ] evidence cannot be produced for claims
 
 No guessing. No hand-waving.
+
+---
+
+## GEAR: SHIP Checklist
+
+**For production releases, customer-facing deployment.**
+
+### Preflight (Before Implementation)
+- [ ] **All GEAR: BUILD Preflight items** (Product Target, Mode, Artifact, Problem, Memory, Automation, Verification, Cleanup)
+- [ ] Pre-ship verification plan (run full test suite, not just affected tests)
+- [ ] Rollback plan documented
+- [ ] Performance budget confirmed (see `Engineering/Performance.md`)
+- [ ] Security checklist complete (see `Engineering/Security.md`)
+- [ ] Documentation updated (if customer-facing)
+
+### Execution (During Implementation)
+- [ ] **All GEAR: BUILD Execution items**
+- [ ] Automation mandatory (no manual steps in default workflow)
+
+### Completion Gate (Before Declaring Done)
+- [ ] **All GEAR: BUILD Completion items**
+- [ ] Cross-browser/cross-platform testing (if WEB_SAAS: Chromium + WebKit/Firefox)
+- [ ] Accessibility audit (WCAG AA minimum if UI)
+- [ ] Load/performance testing (if API_SERVICE or high-traffic)
+- [ ] Staging environment validation (if available)
+- [ ] Engineering Score ≥ 4.5 in all categories (stricter than BUILD)
+- [ ] Zero known failures
+- [ ] Zero TODO comments without owners
+
+---
+
+## GEAR: HOTFIX Checklist
+
+**For emergency production fix, critical incident response.**
+
+### Required (Minimal Safe Set)
+- [ ] Product Target declared
+- [ ] Engineering Mode declared
+- [ ] Evidence of the failure captured (logs, errors, user reports)
+- [ ] Minimal correct fix identified (no scope creep)
+- [ ] Fix does not introduce new security vulnerabilities
+- [ ] Fix does not expose secrets in logs or commits
+- [ ] Smoke test proves fix resolves the failure
+- [ ] Smoke test proves fix does not break critical paths
+
+### Allowed Shortcuts (with Documentation)
+- Skip Artifact Classification (if obvious from context)
+- Skip SolutionIndex/Regressions consultation (defer to post-incident)
+- Skip Cleanup (defer to post-incident)
+- Relaxed verification (manual allowed if automation is too slow)
+
+### Mandatory Post-Incident (Within 24-48 Hours)
+- [ ] Post-incident review completed (see `Engineering/Incidents.md`)
+- [ ] Document what broke, why, and how it was fixed
+- [ ] Identify what was skipped during hotfix
+- [ ] Create follow-up tasks for deferred work
+- [ ] Update Regressions.md if failure could have been prevented
+
+---
+
+## Justified Violations
+
+**Allowed ONLY in GEAR: HOTFIX or GEAR: EXPLORE.**
+
+When a governance rule must be bypassed:
+
+### Documentation Required
+- [ ] **Rule bypassed:** (which specific rule)
+- [ ] **Product Target:** (context)
+- [ ] **Execution Gear:** (HOTFIX or EXPLORE)
+- [ ] **Why necessary:** (time constraint, technical impossibility, emergency)
+- [ ] **Risk introduced:** (P0-P3 severity)
+- [ ] **Follow-up plan:** (how/when it will be corrected)
+
+### Logging Required
+- **GEAR: HOTFIX** → Log in `Engineering/Incidents.md` (operational incident)
+- **GEAR: EXPLORE** → No logging required unless insight is permanent
+- **If systemic** → Log in `Engineering/Solutions/Regressions.md`
+
+### Never Justified
+The following violations are **never acceptable**, regardless of Execution Gear:
+- Guessing instead of retrieving evidence
+- Assuming facts that can be verified
+- Silently falling back to manual workflows when automation exists
+- Committing secrets to repository
+- Ignoring P0/P1 security vulnerabilities
+- Ignoring console errors or uncaught exceptions
 
 ---
 

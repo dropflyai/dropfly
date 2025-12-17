@@ -20,6 +20,96 @@ Failure to select a mode is a system violation.
 
 ---
 
+## Product Target (Required)
+
+**Product Target must be explicitly declared or inferred, never assumed.**
+
+### Supported Product Targets
+
+- **WEB_SAAS** — customer-facing web app, dashboards, SaaS products
+- **WEB_APP** — non-SaaS web apps, internal tools, static web apps
+- **MOBILE_IOS** — iOS native applications
+- **MOBILE_ANDROID** — Android native applications
+- **API_SERVICE** — backend services, REST/GraphQL APIs
+- **AGENT_SYSTEM** — automation systems, AI agents, workflows
+- **LIBRARY** — shared libraries, SDKs, packages
+- **SCRIPT** — one-off scripts, utilities, tooling
+- **UNKNOWN** — forces clarification (not allowed without resolution)
+
+### Product Target Rules
+
+- If Product Target is **UNKNOWN** → STOP and ask for clarification
+- Product Target drives verification, security, and automation expectations
+- Product Target ≠ Engineering Mode (they are orthogonal concepts)
+- If multiple product types exist in the repo, scope decisions to the current task
+- **DO NOT assume WEB_SAAS** unless explicitly declared or inferred from evidence
+
+### How Product Target Affects Rigor
+
+- **WEB_SAAS / MOBILE_IOS / MOBILE_ANDROID** → high security bar, accessibility requirements, performance budgets
+- **API_SERVICE** → contract testing, backward compatibility, load testing
+- **AGENT_SYSTEM** → idempotency, retry logic, observability
+- **LIBRARY** → API stability, semantic versioning, broad compatibility
+- **SCRIPT / WEB_APP** → lighter requirements, context-dependent rigor
+
+---
+
+## Execution Gear (Required)
+
+**Execution Gear determines enforcement strength, not what correctness means.**
+
+### Supported Execution Gears
+
+#### GEAR: EXPLORE
+- **Purpose:** Prototypes, spikes, experiments, throwaway code
+- **Gates:** Minimal (Product Target + Mode recommended, not required)
+- **Manual steps:** Allowed
+- **Verification:** Optional (manual allowed)
+- **Regression logging:** Not required unless insight is permanent
+- **When to use:** "Just trying something," learning, validation
+
+#### GEAR: BUILD
+- **Purpose:** Real feature development, normal engineering work
+- **Gates:** Normal (Product Target + Mode + Artifact Type required)
+- **Automation:** Strongly recommended
+- **Verification:** Encouraged; mandatory only for risky changes
+- **Regression logging:** Required when failures occur
+- **When to use:** Default for production-bound work
+
+#### GEAR: SHIP
+- **Purpose:** Production release, customer-facing deployment
+- **Gates:** Full (all gates mandatory)
+- **Automation + Verification:** Mandatory
+- **Manual verification:** Not allowed
+- **Regression logging:** Required
+- **When to use:** Releasing to production, customer-facing changes
+
+#### GEAR: HOTFIX
+- **Purpose:** Emergency production fix, critical incident response
+- **Gates:** Minimal safe set (Product Target + Mode + Evidence of failure required)
+- **Justified violations:** Allowed with documentation
+- **Verification:** Smoke test minimum; defer full verification to post-incident
+- **Incident + Rollback documentation:** Required
+- **When to use:** Production is broken, users impacted
+
+### Execution Gear + Product Target Matrix
+
+**Product Target + Artifact Classification:**
+- **Mandatory for:** SHIP, HOTFIX
+- **Recommended for:** BUILD
+- **Optional for:** EXPLORE
+
+**Primary Engineering Mode:**
+- **Mandatory for:** All gears
+
+**Automation Preference:**
+- **SHIP:** Automation mandatory
+- **BUILD:** Automation strongly preferred
+- **HOTFIX:** Automation preferred, manual allowed if urgent
+- **EXPLORE:** Manual allowed
+
+---
+
 ## MODE: APP
 **User-Facing Application**
 

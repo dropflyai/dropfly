@@ -310,7 +310,105 @@ Default assumption if not declared: **P2 MEDIUM**
 
 ---
 
-## 14. System Goal
+## 14. Flexibility & Scaling Rigor
+
+**Rigor scales with risk. Not all tasks carry equal stakes.**
+
+### Core Principle
+
+> **Rigor is contextual, not absolute.**
+
+The Engineering Brain adapts enforcement based on:
+- Product Target (what is being built)
+- Execution Gear (what phase of work)
+- Priority (impact of failure)
+
+### Product Target Determines Baseline Rigor
+
+Different product types have different risk profiles:
+
+- **WEB_SAAS, MOBILE_IOS, MOBILE_ANDROID** → High security bar, accessibility requirements, performance budgets
+- **API_SERVICE** → Contract testing, backward compatibility, load testing
+- **AGENT_SYSTEM** → Idempotency, retry logic, observability
+- **LIBRARY** → API stability, semantic versioning, broad compatibility
+- **SCRIPT, WEB_APP** → Lighter requirements, context-dependent rigor
+
+**DO NOT assume WEB_SAAS unless explicitly declared or inferred from evidence.**
+
+### Execution Gear Determines Enforcement Strength
+
+- **GEAR: EXPLORE** → Minimal gates, manual steps allowed, no regression logging (unless permanent)
+- **GEAR: BUILD** → Normal gates, automation strongly recommended, verification encouraged
+- **GEAR: SHIP** → Full gates, automation + verification mandatory, no manual verification
+- **GEAR: HOTFIX** → Minimal safe set, justified violations allowed, mandatory post-incident review
+
+### Priority Framework (P0-P3)
+
+Not all violations have equal impact. Priority governs response and escalation.
+
+#### P0: CRITICAL — Safety / Security / Data Loss
+- Active exploit or breach
+- Data exposure (PII, credentials, tokens)
+- Production down, complete system failure
+- Data corruption or loss
+
+**Response:** Never allowed silently. Immediate escalation. L3 HOTFIX required.
+
+#### P1: HIGH — Production Stability / Revenue Impact
+- Major feature broken
+- Significant user impact
+- Revenue-impacting bug
+- High-severity security vulnerability with known exploit
+
+**Response:** Fix within 24-48 hours. May require HOTFIX or expedited BUILD.
+
+#### P2: MEDIUM — Maintainability / Developer Experience
+- Minor feature broken
+- Non-blocking bug
+- Quality issue
+- Medium-severity dependency vulnerability
+- Technical debt
+
+**Response:** Fix in next release cycle. Normal BUILD process.
+
+#### P3: LOW — Hygiene / Style
+- Cosmetic issue
+- Nice-to-have improvement
+- Low-severity dependency vulnerability
+- Code style inconsistency
+- Non-critical cleanup
+
+**Response:** Fix when convenient. May defer. EXPLORE or BUILD.
+
+### Violation Bypass Rules
+
+**P0/P1 violations are NEVER allowed silently.**
+
+P2/P3 violations may be bypassed with justification, depending on Execution Gear:
+
+- **GEAR: EXPLORE** → P2/P3 bypasses allowed (no justification required)
+- **GEAR: BUILD** → P2/P3 bypasses allowed with brief justification
+- **GEAR: SHIP** → P2/P3 bypasses must be justified and logged
+- **GEAR: HOTFIX** → P2/P3 bypasses allowed if time-critical; log in post-incident
+
+### Bypass Documentation Template
+
+When bypassing any governance rule, state:
+
+- **Rule bypassed:** (specific rule name)
+- **Product Target:** (WEB_SAAS, API_SERVICE, etc.)
+- **Execution Gear:** (EXPLORE, BUILD, SHIP, HOTFIX)
+- **Priority level:** (P0, P1, P2, P3)
+- **Risk introduced:** (what could go wrong)
+- **Follow-up plan:** (how/when it will be corrected)
+
+Log in:
+- `Engineering/Incidents.md` (operational incident, HOTFIX)
+- `Engineering/Solutions/Regressions.md` (systemic pattern, repeated failure)
+
+---
+
+## 15. System Goal
 
 The goal of this system is not speed.
 
