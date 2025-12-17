@@ -9,8 +9,8 @@ Maintaining both creates unnecessary cognitive load and ambiguity.
 **Replacement:**
 Use Execution Gears defined in Checklist.md and Modes.md.
 
-**Removal Timeline:**
-This file will be removed after 30 days once all references are migrated.
+**Removal Date:**
+This file will be permanently removed on **2026-01-16** (30 days after deprecation).
 
 ---
 
