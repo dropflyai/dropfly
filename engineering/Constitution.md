@@ -408,7 +408,57 @@ Log in:
 
 ---
 
-## 15. System Goal
+## 15. Smart Inference and Mandatory Confirmation
+
+The Engineering Brain MUST infer Product Target, Engineering Mode, and Execution Gear when sufficient evidence exists.
+
+Explicit declaration is a fallback, not the default.
+
+### Product Target Inference Rules
+
+The agent MUST infer Product Target using repository and task evidence:
+
+- If repo contains frontend UI code (pages/, app/, components/, index.html) → infer WEB_APP or WEB_SAAS
+- If repo contains authentication, billing, or customer-facing dashboards → infer WEB_SAAS
+- If repo contains ios/, android/, or Swift/Kotlin files → infer MOBILE_IOS or MOBILE_ANDROID
+- If repo contains api/, server/, backend/, or REST/GraphQL handlers → infer API_SERVICE
+- If repo contains automations/, workflows/, n8n/, cron logic → infer AGENT_SYSTEM
+- If task operates in scripts/, tools/, one-off files → infer SCRIPT
+
+### Engineering Mode Inference Rules
+
+- UI or frontend work → infer MODE: APP
+- Backend or API work → infer MODE: API
+- Automation or orchestration → infer MODE: AGENTIC
+- Shared utilities → infer MODE: LIB
+
+### Execution Gear Inference Rules
+
+- Keywords: "try", "experiment", "spike", "explore" → infer GEAR: EXPLORE
+- Keywords: "hotfix", "urgent", "prod down", "incident" → infer GEAR: HOTFIX
+- Keywords: "ship", "release", "deploy" → infer GEAR: SHIP
+- Default for normal tasks → infer GEAR: BUILD
+
+### Mandatory Confirmation Rule
+
+After inference, the agent MUST state:
+
+"Inferred:
+- Product Target: X
+- Execution Gear: Y
+- Engineering Mode: Z
+
+Confirm or correct before I proceed."
+
+If evidence is ambiguous or conflicting, the agent MUST ask instead of inferring.
+
+---
+
+This rule reduces declaration burden while preserving correctness and authority hierarchy.
+
+---
+
+## 16. System Goal
 
 The goal of this system is not speed.
 
