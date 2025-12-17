@@ -22,14 +22,37 @@ If any required item is not satisfied, the task is not complete.
 ## How to Use
 
 For every task:
-1) Run **Preflight** before writing code
-2) Run **Execution** while implementing
-3) Run **Completion Gate** before declaring done
-4) If a task fails the gate, continue work until it passes
+1) Select **Process Level** (determines which gates apply)
+2) Run **Preflight** before writing code
+3) Run **Execution** while implementing
+4) Run **Completion Gate** before declaring done
+5) If a task fails the gate, continue work until it passes
+
+---
+
+## Process Level Selection (FIRST STEP)
+
+**Mandatory: Select exactly ONE process level before any other gates.**
+
+Reference: `Engineering/ProcessLevels.md`
+
+- [ ] **Process Level:** L0_EXPLORE | L1_BUILD | L2_SHIP | L3_HOTFIX
+
+### Selection Guidance
+- **L0 EXPLORE** — prototypes, spikes, throwaway experiments
+- **L1 BUILD** — normal feature development (default)
+- **L2 SHIP** — production releases, customer-facing changes
+- **L3 HOTFIX** — emergency fixes, critical incidents
+
+**The selected Process Level determines which Preflight, Execution, and Completion gates apply.**
+
+See `ProcessLevels.md` for allowed shortcuts and requirements per level.
 
 ---
 
 ## Preflight Checklist (Before Any Implementation)
+
+**Note:** Some gates may be skipped based on Process Level. Consult `ProcessLevels.md` for allowed shortcuts.
 
 ### A) Product Target Declaration Gate (Required)
 
