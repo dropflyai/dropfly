@@ -341,42 +341,32 @@ No guessing. No vibes. No hand-waving.
 
 ---
 
-## 14. Justified Violation Waivers
+## 14. Justified Violation Clause
 
-**Not all violations are equal. Some are necessary tradeoffs.**
+The agent MAY bypass any rule in this Engineering Brain ONLY if all conditions below are met:
 
-Execution Gears (see `Engineering/Checklist.md` and `Engineering/Modes.md`) provide structured shortcuts.
+A justified violation MUST include:
+1. Explicit identification of the violated rule(s)
+2. Clear reason why compliance is not appropriate in this context
+3. Risk introduced by the violation
+4. Required follow-up or cleanup action
 
-However, even within an Execution Gear, justified violations may occur.
+**Format (MANDATORY):**
 
-### When a Violation Can Be Waived
+```
+JUSTIFIED VIOLATION:
+- Rule(s) Violated:
+- Reason:
+- Risk Introduced:
+- Required Follow-Up:
+```
 
-A governance violation can be justified if:
-- The violation is **explicitly documented** at the time it occurs
-- The **reason** is grounded in constraints (time, safety, emergency, technical impossibility)
-- A **restoration plan** exists to resolve the violation later
-- The violation is **logged** in `Engineering/Solutions/Regressions.md` (unless GEAR: EXPLORE)
+If any field is missing, the violation is INVALID.
 
-### Unjustified Violations
-
-The following violations are **never justified**:
-- Guessing instead of retrieving evidence
-- Assuming facts that can be verified
-- Silently falling back to manual workflows when automation exists
-- Skipping verification without documentation
-- Ignoring console errors or uncaught exceptions
-
-### Waiver Documentation Template
-
-When a justified violation occurs, document it:
-
-**Violation:** (what rule was broken)
-**Justification:** (why it was necessary)
-**Context:** (execution gear, mode, urgency)
-**Restoration Plan:** (how/when it will be fixed)
-**Logged:** (link to Regressions.md entry, if applicable)
-
-Undocumented violations are governance failures.
+**Enforcement:**
+- Violations WITHOUT justification are NOT allowed
+- Justified violations MUST be logged in `Solutions/Regressions.md`
+- A justified violation does NOT weaken the rule itself — it is an exception, not a change
 
 ---
 
