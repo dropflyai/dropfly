@@ -207,4 +207,47 @@ If a decision conflicts with the selected mode:
 
 ---
 
+## Mode Behavior Under Process Levels
+
+**Process Level modulates mode strictness, not mode identity.**
+
+Reference: `Engineering/ProcessLevels.md`
+
+### How Process Level Affects Mode Requirements
+
+The **mode defines what correctness means**.
+The **process level defines how strictly correctness is enforced**.
+
+#### MODE: APP Under Different Process Levels
+
+- **L0 EXPLORE** — UI verification optional; manual testing allowed; Playwright skippable
+- **L1 BUILD** — UI verification via Playwright required; Chromium default; artifacts required
+- **L2 SHIP** — UI verification via Playwright + cross-browser testing; accessibility audit required; WCAG AA minimum
+- **L3 HOTFIX** — UI verification via smoke test; Playwright preferred but manual allowed if urgent
+
+#### MODE: API Under Different Process Levels
+
+- **L0 EXPLORE** — Schema validation optional; manual curl testing allowed
+- **L1 BUILD** — Automated API tests required; backward compatibility checked
+- **L2 SHIP** — Full contract testing; load testing; migration safety validated
+- **L3 HOTFIX** — Smoke test critical endpoints; defer full contract testing to post-incident
+
+#### MODE: AGENTIC Under Different Process Levels
+
+- **L0 EXPLORE** — Automation can be manual; idempotency optional
+- **L1 BUILD** — Automation-first execution; idempotency required; runbooks for failures
+- **L2 SHIP** — Full retry logic; failure recovery automated; observability required
+- **L3 HOTFIX** — Minimal runnable automation; defer full retry logic to post-incident
+
+### Key Principle
+
+> **Mode = what to verify. Process Level = how thoroughly to verify it.**
+
+A task at `MODE: APP, L0 EXPLORE` still verifies UI correctness, but manually.
+A task at `MODE: APP, L2 SHIP` verifies UI correctness with full automation + accessibility + cross-browser.
+
+Both are APP mode. Different rigor.
+
+---
+
 **Mode selection is mandatory and binding.**
