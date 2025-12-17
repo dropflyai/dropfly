@@ -117,7 +117,58 @@ WEB_SAAS requires explicit evidence or explicit user declaration.
 
 ---
 
-## 4. Mandatory Workflow (Cannot Be Skipped)
+## 4. Execution Gears (Authoritative)
+
+Execution Gears define **how much rigor, verification, and governance apply to a task**.
+
+Execution Gears are the ONLY supported mechanism for execution strictness.
+
+### Available Gears
+
+- **GEAR: EXPLORE**
+  - Purpose: Spikes, prototypes, experiments, throwaway work
+  - Verification: Optional
+  - Automation: Best-effort
+  - Cleanup: Not required
+  - Documentation: Minimal
+  - Allowed: Manual steps, partial solutions
+
+- **GEAR: BUILD**
+  - Purpose: Normal feature development, refactors, improvements
+  - Verification: Required
+  - Automation: Strongly preferred
+  - Cleanup: Required
+  - Documentation: Required where behavior changes
+  - Default gear when unclear
+
+- **GEAR: SHIP**
+  - Purpose: Production deployment or release
+  - Verification: Mandatory and complete
+  - Automation: Mandatory
+  - Cleanup: Mandatory
+  - Evidence: Required
+  - No manual steps allowed
+
+- **GEAR: HOTFIX**
+  - Purpose: Production incident or emergency
+  - Verification: Minimal but explicit
+  - Automation: Best available option
+  - Cleanup: Deferred (must be logged)
+  - Governance: Violations allowed but MUST be logged in Regressions.md
+
+### Enforcement Rule
+
+- Exactly ONE Execution Gear must be active per task.
+- Execution Gears replace ALL other "process level" concepts.
+- Any reference to L0/L1/L2/L3 is considered deprecated.
+
+### Deprecation Enforcement Rule
+
+Any use of Process Levels after 2025-12-17 is a governance violation and must be logged.
+
+---
+
+## 5. Mandatory Workflow (Cannot Be Skipped)
 
 Every task MUST follow this lifecycle:
 
@@ -164,7 +215,7 @@ Every task MUST follow this lifecycle:
 
 ---
 
-## 5. Automation Precedence Rule
+## 6. Automation Precedence Rule
 
 **Automation always wins.**
 
@@ -185,7 +236,7 @@ If automation fails:
 
 ---
 
-## 6. Solution Memory Rule (No Amnesia)
+## 7. Solution Memory Rule (No Amnesia)
 
 Once a problem is solved, it must **never be re-solved from scratch**.
 
@@ -199,7 +250,7 @@ If a solution exists and is ignored, that is a system failure.
 
 ---
 
-## 7. Tool Authority Rules
+## 8. Tool Authority Rules
 
 You may not "assume" facts that can be retrieved.
 
@@ -214,7 +265,7 @@ Violations are considered incorrect behavior.
 
 ---
 
-## 8. Evidence Rule (No Claims Without Proof)
+## 9. Evidence Rule (No Claims Without Proof)
 
 You may not claim:
 - "It works"
@@ -234,7 +285,7 @@ If evidence cannot be produced, you must state that explicitly and stop.
 
 ---
 
-## 9. Cleanup & Deletion Governance
+## 10. Cleanup & Deletion Governance
 
 Cleanup is mandatory.
 
@@ -256,7 +307,7 @@ All deletions must:
 
 ---
 
-## 10. Scoring & Completion Gate
+## 11. Scoring & Completion Gate
 
 Work is complete only when:
 - All verification passes
@@ -268,7 +319,7 @@ If not, the task is still in progress.
 
 ---
 
-## 11. Presentation Rules
+## 12. Presentation Rules
 
 - Present at most **two options** when tradeoffs exist.
 - Default to the safest, simplest path.
@@ -277,7 +328,7 @@ If not, the task is still in progress.
 
 ---
 
-## 12. Silence Rule
+## 13. Silence Rule
 
 If:
 - verification fails
@@ -290,7 +341,7 @@ No guessing. No vibes. No hand-waving.
 
 ---
 
-## 13. Justified Violation Waivers
+## 14. Justified Violation Waivers
 
 **Not all violations are equal. Some are necessary tradeoffs.**
 
@@ -329,7 +380,7 @@ Undocumented violations are governance failures.
 
 ---
 
-## 14. Severity Framework (P0–P3)
+## 15. Severity Framework (P0–P3)
 
 **Not all tasks have equal stakes. Severity governs escalation and verification rigor.**
 
@@ -374,7 +425,7 @@ Default assumption if not declared: **P2 MEDIUM**
 
 ---
 
-## 15. Flexibility & Scaling Rigor
+## 16. Flexibility & Scaling Rigor
 
 **Rigor scales with risk. Not all tasks carry equal stakes.**
 
@@ -472,7 +523,7 @@ Log in:
 
 ---
 
-## 16. System Goal
+## 17. System Goal
 
 The goal of this system is not speed.
 
