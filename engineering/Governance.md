@@ -95,7 +95,7 @@ Examples:
 ```
 feat(engineering-brain): add performance budgets for WEB_SAAS
 chore(engineering-brain): log governance violation for missing artifact type
-BREAKING(engineering-brain): make artifact type optional for L0 EXPLORE
+BREAKING(engineering-brain): make artifact type optional for GEAR: EXPLORE
 ```
 
 ### In File (When Applicable)
@@ -145,9 +145,9 @@ For breaking changes, run the Lightweight Test **plus**:
    - [ ] Check that Constitution → Checklist → Modes flow is intact
 
 6. **Simulate edge cases:**
-   - [ ] L0 EXPLORE + MODE: APP + Artifact: Fragment
-   - [ ] L3 HOTFIX + P0 CRITICAL + MODE: API
-   - [ ] L2 SHIP + MODE: AGENTIC + Test artifact
+   - [ ] GEAR: EXPLORE + MODE: APP + Artifact: Fragment
+   - [ ] GEAR: HOTFIX + P0 CRITICAL + MODE: API
+   - [ ] GEAR: SHIP + MODE: AGENTIC + Test artifact
 
    Do the rules still make sense? Any contradictions?
 
@@ -239,7 +239,7 @@ If two Brain files contradict each other:
 - Identify patterns (3+ similar violations → add to SolutionIndex)
 
 ### Monthly
-- Review Process Level usage (is L0/L1/L2/L3 distribution sensible?)
+- Review Execution Gear usage (is EXPLORE/BUILD/SHIP/HOTFIX distribution sensible?)
 - Check for stale Solutions/Recipes (are any obsolete?)
 - Review changelog commits (any trends or concerns?)
 

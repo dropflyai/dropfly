@@ -140,7 +140,7 @@ Poor performance results in:
 - Performance regression > 5x slower (e.g., 2s → 10s load time)
 - Out of memory errors causing crashes
 
-**Response:** Immediate L3 HOTFIX required.
+**Response:** Immediate GEAR: HOTFIX required.
 
 ### P1 HIGH
 - Load time > 10 seconds (previously < 3s)
@@ -148,7 +148,7 @@ Poor performance results in:
 - API latency > 2s (previously < 500ms)
 - Blocking main thread > 5 seconds
 
-**Response:** Fix within 24-48 hours; L1 BUILD or L3 HOTFIX depending on user impact.
+**Response:** Fix within 24-48 hours; GEAR: BUILD or GEAR: HOTFIX depending on user impact.
 
 ### P2 MEDIUM
 - Load time 5-10 seconds
@@ -156,7 +156,7 @@ Poor performance results in:
 - API latency 500ms-1s
 - Bundle size increased by > 50%
 
-**Response:** Fix in next release cycle; L1 BUILD.
+**Response:** Fix in next release cycle; GEAR: BUILD.
 
 ### P3 LOW
 - Load time 4-5 seconds (acceptable but not great)
@@ -164,31 +164,31 @@ Poor performance results in:
 - Minor performance optimizations (e.g., image compression)
 - Incremental bundle size increases (< 20%)
 
-**Response:** Optimize when convenient; L1 BUILD or defer.
+**Response:** Optimize when convenient; GEAR: BUILD or defer.
 
 ---
 
-## Minimum Performance Bar (Process Level)
+## Minimum Performance Bar (Execution Gear)
 
-### L0 EXPLORE
+### GEAR: EXPLORE
 - **Optional:** performance measurement (prototypes may skip)
 - **No performance budgets enforced**
-- **Required:** if prototype becomes production, re-evaluate under L1
+- **Required:** if prototype becomes production, re-evaluate under GEAR: BUILD
 
-### L1 BUILD
+### GEAR: BUILD
 - **Required:** Lighthouse run (target score > 70)
 - **Required:** Check for obvious performance issues (massive bundles, blocking resources)
 - **Required:** API latency within acceptable range (< 1s for p95)
 - **Optional:** Advanced optimization (defer if not blocking)
 
-### L2 SHIP
+### GEAR: SHIP
 - **Required:** Lighthouse score > 90
 - **Required:** Core Web Vitals meet "Good" thresholds (LCP < 2.5s, FID < 100ms, CLS < 0.1)
 - **Required:** Bundle size within budget (< 500kb JS, < 200kb CSS gzipped)
 - **Required:** API latency p95 < 500ms
 - **Required:** Performance tested on slow networks/devices (throttled mode)
 
-### L3 HOTFIX
+### GEAR: HOTFIX
 - **Required:** Hotfix does not introduce new performance regressions
 - **Optional:** Full performance audit (defer to post-incident if time-critical)
 - **Mandatory:** Post-incident performance review if hotfix affects load time or API latency

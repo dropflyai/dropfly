@@ -1,3 +1,19 @@
+# PROCESS LEVELS (DEPRECATED)
+
+**This file is deprecated as of 2025-12-17.**
+
+**Reason:**
+Process Levels (L0–L3) overlap conceptually with Execution Gears (EXPLORE, BUILD, SHIP, HOTFIX).
+Maintaining both creates unnecessary cognitive load and ambiguity.
+
+**Replacement:**
+Use Execution Gears defined in Checklist.md and Modes.md.
+
+**Removal Timeline:**
+This file will be removed after 30 days once all references are migrated.
+
+---
+
 # PROCESS LEVELS
 **Context-Appropriate Rigor Without Losing Discipline**
 

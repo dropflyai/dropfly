@@ -1,0 +1,41 @@
+{
+  "mcpServers": {
+    "n8n-mcp": {
+      "command": "npx",
+      "args": ["n8n-mcp"],
+      "env": {
+        "MCP_MODE": "stdio",
+        "LOG_LEVEL": "error",
+        "DISABLE_CONSOLE_OUTPUT": "true",
+        "N8N_API_URL": "https://your-n8n-instance.com",
+        "N8N_API_KEY": "your_n8n_api_key"
+      }
+    },
+    "context7-docs": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/upstash/context7"
+      ]
+    },
+    "n8n-workflows-docs": {
+      "command": "npx",
+      "args": [
+        "mcp-remote",
+        "https://gitmcp.io/Zie619/n8n-workflows"
+      ]
+    },
+    "supabase-db": {
+      "command": "npx",
+      "args": ["@anthropic/mcp-server-postgres"],
+      "env": {
+        "DATABASE_URL": "postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT.supabase.co:5432/postgres"
+      }
+    },
+    "filesystem": {
+      "command": "npx",
+      "args": ["@anthropic/mcp-server-filesystem", "/path/to/your/project"],
+      "env": {}
+    }
+  }
+}

@@ -230,9 +230,9 @@ No guessing. No vibes. No hand-waving.
 
 **Not all violations are equal. Some are necessary tradeoffs.**
 
-Process Levels (see `Engineering/ProcessLevels.md`) provide structured shortcuts.
+Execution Gears (see `Engineering/Checklist.md` and `Engineering/Modes.md`) provide structured shortcuts.
 
-However, even within a Process Level, justified violations may occur.
+However, even within an Execution Gear, justified violations may occur.
 
 ### When a Violation Can Be Waived
 
@@ -240,7 +240,7 @@ A governance violation can be justified if:
 - The violation is **explicitly documented** at the time it occurs
 - The **reason** is grounded in constraints (time, safety, emergency, technical impossibility)
 - A **restoration plan** exists to resolve the violation later
-- The violation is **logged** in `Engineering/Solutions/Regressions.md` (unless L0 EXPLORE)
+- The violation is **logged** in `Engineering/Solutions/Regressions.md` (unless GEAR: EXPLORE)
 
 ### Unjustified Violations
 
@@ -257,7 +257,7 @@ When a justified violation occurs, document it:
 
 **Violation:** (what rule was broken)
 **Justification:** (why it was necessary)
-**Context:** (process level, mode, urgency)
+**Context:** (execution gear, mode, urgency)
 **Restoration Plan:** (how/when it will be fixed)
 **Logged:** (link to Regressions.md entry, if applicable)
 
@@ -278,25 +278,25 @@ Undocumented violations are governance failures.
 
 ### How Severity Affects Process
 
-#### Severity + Process Level Interaction
+#### Severity + Execution Gear Interaction
 
-- **P0 + L3 HOTFIX** — maximum urgency, allowed shortcuts with mandatory post-incident review
-- **P1 + L1 BUILD** — normal rigor with expedited verification
-- **P2 + L1 BUILD** — normal rigor, standard timeline
-- **P3 + L0 EXPLORE** — low stakes, maximum flexibility
+- **P0 + GEAR: HOTFIX** — maximum urgency, allowed shortcuts with mandatory post-incident review
+- **P1 + GEAR: BUILD** — normal rigor with expedited verification
+- **P2 + GEAR: BUILD** — normal rigor, standard timeline
+- **P3 + GEAR: EXPLORE** — low stakes, maximum flexibility
 
 #### Verification Requirements by Severity
 
 - **P0** — minimal smoke test to prove fix; defer full verification to post-incident
 - **P1** — automated verification required; staging validation preferred
 - **P2** — full automated verification; all tests must pass
-- **P3** — verification appropriate to Process Level (can be relaxed for L0)
+- **P3** — verification appropriate to Execution Gear (can be relaxed for EXPLORE)
 
 #### Escalation Rules
 
 If severity is misclassified:
-- User reports P3 but production is down → escalate to P0, switch to L3 HOTFIX
-- User reports P0 but impact is cosmetic → de-escalate to P3, continue L1 BUILD
+- User reports P3 but production is down → escalate to P0, switch to GEAR: HOTFIX
+- User reports P0 but impact is cosmetic → de-escalate to P3, continue GEAR: BUILD
 
 Severity is a constraint, not a judgment. High severity does not mean "bad engineering."
 
@@ -352,7 +352,7 @@ Not all violations have equal impact. Priority governs response and escalation.
 - Production down, complete system failure
 - Data corruption or loss
 
-**Response:** Never allowed silently. Immediate escalation. L3 HOTFIX required.
+**Response:** Never allowed silently. Immediate escalation. GEAR: HOTFIX required.
 
 #### P1: HIGH — Production Stability / Revenue Impact
 - Major feature broken

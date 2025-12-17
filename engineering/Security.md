@@ -95,7 +95,7 @@ Security failures can result in:
 - Complete authentication bypass
 - Remote code execution vulnerability
 
-**Response:** Immediate L3 HOTFIX required.
+**Response:** Immediate GEAR: HOTFIX required.
 
 ### P1 HIGH
 - XSS or CSRF vulnerability in production
@@ -103,7 +103,7 @@ Security failures can result in:
 - Secrets committed to git (public repo)
 - High-severity dependency vulnerability with known exploit
 
-**Response:** Fix within 24-48 hours; L1 BUILD or L3 HOTFIX depending on exposure.
+**Response:** Fix within 24-48 hours; GEAR: BUILD or GEAR: HOTFIX depending on exposure.
 
 ### P2 MEDIUM
 - CSP not configured
@@ -111,7 +111,7 @@ Security failures can result in:
 - Medium-severity dependency vulnerability
 - Session management weakness (no expiration)
 
-**Response:** Fix in next release cycle; L1 BUILD.
+**Response:** Fix in next release cycle; GEAR: BUILD.
 
 ### P3 LOW
 - Low-severity dependency vulnerability
@@ -119,26 +119,26 @@ Security failures can result in:
 - Informational security findings
 - Security tech debt
 
-**Response:** Fix when convenient; L1 BUILD or defer.
+**Response:** Fix when convenient; GEAR: BUILD or defer.
 
 ---
 
-## Minimum Security Bar (Process Level)
+## Minimum Security Bar (Execution Gear)
 
-### L0 EXPLORE
+### GEAR: EXPLORE
 - **DO NOT** commit secrets
 - **DO NOT** expose authentication endpoints publicly
 - **Optional:** full security checklist (prototypes may skip)
-- **Required:** if prototype becomes production, re-evaluate under L1
+- **Required:** if prototype becomes production, re-evaluate under GEAR: BUILD
 
-### L1 BUILD
+### GEAR: BUILD
 - **Required:** XSS/CSRF/input validation checks
 - **Required:** Secrets handling compliance
 - **Required:** `npm audit` run; high/critical vulnerabilities addressed
 - **Required:** Authentication/authorization checks for protected routes
 - **Optional:** CSP, advanced security headers (recommended but not blocking)
 
-### L2 SHIP
+### GEAR: SHIP
 - **Required:** Full OWASP checklist
 - **Required:** CSP configured and tested
 - **Required:** Security review of authentication flows
@@ -146,7 +146,7 @@ Security failures can result in:
 - **Required:** Secrets rotation verified
 - **Required:** HTTPS enforced
 
-### L3 HOTFIX
+### GEAR: HOTFIX
 - **Required:** No new vulnerabilities introduced by hotfix
 - **Required:** Secrets not exposed in logs or commits
 - **Optional:** Full security review (defer to post-incident if time-critical)
@@ -156,7 +156,7 @@ Security failures can result in:
 
 ## Security Violations (Never Justified)
 
-The following are **never acceptable**, regardless of Process Level or Severity:
+The following are **never acceptable**, regardless of Execution Gear or Severity:
 - Committing secrets to public repositories
 - Disabling authentication for convenience
 - Storing passwords in plain text
@@ -170,7 +170,7 @@ The following are **never acceptable**, regardless of Process Level or Severity:
 If a security issue is discovered:
 1. **Assess severity** (P0-P3)
 2. **Escalate if P0/P1** (notify stakeholders immediately)
-3. **Create hotfix** (L3 HOTFIX for P0/P1)
+3. **Create hotfix** (GEAR: HOTFIX for P0/P1)
 4. **Log incident** in `Engineering/Incidents.md` or incident log
 5. **Update Regressions** to prevent recurrence
 
