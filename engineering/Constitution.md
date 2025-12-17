@@ -226,7 +226,91 @@ No guessing. No vibes. No hand-waving.
 
 ---
 
-## 12. System Goal
+## 12. Justified Violation Waivers
+
+**Not all violations are equal. Some are necessary tradeoffs.**
+
+Process Levels (see `Engineering/ProcessLevels.md`) provide structured shortcuts.
+
+However, even within a Process Level, justified violations may occur.
+
+### When a Violation Can Be Waived
+
+A governance violation can be justified if:
+- The violation is **explicitly documented** at the time it occurs
+- The **reason** is grounded in constraints (time, safety, emergency, technical impossibility)
+- A **restoration plan** exists to resolve the violation later
+- The violation is **logged** in `Engineering/Solutions/Regressions.md` (unless L0 EXPLORE)
+
+### Unjustified Violations
+
+The following violations are **never justified**:
+- Guessing instead of retrieving evidence
+- Assuming facts that can be verified
+- Silently falling back to manual workflows when automation exists
+- Skipping verification without documentation
+- Ignoring console errors or uncaught exceptions
+
+### Waiver Documentation Template
+
+When a justified violation occurs, document it:
+
+**Violation:** (what rule was broken)
+**Justification:** (why it was necessary)
+**Context:** (process level, mode, urgency)
+**Restoration Plan:** (how/when it will be fixed)
+**Logged:** (link to Regressions.md entry, if applicable)
+
+Undocumented violations are governance failures.
+
+---
+
+## 13. Severity Framework (P0–P3)
+
+**Not all tasks have equal stakes. Severity governs escalation and verification rigor.**
+
+### Severity Levels
+
+- **P0 CRITICAL** — production down, data loss, security breach, customer-blocking
+- **P1 HIGH** — major feature broken, significant user impact, revenue impact
+- **P2 MEDIUM** — minor feature broken, non-blocking bug, quality issue
+- **P3 LOW** — cosmetic issue, nice-to-have, technical debt, cleanup
+
+### How Severity Affects Process
+
+#### Severity + Process Level Interaction
+
+- **P0 + L3 HOTFIX** — maximum urgency, allowed shortcuts with mandatory post-incident review
+- **P1 + L1 BUILD** — normal rigor with expedited verification
+- **P2 + L1 BUILD** — normal rigor, standard timeline
+- **P3 + L0 EXPLORE** — low stakes, maximum flexibility
+
+#### Verification Requirements by Severity
+
+- **P0** — minimal smoke test to prove fix; defer full verification to post-incident
+- **P1** — automated verification required; staging validation preferred
+- **P2** — full automated verification; all tests must pass
+- **P3** — verification appropriate to Process Level (can be relaxed for L0)
+
+#### Escalation Rules
+
+If severity is misclassified:
+- User reports P3 but production is down → escalate to P0, switch to L3 HOTFIX
+- User reports P0 but impact is cosmetic → de-escalate to P3, continue L1 BUILD
+
+Severity is a constraint, not a judgment. High severity does not mean "bad engineering."
+
+### Severity Declaration
+
+Every task should declare severity if non-obvious:
+
+> **Severity: P0 | P1 | P2 | P3**
+
+Default assumption if not declared: **P2 MEDIUM**
+
+---
+
+## 14. System Goal
 
 The goal of this system is not speed.
 
