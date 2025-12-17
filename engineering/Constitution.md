@@ -53,7 +53,71 @@ You do not ask the user to compensate for system failures.
 
 ---
 
-## 3. Mandatory Workflow (Cannot Be Skipped)
+## 3. Smart Defaults and Inference
+
+The agent MUST infer Product Target, Execution Gear, Engineering Mode, and Artifact Type when evidence is strong.
+Inference is NOT a hard override. It is a default hypothesis.
+
+### 1) Inference Rules (Evidence-Based)
+
+#### Product Target Inference
+Infer Product Target from repo structure + the files being edited:
+
+- If changes touch `/DropFly-PROJECTS/*Frontend*`, `/pages/`, `/components/`, `/css/`, `/js/`, `index.html` → infer `WEB_APP`
+- If changes touch `/ios/`, `.xcodeproj`, `Podfile`, `SwiftUI`, `/Sources/iOS/` → infer `MOBILE_IOS`
+- If changes touch `/android/`, `gradle`, `AndroidManifest.xml` → infer `MOBILE_ANDROID`
+- If changes touch `/api/`, `/server/`, `/backend/`, `routes/`, `controllers/` → infer `API_SERVICE`
+- If changes touch `/engineering/Automations/`, `/workflows/`, `n8n`, `Make.com`, `scripts/automation/` → infer `AGENT_SYSTEM`
+- If changes touch `/scripts/`, `/bin/`, single-purpose `.sh`/`.py`/`.js` tools → infer `SCRIPT`
+
+SaaS vs Web App distinction:
+- `WEB_SAAS` is ONLY inferred if there is strong evidence of multi-user/customer-facing SaaS semantics
+  (auth, billing, tenant/user accounts, onboarding flows, customer settings).
+- Otherwise default inference is `WEB_APP`.
+
+#### Engineering Mode Inference
+- UI/front-end files → infer `MODE: APP`
+- Backend/service files → infer `MODE: API`
+- Automation/agent/workflow files → infer `MODE: AGENTIC`
+- Shared packages/utilities → infer `MODE: LIB`
+- Multiple systems touched broadly → infer `MODE: MONOREPO`
+
+#### Execution Gear Inference
+- If user says: "try", "experiment", "spike", "prototype", "throwaway" → infer `GEAR: EXPLORE`
+- If user says: "build", "implement", "refactor", "feature" → infer `GEAR: BUILD`
+- If user says: "ship", "release", "production deploy" → infer `GEAR: SHIP`
+- If user says: "hotfix", "prod down", "incident", "emergency" → infer `GEAR: HOTFIX`
+Default when unclear: `GEAR: BUILD`
+
+#### Artifact Type Inference (Optional)
+Infer only when obvious:
+- Page fragment via router injection → `Fragment`
+- Full HTML document / entrypoint → `Full Document`
+- Reusable UI snippet/module → `Component`
+- Pure style file → `Style`
+- Test file → `Test`
+- Script → `Script`
+
+### 2) Mandatory Confirmation (One Line)
+
+Before planning or coding, the agent MUST print one line:
+
+"Inferred: TARGET=<...> | GEAR=<...> | MODE=<...> | ARTIFACT=<...>. Say 'override:' to change any value."
+
+If ambiguity is high, the agent MUST ask for a single clarification instead of guessing.
+
+### 3) User Overrides Are Binding
+
+If the user provides overrides, the agent MUST use them for the remainder of the task/session unless the user says "reset".
+
+### 4) No Hardwiring
+
+The agent MUST NOT default everything to WEB_SAAS.
+WEB_SAAS requires explicit evidence or explicit user declaration.
+
+---
+
+## 4. Mandatory Workflow (Cannot Be Skipped)
 
 Every task MUST follow this lifecycle:
 
@@ -100,7 +164,7 @@ Every task MUST follow this lifecycle:
 
 ---
 
-## 4. Automation Precedence Rule
+## 5. Automation Precedence Rule
 
 **Automation always wins.**
 
@@ -121,7 +185,7 @@ If automation fails:
 
 ---
 
-## 5. Solution Memory Rule (No Amnesia)
+## 6. Solution Memory Rule (No Amnesia)
 
 Once a problem is solved, it must **never be re-solved from scratch**.
 
@@ -135,7 +199,7 @@ If a solution exists and is ignored, that is a system failure.
 
 ---
 
-## 6. Tool Authority Rules
+## 7. Tool Authority Rules
 
 You may not "assume" facts that can be retrieved.
 
@@ -150,7 +214,7 @@ Violations are considered incorrect behavior.
 
 ---
 
-## 7. Evidence Rule (No Claims Without Proof)
+## 8. Evidence Rule (No Claims Without Proof)
 
 You may not claim:
 - "It works"
@@ -170,7 +234,7 @@ If evidence cannot be produced, you must state that explicitly and stop.
 
 ---
 
-## 8. Cleanup & Deletion Governance
+## 9. Cleanup & Deletion Governance
 
 Cleanup is mandatory.
 
@@ -192,7 +256,7 @@ All deletions must:
 
 ---
 
-## 9. Scoring & Completion Gate
+## 10. Scoring & Completion Gate
 
 Work is complete only when:
 - All verification passes
@@ -204,7 +268,7 @@ If not, the task is still in progress.
 
 ---
 
-## 10. Presentation Rules
+## 11. Presentation Rules
 
 - Present at most **two options** when tradeoffs exist.
 - Default to the safest, simplest path.
@@ -213,7 +277,7 @@ If not, the task is still in progress.
 
 ---
 
-## 11. Silence Rule
+## 12. Silence Rule
 
 If:
 - verification fails
@@ -226,7 +290,7 @@ No guessing. No vibes. No hand-waving.
 
 ---
 
-## 12. Justified Violation Waivers
+## 13. Justified Violation Waivers
 
 **Not all violations are equal. Some are necessary tradeoffs.**
 
@@ -265,7 +329,7 @@ Undocumented violations are governance failures.
 
 ---
 
-## 13. Severity Framework (P0–P3)
+## 14. Severity Framework (P0–P3)
 
 **Not all tasks have equal stakes. Severity governs escalation and verification rigor.**
 
@@ -310,7 +374,7 @@ Default assumption if not declared: **P2 MEDIUM**
 
 ---
 
-## 14. Flexibility & Scaling Rigor
+## 15. Flexibility & Scaling Rigor
 
 **Rigor scales with risk. Not all tasks carry equal stakes.**
 
@@ -405,56 +469,6 @@ When bypassing any governance rule, state:
 Log in:
 - `Engineering/Incidents.md` (operational incident, HOTFIX)
 - `Engineering/Solutions/Regressions.md` (systemic pattern, repeated failure)
-
----
-
-## 15. Smart Inference and Mandatory Confirmation
-
-The Engineering Brain MUST infer Product Target, Engineering Mode, and Execution Gear when sufficient evidence exists.
-
-Explicit declaration is a fallback, not the default.
-
-### Product Target Inference Rules
-
-The agent MUST infer Product Target using repository and task evidence:
-
-- If repo contains frontend UI code (pages/, app/, components/, index.html) → infer WEB_APP or WEB_SAAS
-- If repo contains authentication, billing, or customer-facing dashboards → infer WEB_SAAS
-- If repo contains ios/, android/, or Swift/Kotlin files → infer MOBILE_IOS or MOBILE_ANDROID
-- If repo contains api/, server/, backend/, or REST/GraphQL handlers → infer API_SERVICE
-- If repo contains automations/, workflows/, n8n/, cron logic → infer AGENT_SYSTEM
-- If task operates in scripts/, tools/, one-off files → infer SCRIPT
-
-### Engineering Mode Inference Rules
-
-- UI or frontend work → infer MODE: APP
-- Backend or API work → infer MODE: API
-- Automation or orchestration → infer MODE: AGENTIC
-- Shared utilities → infer MODE: LIB
-
-### Execution Gear Inference Rules
-
-- Keywords: "try", "experiment", "spike", "explore" → infer GEAR: EXPLORE
-- Keywords: "hotfix", "urgent", "prod down", "incident" → infer GEAR: HOTFIX
-- Keywords: "ship", "release", "deploy" → infer GEAR: SHIP
-- Default for normal tasks → infer GEAR: BUILD
-
-### Mandatory Confirmation Rule
-
-After inference, the agent MUST state:
-
-"Inferred:
-- Product Target: X
-- Execution Gear: Y
-- Engineering Mode: Z
-
-Confirm or correct before I proceed."
-
-If evidence is ambiguous or conflicting, the agent MUST ask instead of inferring.
-
----
-
-This rule reduces declaration burden while preserving correctness and authority hierarchy.
 
 ---
 
