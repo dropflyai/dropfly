@@ -53,7 +53,46 @@ You do not ask the user to compensate for system failures.
 
 ---
 
-## 3. Smart Defaults and Inference
+## 3. Mandatory Regression Prevention (Non-Negotiable)
+
+**Before attempting ANY solution to ANY problem, you MUST:**
+
+1. **Search `Engineering/Solutions/Regressions.md`** — Have we failed at this exact problem before?
+2. **Search `Engineering/Memory/FailureArchive`** — What approaches have failed for similar problems?
+3. **Search `Engineering/Memory/ExperienceLog`** — Have we solved this before? How?
+4. **Consult `Engineering/Solutions/SolutionIndex.md`** — Do we have a documented solution recipe?
+5. **Search `Engineering/Memory/Patterns`** — Are there applicable patterns for this problem?
+
+**If ANY of the above contain relevant information, you MUST use it.**
+
+**Bypassing this rule is NEVER acceptable for:**
+- Bug fixes
+- Feature additions
+- Refactoring
+- Debugging
+- Performance issues
+- Integration issues
+
+**The ONLY exceptions (where you can skip the above):**
+- Fixing a typo in a comment or string literal
+- Adding a comment to existing code
+- Renaming a variable for clarity (no logic change)
+- Formatting/whitespace changes only
+
+**Enforcement:**
+- If you attempt a solution without checking the above sources first, you are violating this Constitution
+- If you repeat a previously-failed approach documented in FailureArchive or Regressions, you have failed
+- If you ignore a documented solution in SolutionIndex or ExperienceLog, you have failed
+
+**Cross-Project Memory:**
+- Memory system (`brain-memory.db`) is shared across ALL projects
+- Always log to `/Users/rioallen/Documents/DropFly-OS-App-Builder/engineering/Memory/brain-memory.db`
+- Even if working in a different project directory, ALL experiences must be logged to the central Memory database
+- This ensures learning compounds across all work, not just one project
+
+---
+
+## 4. Smart Defaults and Inference
 
 The agent MUST infer Product Target, Execution Gear, Engineering Mode, and Artifact Type when evidence is strong.
 Inference is NOT a hard override. It is a default hypothesis.
@@ -204,12 +243,27 @@ Every task MUST follow this lifecycle:
    - Re-organize folders if needed.
    - Cleanup is mandatory, not optional.
 
-8. **Capture Memory**
-   - If something new was learned:
-     - Update `Engineering/Solutions/`
-     - Log regressions if applicable.
+8. **Capture Memory** (MANDATORY)
+   - Log EVERY completed task to Memory system:
+     - `node /Users/rioallen/Documents/DropFly-OS-App-Builder/engineering/Memory/log.js experience`
+     - Or direct SQL insert to `brain-memory.db`
+   - If something new was learned or pattern discovered:
+     - Update `Engineering/Solutions/SolutionIndex.md`
+     - Add recipe to `Engineering/Solutions/Recipes/`
+     - Log pattern to Memory: `node log.js pattern`
+   - If approach failed before succeeding:
+     - Log failure to Memory: `node log.js failure`
+     - Update `Engineering/Solutions/Regressions.md` if it prevents a loop
 
-9. **Score**
+9. **Commit Changes** (MANDATORY for Engineering Brain updates)
+   - If you modified any files in `engineering/` directory (Solutions, Memory, Automations, etc):
+     - You MUST commit those changes immediately
+     - Commit message MUST explain what was learned/documented
+     - Format: `chore(engineering-brain): <what was added/learned>`
+   - This ensures Engineering Brain improvements are never lost
+   - User should NOT have to manually commit Engineering Brain updates
+
+10. **Score**
    - Evaluate against `Engineering/Score.md`.
    - If score < 4 in any category, work is not complete.
 

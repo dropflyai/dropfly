@@ -107,22 +107,36 @@ Reference: `Engineering/Modes.md`
 
 ### Preflight (Before Implementation)
 
-#### Hard Gates (Required)
+#### Hard Gates (Required - No Exceptions)
 - [ ] **Product Target** declared or inferred + confirmed (see STEP 0)
 - [ ] **Engineering Mode** declared or inferred + confirmed
 - [ ] **Execution Gear** = BUILD
 
-#### Soft Gates (Recommended — skip for trivial tasks)
+#### Regression Prevention (MANDATORY - Cannot Skip)
+**Skip ONLY if task is truly trivial: typo fix, comment addition, variable rename ONLY**
+
+- [ ] **CHECK FIRST:** Search `Engineering/Solutions/Regressions.md` for this exact problem
+- [ ] **CHECK FIRST:** Search `Engineering/Memory/FailureArchive` for failed approaches to this problem
+- [ ] **CHECK FIRST:** Search `Engineering/Memory/ExperienceLog` for similar past tasks
+- [ ] **CHECK FIRST:** Consult `Engineering/Solutions/SolutionIndex.md` for relevant solution recipes
+- [ ] **CHECK FIRST:** Search `Engineering/Automations/AutomationIndex.md` for automation
+- [ ] **CHECK FIRST:** Search `Engineering/Memory/Patterns` for applicable patterns
+
+**If ANY of the above contain relevant information, you MUST use it. Do not reinvent solutions.**
+
+**Definition of "Trivial" (the ONLY cases where you can skip above):**
+- Fixing a typo in a comment or string
+- Adding a comment to existing code
+- Renaming a variable for clarity
+- Formatting/whitespace changes
+
+**If you are fixing a bug, adding a feature, refactoring logic, or debugging → NOT TRIVIAL → CHECK EVERYTHING ABOVE**
+
+#### Artifact Classification (Required for Non-Trivial)
 - [ ] **Artifact Type** declared (Full Document | Fragment | Component | Script | Automation | Test)
 - [ ] **Priority** declared (default: P2 if not specified)
-- [ ] Consult `Engineering/Solutions/SolutionIndex.md` for relevant entries
-- [ ] Consult `Engineering/Solutions/Regressions.md` for known loops
-- [ ] Search `Engineering/Automations/AutomationIndex.md` for automation
-- [ ] **NEW:** Search Memory system for similar past tasks (Recipe 2 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
-- [ ] **NEW:** Search Memory system for applicable patterns (Recipe 3 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
-- [ ] **NEW:** Search Memory system for known failure modes (Recipe 4 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
 
-#### Always Required (Cannot Skip)
+#### Planning (Always Required - Cannot Skip)
 - [ ] **Verification plan** identified (exact commands/tests to run)
 - [ ] **Evidence strategy** defined (logs, outputs, screenshots, traces)
 - [ ] **Cleanup plan** identified (dead code, unused files, deps)
