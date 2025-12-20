@@ -16,7 +16,33 @@ All tables share `project_id` column for isolation when brains share tables.
 
 ---
 
-## Step 1: Create Supabase Project
+## Step 1: Run Automation Script (RECOMMENDED)
+
+**FULLY AUTOMATED - No manual browser steps required**
+
+```bash
+cd engineering/Memory
+node setup-supabase.js
+```
+
+This script will:
+1. Authenticate with Supabase (opens browser for OAuth if needed)
+2. List your organizations and let you choose one
+3. Create "ai-brains-memory" project
+4. Initialize local Supabase
+5. Create migration with Memory schema
+6. Apply migration locally
+7. Link to remote project
+8. Push migration to remote
+9. Display your API keys
+
+**All automated. All visible. Takes ~3 minutes.**
+
+---
+
+## Alternative: Manual Setup (Only if automation fails)
+
+### Step 1: Create Supabase Project Manually
 
 1. Go to [supabase.com/dashboard](https://supabase.com/dashboard)
 2. Click **"New Project"**
@@ -26,6 +52,8 @@ All tables share `project_id` column for isolation when brains share tables.
 6. **Pricing Plan**: Free (500MB database, 50K rows — plenty for 4+ brains)
 7. Click **"Create new project"**
 8. Wait ~2 minutes for project to initialize
+
+**Note**: If you use manual setup, you MUST still use Supabase CLI for migrations per Engineering/Solutions/Recipes/Supabase.md
 
 ---
 
