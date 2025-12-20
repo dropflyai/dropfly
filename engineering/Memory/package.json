@@ -1,0 +1,16 @@
+{
+  "name": "engineering-brain-memory",
+  "version": "1.0.0",
+  "description": "AI Brains Memory System - Local SQLite logging tool",
+  "main": "log.js",
+  "scripts": {
+    "log": "node log.js",
+    "search": "node log.js search"
+  },
+  "keywords": ["engineering-brain", "memory", "logging", "sqlite"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.8.1"
+  }
+}

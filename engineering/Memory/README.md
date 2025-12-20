@@ -57,17 +57,15 @@ Log every failure:
 
 ## Storage Options
 
-### Option A: Local Markdown Files (Default)
-**Files in this directory:**
-- **ExperienceLog.md** — Every task logged with full context
-- **Patterns.md** — Generalizable lessons (3+ similar tasks)
-- **FailureArchive.md** — What doesn't work and why
-- **LearnedRules.md** — Domain-specific rules discovered over time
-- **RegressionHistory.md** — Bugs that came back (never again)
-- **KnownConstraints.md** — System limitations and workarounds
+### Option A: Local SQLite Database (Default) ✅
+**Setup**: Follow `LOCAL-SETUP.md` (ready to use now!)
+**Database**: `brain-memory.db` (single file, portable, fast queries)
+**CLI Tool**: `node log.js experience` for interactive logging
 
-**Pros**: Simple, no setup, works immediately
-**Cons**: Doesn't scale across machines/sessions, no analytics, manual search
+**Pros**: Fast, offline, structured queries, analytics, scales to 1000+ tasks
+**Cons**: Single machine (unless you commit DB to git)
+
+**Migration path**: Start with SQLite, migrate to Supabase when you hit 50+ tasks (zero downtime)
 
 ### Option B: Supabase Database (Recommended for Teams)
 **Setup**: Follow `SUPABASE-SETUP.md` (step-by-step guide)
