@@ -179,6 +179,28 @@ If the same governance violation occurs **more than twice**:
 - **Corrective Action Taken:** Removed all time/effort estimates from plan sections
 - **Preventative Rule/Pattern Added:** Do not include time estimates in preflight or final plans unless explicitly requested
 
+### Mobile-Specific Changes Applied Globally - Desktop Breakage
+- **Date/Time:** 2025-12-20 10:25
+- **Task/Context:** Fixing mobile PDF form field responsiveness on pdfdocsign.com
+- **Rule Violated:** Changed global field detection logic (constructor.name check) without testing impact on all platforms (Checklist.md - Evidence Discipline, Verification semantics)
+- **Why It Happened:**
+  - Task was "fix mobile responsiveness" but modified code that runs on ALL platforms
+  - Added `|| fieldConstructor === 'e'` check globally (commits edf141c, fdb8bd9)
+  - Did not verify desktop functionality before deploying
+  - Focused only on mobile testing (iPhone 17 Pro Max Safari)
+  - Violated principle: "we were just supposed to be fixing the mobile responsiveness of the webapp. trying to get it to function just like on the desktop"
+- **Corrective Action Taken:**
+  - GEAR: HOTFIX rollback to commit a541771 (before field type detection changes)
+  - Deployed rollback to production
+  - Form fields restored: 23 detected (was working state)
+  - Awaiting user verification of checkbox functionality
+- **Preventative Rule/Pattern Added:**
+  - **MANDATORY:** When task is platform-specific (mobile, desktop, iOS, Android), changes MUST be scoped to that platform only
+  - **MANDATORY:** Use responsive design patterns (media queries, viewport detection) NOT global logic changes
+  - **MANDATORY:** Test ALL platforms before deployment when modifying shared code paths
+  - **MANDATORY:** If mobile needs different behavior, use `window.innerWidth` or user-agent detection, NOT changing core field detection
+  - Add cross-platform verification to GEAR: BUILD checklist when modifying form/PDF rendering logic
+
 ---
 
 ## Justified Violation Entry Template
