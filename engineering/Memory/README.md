@@ -55,14 +55,29 @@ Log every failure:
 
 ---
 
-## Files in This Directory
+## Storage Options
 
+### Option A: Local Markdown Files (Default)
+**Files in this directory:**
 - **ExperienceLog.md** — Every task logged with full context
 - **Patterns.md** — Generalizable lessons (3+ similar tasks)
 - **FailureArchive.md** — What doesn't work and why
 - **LearnedRules.md** — Domain-specific rules discovered over time
 - **RegressionHistory.md** — Bugs that came back (never again)
 - **KnownConstraints.md** — System limitations and workarounds
+
+**Pros**: Simple, no setup, works immediately
+**Cons**: Doesn't scale across machines/sessions, no analytics, manual search
+
+### Option B: Supabase Database (Recommended for Teams)
+**Setup**: Run `supabase-migration.sql` in Supabase SQL Editor
+**Usage**: See `../Solutions/Recipes/MemoryLogging.md` for all queries
+**Test**: Run `test-example.sql` to verify setup
+
+**Pros**: Multi-machine, full-text search, analytics, real-time, scales to 1000+ tasks
+**Cons**: Requires Supabase project setup
+
+**Migration path**: Start with local files, migrate to Supabase when you hit 50+ tasks
 
 ---
 
