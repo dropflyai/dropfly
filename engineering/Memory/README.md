@@ -70,12 +70,13 @@ Log every failure:
 **Cons**: Doesn't scale across machines/sessions, no analytics, manual search
 
 ### Option B: Supabase Database (Recommended for Teams)
-**Setup**: Run `supabase-migration.sql` in Supabase SQL Editor
+**Setup**: Follow `SUPABASE-SETUP.md` (step-by-step guide)
+**Architecture**: One Supabase project for ALL AI brains (Engineering, Design, Options, MBA)
 **Usage**: See `../Solutions/Recipes/MemoryLogging.md` for all queries
 **Test**: Run `test-example.sql` to verify setup
 
-**Pros**: Multi-machine, full-text search, analytics, real-time, scales to 1000+ tasks
-**Cons**: Requires Supabase project setup
+**Pros**: Multi-machine, full-text search, analytics, real-time, scales to 1000+ tasks, multi-brain support
+**Cons**: Requires Supabase project setup (~10 minutes)
 
 **Migration path**: Start with local files, migrate to Supabase when you hit 50+ tasks
 

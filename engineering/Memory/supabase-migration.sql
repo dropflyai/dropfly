@@ -1,9 +1,17 @@
--- ENGINEERING BRAIN MEMORY SYSTEM
--- Supabase Migration: Experience Log, Patterns, and Failure Archive
+-- AI BRAINS MEMORY SYSTEM
+-- Architecture: Multi-brain support via project_id column
+-- Current: Engineering Brain (experience_log, patterns, failure_archive)
+-- Future: Design Brain, Options Trader Brain, MBA Brain (separate tables added later)
+--
 -- Run this in your Supabase SQL Editor to create Memory tables
+-- Project: Create new Supabase project named "ai-brains-memory" or similar
 
 -- Enable UUID extension (if not already enabled)
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
+-- ========================================
+-- ENGINEERING BRAIN TABLES
+-- ========================================
 
 -- ========================================
 -- EXPERIENCE LOG TABLE
