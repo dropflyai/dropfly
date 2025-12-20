@@ -154,6 +154,23 @@ If the same governance violation occurs **more than twice**:
 
 ## Logged Violations
 
+### PDF Form Field Font Sizing - Minimum Constraint Causing Overflow
+- **Date/Time:** 2025-12-20 08:45
+- **Task/Context:** Fixing mobile PDF form field text rendering on pdfdocsign.com
+- **Rule Violated:** Made multiple font scaling changes without evidence-based testing (Checklist.md - Evidence Discipline)
+- **Why It Happened:** Applied fixes based on visual inspection of screenshots rather than measuring actual field dimensions and font sizes
+- **Corrective Action Taken:**
+  - Created automated test on iPhone 17 Pro Max Safari WebKit
+  - Measured actual field heights (5px) vs font sizes (8px = 160% overflow)
+  - Removed Math.max(..., 8) minimum font constraint
+  - Changed scaling from 45% to 70% of field height
+  - Evidence: Field height=5.0px now gets fontSize=3.5px (70% fit)
+- **Preventative Rule/Pattern Added:**
+  - Always test font scaling with actual device dimensions
+  - Never apply hard minimums that can override container constraints
+  - Use Playwright + Safari WebKit for iOS-specific testing
+  - Capture field measurements (bounding box + computed styles) before making changes
+
 ### Time/Effort Estimates in Preflight Plans
 - **Date/Time:** 2025-12-16 15:27
 - **Task/Context:** Trading Signals page preflight planning
