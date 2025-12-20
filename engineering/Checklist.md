@@ -118,9 +118,9 @@ Reference: `Engineering/Modes.md`
 - [ ] Consult `Engineering/Solutions/SolutionIndex.md` for relevant entries
 - [ ] Consult `Engineering/Solutions/Regressions.md` for known loops
 - [ ] Search `Engineering/Automations/AutomationIndex.md` for automation
-- [ ] **NEW:** Search `Engineering/Memory/ExperienceLog.md` for similar past tasks
-- [ ] **NEW:** Search `Engineering/Memory/Patterns.md` for applicable patterns
-- [ ] **NEW:** Search `Engineering/Memory/FailureArchive.md` for known failure modes
+- [ ] **NEW:** Search Memory system for similar past tasks (Recipe 2 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
+- [ ] **NEW:** Search Memory system for applicable patterns (Recipe 3 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
+- [ ] **NEW:** Search Memory system for known failure modes (Recipe 4 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
 
 #### Always Required (Cannot Skip)
 - [ ] **Verification plan** identified (exact commands/tests to run)
@@ -180,9 +180,11 @@ If the work discovered or confirmed a repeatable solution:
 - [ ] If this creates an execution path: update `Engineering/Automations/`
 
 **Experience Logging (ALWAYS REQUIRED):**
-- [ ] Log task in `Engineering/Memory/ExperienceLog.md` (problem, attempts, solution, lessons)
-- [ ] If 3+ similar experiences exist, propose a pattern in `Engineering/Memory/Patterns.md`
-- [ ] If something failed before succeeding, log in `Engineering/Memory/FailureArchive.md`
+- [ ] Log task to Memory system (Recipe 1 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
+- [ ] If 3+ similar experiences exist, propose a pattern (Recipe 6 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
+- [ ] If something failed before succeeding, log failure (Recipe 5 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
+
+**Note:** Memory system can be local markdown files (default) or Supabase database (see `Engineering/Memory/supabase-migration.sql`)
 
 ### E) Engineering Score Gate (Required)
 - [ ] Score each category in `Engineering/Score.md`
