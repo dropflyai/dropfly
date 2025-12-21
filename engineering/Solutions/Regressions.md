@@ -201,6 +201,31 @@ If the same governance violation occurs **more than twice**:
   - **MANDATORY:** If mobile needs different behavior, use `window.innerWidth` or user-agent detection, NOT changing core field detection
   - Add cross-platform verification to GEAR: BUILD checklist when modifying form/PDF rendering logic
 
+### Relying on constructor.name for Type Detection - Checkboxes Lost
+- **Date/Time:** 2025-12-20 17:31
+- **Task/Context:** Debugging why checkboxes don't work and SSN/EIN fields don't split on pdfdocsign.com
+- **Rule Violated:** Assumed constructor.name is reliable for field type detection (Checklist.md - Evidence Discipline: "Do not assume facts that can be verified")
+- **Why It Happened:**
+  - Original code at line 498: `if (fieldConstructor === 'PDFTextField' || fieldConstructor === 'e')`
+  - In bundled/minified production code, pdf-lib returns `constructor.name === 'e'` for ALL field types, not just text fields
+  - Checkboxes also had `constructor.name === 'e'`, so they were immediately classified as text fields
+  - Result: 8 checkboxes lost (extracted 15/23 fields instead of all 23)
+  - User reported: "checkmarks stil dont actually make a checkmark in the box, the ssn/ein still dont have individual boxes"
+- **Corrective Action Taken:**
+  - Replaced constructor.name checks with try-catch field type detection (commit 7e3a14c)
+  - Try `form.getCheckBox()` first (most specific)
+  - Then try `form.getRadioGroup()`, `form.getDropdown()`, `form.getTextField()` in order
+  - Each method throws if field is wrong type, so first successful call determines actual type
+  - Evidence gathered via visible Chromium browser (test-production-evidence.js)
+  - Verified on production: 23/23 fields extracted, 8 checkboxes detected and clickable
+- **Preventative Rule/Pattern Added:**
+  - **MANDATORY:** Never rely on `constructor.name` for type detection in production code (minification breaks it)
+  - **MANDATORY:** Use feature detection (try-catch with type-specific methods) instead of name inspection
+  - **GOLDEN PATH:** For pdf-lib field detection, always try checkbox→radio→dropdown→text in that order
+  - Add to SolutionIndex: "PDF form field type detection" → use try-catch, not constructor.name
+  - Add to Checklist.md Evidence Discipline: "Verify assumptions work in bundled/minified production builds"
+- **Components Changed:** components/PDFEditorSimple.tsx:498-537
+
 ---
 
 ## Justified Violation Entry Template
