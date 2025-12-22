@@ -26,6 +26,30 @@ if (!fs.existsSync(DB_PATH)) {
 
 const db = new sqlite3(DB_PATH);
 
+// Auto-detect project from current working directory
+function detectProject() {
+  const cwd = process.cwd();
+
+  // If in DropFly-PROJECTS/<project-name>/
+  if (cwd.includes('/DropFly-PROJECTS/')) {
+    const match = cwd.match(/\/DropFly-PROJECTS\/([^\/]+)/);
+    if (match) {
+      return match[1]; // e.g., "pdf-editor", "tradefly"
+    }
+  }
+
+  // If in engineering/ directory
+  if (cwd.includes('/engineering')) {
+    return 'engineering-brain';
+  }
+
+  // Fallback: use directory name where command is run
+  return path.basename(cwd);
+}
+
+const PROJECT_ID = detectProject();
+console.log(`\n[Project: ${PROJECT_ID}]\n`);
+
 // Helper function for prompts
 const prompt = (question) => {
   const rl = readline.createInterface({
@@ -73,13 +97,14 @@ async function logExperience() {
       task_title, product_target, execution_gear, engineering_mode,
       artifact_type, problem, solution, why_it_worked,
       pattern_observed, would_do_differently, time_spent_minutes, project_id
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'engineering-brain')
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   stmt.run(
     taskTitle, productTarget, executionGear, engineeringMode,
     artifactType || null, problem, solution, whyItWorked,
-    patternObserved || null, wouldDoDifferently || null, timeSpent
+    patternObserved || null, wouldDoDifferently || null, timeSpent,
+    PROJECT_ID
   );
 
   console.log('\n✅ Experience logged successfully!\n');
@@ -104,12 +129,13 @@ async function logPattern() {
     INSERT INTO patterns (
       title, observed_count, context_product_target, context_mode,
       root_cause, solution, trigger, anti_pattern, project_id
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, 'engineering-brain')
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   stmt.run(
     title, observedCount, contextProductTarget || null, contextMode || null,
-    rootCause, solution, trigger, antiPattern || null
+    rootCause, solution, trigger, antiPattern || null,
+    PROJECT_ID
   );
 
   console.log('\n✅ Pattern logged successfully!\n');
@@ -136,14 +162,15 @@ async function logFailure() {
       what_i_tried, why_i_thought_it_would_work, what_happened,
       why_it_failed, what_i_learned, correct_approach,
       how_to_detect, project_id
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 'engineering-brain')
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
   `);
 
   stmt.run(
     title, productTarget || null, engineeringMode || null,
     whatITried, whyIThoughtItWouldWork, whatHappened,
     whyItFailed, whatILearned, correctApproach,
-    howToDetect || null
+    howToDetect || null,
+    PROJECT_ID
   );
 
   console.log('\n✅ Failure logged successfully!\n');
@@ -151,30 +178,39 @@ async function logFailure() {
 
 // Search
 function search(keyword) {
-  console.log(`\n=== Search Results for "${keyword}" ===\n`);
+  console.log(`\n=== Search Results for "${keyword}" (Project: ${PROJECT_ID}) ===\n`);
 
   if (keyword === 'recent') {
-    const results = db.prepare('SELECT * FROM recent_experiences LIMIT 10').all();
-    console.log('Recent Experiences (last 30 days):');
+    const results = db.prepare(`
+      SELECT * FROM experience_log
+      WHERE project_id = ?
+        AND created_at >= datetime('now', '-30 days')
+      ORDER BY created_at DESC
+      LIMIT 10
+    `).all(PROJECT_ID);
+
+    console.log(`Recent Experiences (last 30 days) for ${PROJECT_ID}:\n`);
     results.forEach((row, i) => {
-      console.log(`\n${i + 1}. ${row.task_title}`);
+      console.log(`${i + 1}. ${row.task_title}`);
       console.log(`   Target: ${row.product_target} | Gear: ${row.execution_gear} | Mode: ${row.engineering_mode}`);
       console.log(`   Problem: ${row.problem.substring(0, 80)}...`);
       console.log(`   Solution: ${row.solution.substring(0, 80)}...`);
       if (row.pattern_observed) {
         console.log(`   Pattern: ${row.pattern_observed.substring(0, 80)}...`);
       }
+      console.log();
     });
   } else {
     const results = db.prepare(`
       SELECT task_title, problem, solution, pattern_observed, created_at
       FROM experience_log
-      WHERE task_title LIKE ? OR problem LIKE ? OR solution LIKE ? OR pattern_observed LIKE ?
+      WHERE project_id = ?
+        AND (task_title LIKE ? OR problem LIKE ? OR solution LIKE ? OR pattern_observed LIKE ?)
       ORDER BY created_at DESC
       LIMIT 10
-    `).all(`%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
+    `).all(PROJECT_ID, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`, `%${keyword}%`);
 
-    console.log(`Found ${results.length} experiences matching "${keyword}":\n`);
+    console.log(`Found ${results.length} experiences matching "${keyword}" in ${PROJECT_ID}:\n`);
     results.forEach((row, i) => {
       console.log(`${i + 1}. ${row.task_title}`);
       console.log(`   ${row.solution.substring(0, 100)}...`);
@@ -185,7 +221,10 @@ function search(keyword) {
     });
   }
 
-  console.log();
+  if (keyword !== 'recent') {
+    console.log(`\nNote: Showing results for "${PROJECT_ID}" only.`);
+    console.log(`To search ALL projects, use: sqlite3 brain-memory.db "SELECT ... FROM experience_log WHERE ..."\n`);
+  }
 }
 
 // Main

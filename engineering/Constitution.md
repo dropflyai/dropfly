@@ -136,7 +136,7 @@ Execution Gears are the ONLY supported mechanism for execution strictness.
 - **GEAR: BUILD**
   - Purpose: Normal feature development, refactors, improvements
   - Verification: Required
-  - Automation: Required
+  - Automation: Strongly preferred
   - Cleanup: Required
   - Documentation: Required where behavior changes
   - Default gear when unclear
@@ -341,32 +341,42 @@ No guessing. No vibes. No hand-waving.
 
 ---
 
-## 14. Justified Violation Clause
+## 14. Justified Violation Waivers
 
-The agent MAY bypass any rule in this Engineering Brain ONLY if all conditions below are met:
+**Not all violations are equal. Some are necessary tradeoffs.**
 
-A justified violation MUST include:
-1. Explicit identification of the violated rule(s)
-2. Clear reason why compliance is not appropriate in this context
-3. Risk introduced by the violation
-4. Required follow-up or cleanup action
+Execution Gears (see `Engineering/Checklist.md` and `Engineering/Modes.md`) provide structured shortcuts.
 
-**Format (MANDATORY):**
+However, even within an Execution Gear, justified violations may occur.
 
-```
-JUSTIFIED VIOLATION:
-- Rule(s) Violated:
-- Reason:
-- Risk Introduced:
-- Required Follow-Up:
-```
+### When a Violation Can Be Waived
 
-If any field is missing, the violation is INVALID.
+A governance violation can be justified if:
+- The violation is **explicitly documented** at the time it occurs
+- The **reason** is grounded in constraints (time, safety, emergency, technical impossibility)
+- A **restoration plan** exists to resolve the violation later
+- The violation is **logged** in `Engineering/Solutions/Regressions.md` (unless GEAR: EXPLORE)
 
-**Enforcement:**
-- Violations WITHOUT justification are NOT allowed
-- Justified violations MUST be logged in `Solutions/Regressions.md`
-- A justified violation does NOT weaken the rule itself — it is an exception, not a change
+### Unjustified Violations
+
+The following violations are **never justified**:
+- Guessing instead of retrieving evidence
+- Assuming facts that can be verified
+- Silently falling back to manual workflows when automation exists
+- Skipping verification without documentation
+- Ignoring console errors or uncaught exceptions
+
+### Waiver Documentation Template
+
+When a justified violation occurs, document it:
+
+**Violation:** (what rule was broken)
+**Justification:** (why it was necessary)
+**Context:** (execution gear, mode, urgency)
+**Restoration Plan:** (how/when it will be fixed)
+**Logged:** (link to Regressions.md entry, if applicable)
+
+Undocumented violations are governance failures.
 
 ---
 
@@ -443,7 +453,7 @@ Different product types have different risk profiles:
 ### Execution Gear Determines Enforcement Strength
 
 - **GEAR: EXPLORE** → Minimal gates, manual steps allowed, no regression logging (unless permanent)
-- **GEAR: BUILD** → Normal gates, automation required, verification required
+- **GEAR: BUILD** → Normal gates, automation strongly recommended, verification encouraged
 - **GEAR: SHIP** → Full gates, automation + verification mandatory, no manual verification
 - **GEAR: HOTFIX** → Minimal safe set, justified violations allowed, mandatory post-incident review
 

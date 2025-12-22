@@ -28,27 +28,6 @@ For every task:
 
 ---
 
-## Quick Mode Shortcuts
-
-For experienced users, shorthand declarations are allowed:
-
-**Standard shorthand:**
-```
-TARGET: WEB_APP | GEAR: BUILD | MODE: APP | ARTIFACT: Component
-```
-
-**Ultra-short (BUILD gear only):**
-```
-WEB_APP / APP / Component
-```
-
-**Rules:**
-- The agent MUST expand shorthand into full declarations internally
-- Shorthand is only valid for GEAR: BUILD
-- All other gears require full declaration
-
----
-
 ## STEP 0: Declare Product Target + Execution Gear (REQUIRED)
 
 **Mandatory: Must be declared before any other gates.**
@@ -107,25 +86,73 @@ Reference: `Engineering/Modes.md`
 
 ### Preflight (Before Implementation)
 
-#### Hard Gates (Required)
-- [ ] **Product Target** declared or inferred + confirmed (see STEP 0)
-- [ ] **Engineering Mode** declared or inferred + confirmed
-- [ ] **Execution Gear** = BUILD
+#### A) Product Target (Required)
+- [ ] **Product Target declared** (see STEP 0)
+- [ ] Confirm Product Target aligns with tooling/verification strategy
 
-#### Required (NO EXCEPTIONS)
-- [ ] **Artifact Type** declared (Full Document | Fragment | Component | Script | Automation | Test)
-- [ ] **Priority** declared (default: P2 if not specified)
-- [ ] Consult `Engineering/Solutions/SolutionIndex.md` for relevant entries
-- [ ] Consult `Engineering/Solutions/Regressions.md` for known loops
-- [ ] Search `Engineering/Automations/AutomationIndex.md` for automation
-- [ ] Search Memory system for similar past tasks (Recipe 2 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
-- [ ] Search Memory system for applicable patterns (Recipe 3 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
-- [ ] Search Memory system for known failure modes (Recipe 4 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
+#### B) Mode Declaration (Required)
+- [ ] Declare: **Engineering Mode: <MODE>**
+- [ ] If multiple modes apply: declare primary + list secondary modes
+- [ ] Confirm mode aligns with Product Target
 
-#### Always Required (Cannot Skip)
-- [ ] **Verification plan** identified (exact commands/tests to run)
-- [ ] **Evidence strategy** defined (logs, outputs, screenshots, traces)
-- [ ] **Cleanup plan** identified (dead code, unused files, deps)
+#### C) Artifact Classification (Required)
+- [ ] Explicitly declare artifact type: **Full Document | Fragment | Component | Script | Automation | Test**
+- [ ] Confirm navigation strategy aligns with artifact type
+- [ ] Confirm CSS strategy aligns with artifact type
+- [ ] Confirm verification approach aligns with artifact type
+
+### B) Mode Declaration (Required)
+- [ ] Declare: **Engineering Mode: <MODE>**
+- [ ] If multiple modes apply: declare primary + list secondary modes
+- [ ] Confirm the strictest applicable rules will be applied
+- [ ] Confirm mode aligns with declared Product Target
+
+### C) Artifact Classification Gate (Required)
+
+**This gate must pass before planning, verification, or implementation.**
+
+Reference: `Engineering/OutputContracts.md` — Artifact Type Declaration
+
+- [ ] Explicitly declare artifact type: **Full Document | Fragment | Component | Script | Automation | Test**
+- [ ] Confirm navigation strategy aligns with declared artifact type
+- [ ] Confirm CSS strategy aligns with declared artifact type
+- [ ] Confirm verification approach aligns with declared artifact type
+
+**Gate Rules:**
+- If artifact type is missing → **planning is invalid**
+- If artifact type conflicts with navigation or verification strategy → **planning must stop**
+- If artifact type is inferred or implied without explicit declaration → **gate fails**
+
+**Correction Required:**
+- You MUST correct artifact classification before proceeding to implementation or verification.
+
+**Rationale:**
+This gate prevents fragment/document confusion by forcing explicit classification before any architectural or testing decisions are made. Without this gate, fragments can be mistakenly treated as standalone documents, leading to broken navigation tests, incorrect CSS scoping, and invalid verification strategies.
+
+### D) Problem & Constraints (Required)
+- [ ] Restate the goal in one sentence
+- [ ] List hard constraints (security, performance, budget, deadlines, tooling)
+- [ ] Identify impacted systems/files
+
+### E) Consult Institutional Memory (Required)
+- [ ] Search `Engineering/Solutions/SolutionIndex.md` for relevant entries
+- [ ] Search `Engineering/Solutions/Regressions.md` for known loops
+- [ ] Confirm `Engineering/Solutions/ToolAuthority.md` rules apply (time/date, UI, logs, DB)
+
+### F) Automation Availability (Required)
+- [ ] Search `Engineering/Automations/AutomationIndex.md`
+- [ ] If an automation exists, commit to using it
+- [ ] If automation is missing but feasible, plan to create it and add it to the index
+
+### G) Verification Plan (Required)
+- [ ] Identify the exact verification commands/tests to run
+- [ ] If UI is involved: plan Playwright verification (Chromium default)
+- [ ] Define the evidence artifacts expected (logs, outputs, screenshots, traces)
+- [ ] Confirm verification tooling aligns with declared Product Target
+
+### H) Cleanup Plan (Required)
+- [ ] Identify likely cleanup targets (dead code, unused files, deps)
+- [ ] Confirm deletion will follow `Engineering/Cleanup.md` governance
 
 ---
 
@@ -178,13 +205,6 @@ If the work discovered or confirmed a repeatable solution:
 - [ ] Add/update recipe in `Engineering/Solutions/Recipes/`
 - [ ] If this prevents a loop: update `Engineering/Solutions/Regressions.md`
 - [ ] If this creates an execution path: update `Engineering/Automations/`
-
-**Experience Logging (ALWAYS REQUIRED):**
-- [ ] Log task to Memory system (Recipe 1 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
-- [ ] If 3+ similar experiences exist, propose a pattern (Recipe 6 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
-- [ ] If something failed before succeeding, log failure (Recipe 5 in `Engineering/Solutions/Recipes/MemoryLogging.md`)
-
-**Note:** Memory system can be local markdown files (default) or Supabase database (see `Engineering/Memory/supabase-migration.sql`)
 
 ### E) Engineering Score Gate (Required)
 - [ ] Score each category in `Engineering/Score.md`
