@@ -168,6 +168,66 @@ Any use of Process Levels after 2025-12-17 is a governance violation and must be
 
 ---
 
+## 4.5. Design Brain Delegation (UI/UX Work)
+
+**Engineering Brain is the base. Design Brain is delegated to when needed.**
+
+### When Design Brain is Required
+
+If the task involves UI/UX work, the Engineering Brain MUST delegate to Design Brain:
+
+**Triggers for Design Brain Delegation:**
+- Artifact Type = Component (UI component)
+- Artifact Type = Full Document (page with UI)
+- Artifact Type = Fragment (UI fragment)
+- Engineering Mode = APP (application with user interface)
+- Product Target = WEB_SAAS, WEB_APP, MOBILE_IOS, MOBILE_ANDROID
+- Task explicitly mentions: UI, UX, design, layout, interface, screen, component
+
+### Delegation Protocol
+
+When Design Brain is required:
+
+1. **Engineering Brain runs preflight** (A-H from Checklist.md)
+2. **Delegate to Design Brain** for UI creation:
+   - Design Brain entry: `CLAUDE.md`
+   - Design Brain workflow: Design Intent Declaration → Baseline UI → Refactor → Score
+   - Design Brain output: Production-ready UI code
+3. **Engineering Brain resumes** for implementation:
+   - Take Design Brain output
+   - Apply Engineering verification (tests, Playwright, evidence)
+   - Apply Engineering cleanup
+   - Apply Engineering score
+4. **Both scores must pass**: Engineering Score ≥4 AND UX Score ≥4
+
+### Authority Hierarchy for UI Work
+
+When Design Brain is active:
+- **Design decisions** (layout, hierarchy, spacing, states, affordances) → Design Brain authority
+- **Engineering decisions** (correctness, verification, automation, cleanup) → Engineering Brain authority
+- **Conflicts**: Design Brain wins on aesthetics, Engineering Brain wins on correctness
+
+### Memory Integration
+
+Design decisions are logged to Engineering Memory database:
+- Table: `design_decisions` (to be created)
+- Links to `experience_log` via task_id
+- Searchable for future UI work
+
+### Non-Delegation Cases
+
+Design Brain is NOT required for:
+- Artifact Type = Script
+- Artifact Type = Test
+- Artifact Type = Automation
+- Engineering Mode = API (headless services)
+- Engineering Mode = AGENTIC (automation workflows)
+- Product Target = API_SERVICE, LIBRARY, SCRIPT
+
+For these cases, Engineering Brain runs the full workflow alone.
+
+---
+
 ## 5. Mandatory Workflow (Cannot Be Skipped)
 
 Every task MUST follow this lifecycle:

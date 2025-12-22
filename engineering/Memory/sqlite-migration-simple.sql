@@ -120,6 +120,63 @@ CREATE INDEX IF NOT EXISTS idx_failure_archive_mode ON failure_archive(engineeri
 CREATE INDEX IF NOT EXISTS idx_failure_archive_project ON failure_archive(project_id);
 
 -- ========================================
+-- DESIGN BRAIN TABLES
+-- ========================================
+
+-- ========================================
+-- DESIGN DECISIONS TABLE
+-- ========================================
+
+CREATE TABLE IF NOT EXISTS design_decisions (
+  id TEXT PRIMARY KEY DEFAULT (lower(hex(randomblob(16)))),
+  created_at DATETIME DEFAULT CURRENT_TIMESTAMP NOT NULL,
+
+  -- Link to engineering task
+  experience_log_id TEXT,
+  task_title TEXT NOT NULL,
+
+  -- Design metadata
+  ui_mode TEXT NOT NULL, -- MODE_SAAS | MODE_INTERNAL | MODE_AGENTIC
+  component_type TEXT, -- button, form, dashboard, etc.
+  product_target TEXT,
+
+  -- Design intent
+  user_type TEXT NOT NULL,
+  primary_decision TEXT NOT NULL,
+  excluded_on_purpose TEXT,
+  failure_definition TEXT,
+
+  -- Design execution
+  design_rationale TEXT NOT NULL,
+  pattern_applied TEXT,
+  hierarchy_choices TEXT,
+  states_implemented TEXT DEFAULT '[]', -- JSON: ["default", "loading", "error", "empty", "success"]
+
+  -- Quality
+  ux_score REAL, -- Score from /eval/UXScore.md
+  accessibility_notes TEXT,
+
+  -- Retrospective
+  what_worked TEXT,
+  would_do_differently TEXT,
+
+  -- Multi-user support
+  user_id TEXT,
+  project_id TEXT DEFAULT 'engineering-brain',
+
+  -- Foreign key (not enforced in SQLite, but documented)
+  FOREIGN KEY (experience_log_id) REFERENCES experience_log(id)
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_design_decisions_created_at ON design_decisions(created_at DESC);
+CREATE INDEX IF NOT EXISTS idx_design_decisions_ui_mode ON design_decisions(ui_mode);
+CREATE INDEX IF NOT EXISTS idx_design_decisions_component_type ON design_decisions(component_type);
+CREATE INDEX IF NOT EXISTS idx_design_decisions_product_target ON design_decisions(product_target);
+CREATE INDEX IF NOT EXISTS idx_design_decisions_project ON design_decisions(project_id);
+CREATE INDEX IF NOT EXISTS idx_design_decisions_experience ON design_decisions(experience_log_id);
+
+-- ========================================
 -- HELPER VIEWS
 -- ========================================
 
