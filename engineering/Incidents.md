@@ -255,3 +255,105 @@ The best incident response is preventing incidents.
 ---
 
 **Incident response is mandatory. Postmortems are mandatory. Learning is mandatory.**
+
+---
+
+## Incident Log
+
+### P0 CRITICAL - Exposed Secrets in Public GitHub Repository (2025-12-22)
+
+#### Incident Summary
+- **Date/Time:** December 22, 2025, ~09:00 PST
+- **Duration:** ~3 hours (detection to resolution)
+- **Severity:** P0 CRITICAL - Active credentials exposed in public repository
+- **User Impact:** Security risk - Active AWS Access Key, AWS Secret Access Key, and OpenAI API Key exposed in public GitHub repository (dropflyai/dropfly)
+- **Repository State:** 80 commits ahead of origin, unable to push due to GitHub Secret Scanning protection
+
+#### Timeline
+- **Detection:** User discovered GitHub blocking push with message about secret exposure in .env.master and AUTOMATION-GUIDE.md
+- **Response:**
+  1. Immediately rotated all exposed secrets (AWS keys, OpenAI API key)
+  2. User confirmed old keys deactivated, new keys active
+  3. Created backup branch: `backup-before-bfg`
+  4. Installed BFG Repo-Cleaner
+  5. Created mirror clone and ran BFG to remove .env.master (169 commits) and AUTOMATION-GUIDE.md (65 commits)
+  6. Encountered issue: BFG protected HEAD commit, files still present
+  7. Manually removed files from working directory, committed removal
+  8. Created fresh mirror clone (clean2)
+  9. Ran BFG again on clean mirror - successfully removed both files
+  10. Ran aggressive git gc to purge orphaned objects
+  11. Fetched cleaned history into working directory
+  12. Reset working directory to cleaned main branch
+- **Resolution:** Force pushed cleaned history to GitHub (successful - no secret detection)
+- **Verification:**
+  - Verified files removed from working directory (ls check failed as expected)
+  - Verified files removed from git history (git log check returned empty)
+  - Verified files not in current HEAD (git show failed as expected)
+  - GitHub accepted force push without secret detection warnings
+  - Added comprehensive .gitignore with security-first patterns
+  - Pushed .gitignore to prevent future exposure
+
+#### Root Cause
+- **What broke:** `.env.master` (lines 34, 35, 43) and `AUTOMATION-GUIDE.md` (lines 141, 142) containing active AWS and OpenAI credentials were committed to public repository
+- **Why it broke:**
+  1. No pre-commit secrets detection gate in Engineering Brain governance
+  2. Existing .gitignore lacked comprehensive patterns (.env.master not explicitly ignored)
+  3. No automated secrets scanning in local workflow
+- **Why it wasn't caught:**
+  1. .gitignore had basic patterns (.env, .env.local) but not .env.* or .env.master
+  2. No pre-commit hooks for secret detection
+  3. GitHub Secret Scanning only activated at push time (not during commit)
+
+#### What Was Skipped During Hotfix
+- [x] Artifact Classification (not applicable for security incident)
+- [x] SolutionIndex consultation (pre-commit secrets gate already existed in Checklist.md from previous incident)
+- [x] Full test suite (verification limited to smoke tests of git history cleanup)
+- [x] Cleanup (temporary mirror repositories left in /Users/rioallen/Documents/)
+
+#### Follow-Up Actions
+- [x] Add comprehensive .gitignore with security-first patterns (COMPLETED)
+- [x] Update Checklist.md with mandatory Security Gate C.1 (ALREADY EXISTS from previous incident on 2025-12-22)
+- [ ] Add pre-commit hooks for automated secrets detection (gitleaks, git-secrets, or detect-secrets)
+- [ ] Clean up temporary mirror repositories (DropFly-OS-App-Builder-clean.git, DropFly-OS-App-Builder-clean2.git)
+- [ ] Update Engineering/Solutions/Regressions.md if not already logged
+- [ ] Audit all other environment files (.env.development, .env.production) to ensure not committed
+- [ ] Consider GitHub secret scanning alerts for future prevention
+
+#### Lessons Learned
+- **What went well:**
+  - Immediate secret rotation prevented unauthorized access
+  - BFG Repo-Cleaner successfully removed secrets from 196 commits
+  - Checklist.md already had Security Gate C.1 from previous incident (added earlier same day)
+  - GitHub Secret Scanning prevented exposure of 80 commits worth of secrets
+  - Systematic approach (backup → clean → verify → push) prevented data loss
+
+- **What went poorly:**
+  - BFG protected HEAD commit on first attempt, requiring second cleanup pass
+  - Initial .gitignore insufficient despite being a known security critical file type
+  - Security gate existed in governance but was not enforced in practice
+
+- **What will we do differently next time:**
+  - Enforce Security Gate C.1 BEFORE every commit (make it non-skippable)
+  - Add automated pre-commit hooks (not just manual checklist items)
+  - Audit .gitignore quarterly to ensure comprehensive coverage
+  - Never commit .env.* files regardless of name (use .env.example templates instead)
+  - Consider local git hooks that run automatically before commit
+
+#### Resolution Artifacts
+- **Backup branch:** `backup-before-bfg` (preserves pre-cleanup history)
+- **Cleaned commits:** 196 commits cleaned, 3 object IDs changed
+- **Files removed:** `.env.master` (2.5 KB), `AUTOMATION-GUIDE.md` (9.4 KB)
+- **Final commit:** bbac62d (security .gitignore added)
+- **Force push:** 7ecc159 (cleaned history on GitHub)
+
+#### Security Impact Assessment
+- **Exposure duration:** Unknown (repository was public)
+- **Affected credentials:**
+  - AWS Access Key ID (REDACTED)
+  - AWS Secret Access Key (REDACTED)
+  - OpenAI API Key (REDACTED)
+- **Mitigation:** All credentials rotated and deactivated immediately
+- **Risk:** P0 - Credentials were active and public, potential for unauthorized AWS resource usage and OpenAI API abuse
+- **Post-rotation risk:** P4 - Old credentials deactivated, new credentials not exposed
+
+---
