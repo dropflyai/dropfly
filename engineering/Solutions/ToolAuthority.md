@@ -71,6 +71,50 @@ UI verification must produce artifacts where applicable:
 - traces
 - console/network error logs
 
+### Screenshot Content Verification (MANDATORY)
+
+**Problem:** Screenshots can be taken but show wrong content (e.g., login screen when claiming "portfolio page").
+
+**Rule:** For ALL screenshots, content MUST match claim.
+
+**Verification Protocol (3-Step):**
+
+1. **Element-Based Verification (Before Screenshot)**
+   - Identify expected elements for claimed page/state
+   - Use Playwright assertions to verify elements exist
+   - Example: `await expect(page.locator('h1')).toContainText('Portfolio')`
+   - If assertions fail → screenshot claim is invalid
+
+2. **Screenshot Capture**
+   - Take screenshot only after element verification passes
+   - Include URL/route in screenshot filename for traceability
+
+3. **Visual Description (After Screenshot)**
+   - MUST describe what is visible in the screenshot
+   - Compare description to original claim
+   - If mismatch detected (e.g., "I see a login form" when claiming "portfolio page") → verification FAILS
+   - Example output: "Screenshot shows: Portfolio page with 3 project cards, navigation header, footer. Matches claim: ✓"
+
+**Failure Detection:**
+- Login screen when not expected → FAIL
+- Error page when claiming success state → FAIL
+- Empty page when claiming populated content → FAIL
+- Wrong route/page entirely → FAIL
+
+**Evidence Format:**
+```
+Claim: Screenshot of portfolio page
+Element verification: ✓ h1 contains "Portfolio", ✓ .project-card count = 3
+Screenshot: portfolio-page.png
+Visual description: Page shows portfolio header, 3 project cards with titles/images, footer navigation
+Content matches claim: ✓
+```
+
+**Enforcement:**
+- No screenshot claim is valid without this 3-step protocol
+- False claims (screenshot ≠ claim) are correctness failures
+- Must be logged to FailureArchive if pattern repeats
+
 ---
 
 ## Authority: Logs and Errors

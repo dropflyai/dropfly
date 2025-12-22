@@ -283,4 +283,18 @@ A system that logs its failures is a system that improves.
 
 ---
 
+## Known Regressions (Most Recent)
+
+### Screenshot Content Verification Failure
+- **Symptom:** Screenshots taken but show wrong content (login screen when claiming "portfolio page")
+- **Root Cause:** Verification only checked "screenshot exists", not "screenshot matches claim"
+- **Incorrect Behavior:** Taking screenshot without element verification, claiming success without visual description
+- **Correct Solution:** 3-step protocol (element verification → screenshot → visual description)
+- **Enforced Path:** `Engineering/Solutions/Recipes/Playwright.md` - Screenshot Content Verification section
+- **Prevention Mechanism:** Mandatory 3-step protocol for ALL screenshots
+- **Date Logged:** 2025-12-22
+- **User Report:** "i asked it to take screenshot of the apps pages but it kept just bringing me back a bunch of login screenshots...it didnt have a login so it was taking pictures of what it thought was the page"
+
+---
+
 **Regression memory is binding and enforced.**
