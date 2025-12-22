@@ -129,10 +129,6 @@ Reference: `Engineering/OutputContracts.md` — Artifact Type Declaration
 **Rationale:**
 This gate prevents fragment/document confusion by forcing explicit classification before any architectural or testing decisions are made. Without this gate, fragments can be mistakenly treated as standalone documents, leading to broken navigation tests, incorrect CSS scoping, and invalid verification strategies.
 
-**Design Brain Delegation Check:**
-- [ ] If Artifact Type = Component/Full Document/Fragment AND (Engineering Mode = APP OR Product Target = WEB_SAAS/WEB_APP/MOBILE) → **Design Brain delegation required**
-- [ ] Reference `Engineering/Constitution.md` Section 4.5 for delegation protocol
-
 ### D) Problem & Constraints (Required)
 - [ ] Restate the goal in one sentence
 - [ ] List hard constraints (security, performance, budget, deadlines, tooling)
@@ -161,6 +157,13 @@ This gate prevents fragment/document confusion by forcing explicit classificatio
 ---
 
 ## Execution Checklist (During Implementation)
+
+**Note:** Specialist Brain tools are available (see `Engineering/Constitution.md` Section 4.5):
+- Design Brain (UI/UX work)
+- Trading Brain (options strategy) - future
+- MBA Brain (business strategy) - future
+
+Use specialist brains as needed throughout implementation. No fixed sequence required.
 
 ### A) Smallest Correct Change
 - [ ] Implement the smallest change that fully solves the problem

@@ -168,63 +168,91 @@ Any use of Process Levels after 2025-12-17 is a governance violation and must be
 
 ---
 
-## 4.5. Design Brain Delegation (UI/UX Work)
+## 4.5. Specialist Brain Tools
 
-**Engineering Brain is the base. Design Brain is delegated to when needed.**
+**Engineering Brain is the orchestrator. Specialist Brains are tools used as needed.**
 
-### When Design Brain is Required
+### Available Specialist Brains
 
-If the task involves UI/UX work, the Engineering Brain MUST delegate to Design Brain:
+The Engineering Brain has access to specialist brains for domain-specific work:
 
-**Triggers for Design Brain Delegation:**
-- Artifact Type = Component (UI component)
-- Artifact Type = Full Document (page with UI)
-- Artifact Type = Fragment (UI fragment)
-- Engineering Mode = APP (application with user interface)
-- Product Target = WEB_SAAS, WEB_APP, MOBILE_IOS, MOBILE_ANDROID
-- Task explicitly mentions: UI, UX, design, layout, interface, screen, component
+**Design Brain** (`CLAUDE.md` + `design/`)
+- Domain: UI/UX, visual design, interaction patterns
+- Use when: Creating or refining user interfaces
+- Output: Design intent, UI code, UX score
+- Memory: Logs to `design_decisions` table
 
-### Delegation Protocol
+**Future Specialist Brains:**
+- Trading Brain (options trading strategy)
+- MBA Brain (business strategy, market analysis)
+- [Other specialist brains as added]
 
-When Design Brain is required:
+### Tool Usage Rules
 
-1. **Engineering Brain runs preflight** (A-H from Checklist.md)
-2. **Delegate to Design Brain** for UI creation:
-   - Design Brain entry: `CLAUDE.md`
-   - Design Brain workflow: Design Intent Declaration → Baseline UI → Refactor → Score
-   - Design Brain output: Production-ready UI code
-3. **Engineering Brain resumes** for implementation:
-   - Take Design Brain output
-   - Apply Engineering verification (tests, Playwright, evidence)
-   - Apply Engineering cleanup
-   - Apply Engineering score
-4. **Both scores must pass**: Engineering Score ≥4 AND UX Score ≥4
+1. **Engineering Brain decides when to use specialist brains**
+   - Based on task requirements
+   - May use multiple times in a single task
+   - May use multiple specialist brains in sequence
+   - No fixed workflow sequence
 
-### Authority Hierarchy for UI Work
+2. **Usage is contextual, not triggered**
+   - Don't use rigid "if Artifact Type = X then delegate" rules
+   - Engineering Brain evaluates: "Do I need specialist expertise for this?"
+   - Examples:
+     - UI work → likely needs Design Brain
+     - Options trade → likely needs Trading Brain
+     - Market analysis → likely needs MBA Brain
+     - API endpoint → likely doesn't need Design Brain
 
-When Design Brain is active:
-- **Design decisions** (layout, hierarchy, spacing, states, affordances) → Design Brain authority
-- **Engineering decisions** (correctness, verification, automation, cleanup) → Engineering Brain authority
-- **Conflicts**: Design Brain wins on aesthetics, Engineering Brain wins on correctness
+3. **Specialist brains are consulted, not delegated to**
+   - Engineering Brain remains in control
+   - Specialist brain provides output
+   - Engineering Brain integrates output into workflow
+   - Engineering Brain still enforces verification, cleanup, scoring
+
+### Design Brain Usage
+
+**When to use Design Brain:**
+- Task involves creating/modifying UI components
+- Need design pattern guidance
+- Need to evaluate UX quality
+- Need to refactor UI for better usability
+- Stuck on layout/hierarchy decisions
+
+**Design Brain provides:**
+- Design Intent Declaration (user type, primary decision, failure definition, UI mode)
+- Baseline UI implementation
+- Refactored UI (hierarchy, spacing, affordances)
+- UX Score (≥4 required)
+- Design rationale and pattern justification
+
+**Engineering Brain is responsible for:**
+- Deciding when to use Design Brain (may use multiple times)
+- Taking Design Brain output and integrating it
+- Verification (Playwright tests, evidence)
+- Cleanup
+- Engineering Score (≥4 required)
+- Logging to Memory (both engineering and design decisions)
+
+### Authority
+
+- **Specialist brain = authority in their domain**
+  - Design Brain decides layout, hierarchy, spacing, states, affordances
+  - Trading Brain decides entry/exit strategy, risk management
+  - MBA Brain decides market positioning, pricing strategy
+
+- **Engineering Brain = authority on correctness**
+  - Verification, testing, automation
+  - Evidence, cleanup, memory
+  - Final integration decisions
 
 ### Memory Integration
 
-Design decisions are logged to Engineering Memory database:
-- Table: `design_decisions` (to be created)
-- Links to `experience_log` via task_id
-- Searchable for future UI work
-
-### Non-Delegation Cases
-
-Design Brain is NOT required for:
-- Artifact Type = Script
-- Artifact Type = Test
-- Artifact Type = Automation
-- Engineering Mode = API (headless services)
-- Engineering Mode = AGENTIC (automation workflows)
-- Product Target = API_SERVICE, LIBRARY, SCRIPT
-
-For these cases, Engineering Brain runs the full workflow alone.
+All specialist brain outputs are logged to Engineering Memory:
+- `design_decisions` - Design Brain outputs
+- `trading_decisions` - Trading Brain outputs (future)
+- `business_decisions` - MBA Brain outputs (future)
+- All link to `experience_log` for cross-brain learning
 
 ---
 
