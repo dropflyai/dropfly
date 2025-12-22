@@ -56,6 +56,13 @@ For any task:
 - Recipe: `Engineering/Solutions/Recipes/CI.md`
 - Runbook: `Engineering/Solutions/Runbooks/AutomationBroken.md`
 
+### Secrets Detection (Pre-Commit Security Gate)
+- Recipe: `Engineering/Solutions/Recipes/SecretsDetection.md`
+- Authority: `Engineering/Security.md`
+- Gate: `Engineering/Checklist.md` - Security Gate C.1
+- Severity: P0 CRITICAL (public exposure of active credentials)
+- Prevention: `.gitignore-template` in `Engineering/`
+
 ---
 
 ## Regression Memory (Must Be Updated)

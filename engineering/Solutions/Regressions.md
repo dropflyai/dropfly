@@ -285,6 +285,18 @@ A system that logs its failures is a system that improves.
 
 ## Known Regressions (Most Recent)
 
+### Secrets Committed to Public Repository
+- **Symptom:** GitHub blocks push, secrets exposed in git history (`.env.master`, `AUTOMATION-GUIDE.md`)
+- **Root Cause:** No pre-commit secrets detection gate, missing .gitignore patterns
+- **Incorrect Behavior:** Committing files with API keys, AWS credentials without verification
+- **Correct Solution:** Mandatory Security Gate C.1 before every commit (visual inspection + .gitignore check)
+- **Enforced Path:** `Engineering/Checklist.md` - Security Gate C.1, `Engineering/Security.md` - Secrets Handling section
+- **Prevention Mechanism:** Pre-commit secrets inspection, comprehensive .gitignore template
+- **Severity:** P0 CRITICAL (public repo exposure of active credentials)
+- **Date Logged:** 2025-12-22
+- **Incident:** TradeFly project - AWS keys and OpenAI API key exposed in public GitHub history, blocked 80 commits from pushing
+- **Recovery:** Rotate all exposed secrets, BFG Repo-Cleaner to remove from history, force push cleaned history
+
 ### Screenshot Content Verification Failure
 - **Symptom:** Screenshots taken but show wrong content (login screen when claiming "portfolio page")
 - **Root Cause:** Verification only checked "screenshot exists", not "screenshot matches claim"

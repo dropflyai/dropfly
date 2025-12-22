@@ -206,6 +206,27 @@ Use specialist brains as needed throughout implementation. No fixed sequence req
 - [ ] Temporary debug artifacts removed
 - [ ] Folder structure remains clean and intentional
 
+### C.1) Security Gate - Secrets Detection (MANDATORY BEFORE COMMIT)
+- [ ] **Run:** `git diff --cached` and visually inspect for secrets
+- [ ] **Check for:** API keys, tokens, passwords, AWS keys, private keys, credentials
+- [ ] **Verify:** `.env`, `.env.*`, `*credentials*`, `*secret*`, `*key*` files are in `.gitignore`
+- [ ] **Confirm:** `git status` does NOT show any `.env` or credential files
+- [ ] **If secrets found:** STOP, remove from staging, add to `.gitignore`, re-stage
+
+**Forbidden patterns (NEVER commit):**
+- Lines containing: `api_key=`, `API_KEY=`, `secret=`, `password=`, `token=`
+- Files: `.env`, `.env.local`, `.env.master`, `credentials.json`, `secrets.json`
+- AWS keys (starts with `AKIA`), private keys (`-----BEGIN`), JWTs (`eyJ`)
+
+**If secrets accidentally staged:**
+```bash
+git reset HEAD <file>  # Unstage
+echo "<file>" >> .gitignore  # Add to gitignore
+git add .gitignore
+```
+
+**Enforcement:** This gate is MANDATORY. Skipping = P0 security violation.
+
 ### D) Memory Updated (Required When Applicable)
 If the work discovered or confirmed a repeatable solution:
 - [ ] Update `Engineering/Solutions/SolutionIndex.md`
