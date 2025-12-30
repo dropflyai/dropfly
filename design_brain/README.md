@@ -3,6 +3,8 @@
 A comprehensive design operating system that guides the entire UX process,
 from discovery through testing, producing unique, industry-appropriate designs.
 
+**Now includes game development support via MCP-controlled tools (Blender, Unity, Unreal).**
+
 ---
 
 ## What This System Does
@@ -105,6 +107,16 @@ design_brain/
 │   ├── DesignPatterns.md        # Extracted patterns from experience
 │   ├── DesignFailures.md        # Failed designs & lessons
 │   └── StyleDecisions.md        # Visual/style learnings
+│
+├── 3D-GameDev/                  # Game Development Extension
+│   ├── README.md                # Game dev overview & capabilities
+│   ├── WebGameEngines.md        # Phaser, Babylon.js, Three.js, R3F
+│   ├── BlenderWorkflow.md       # 3D modeling via MCP
+│   ├── UnityWorkflow.md         # Unity development via MCP
+│   ├── UnrealWorkflow.md        # Unreal development via MCP
+│   ├── GameUXPatterns.md        # HUDs, menus, tutorials, inventories
+│   ├── AssetPipeline.md         # Asset creation & optimization
+│   └── MCPSetupGuide.md         # Complete MCP setup guide
 │
 ├── eval/                        # Quality Enforcement
 │   ├── A11yRules.md             # Accessibility requirements
@@ -328,6 +340,43 @@ See `Memory/README.md` for full documentation.
 
 ---
 
+## Game Development (3D-GameDev Extension)
+
+The design brain now supports game development:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    GAME DEVELOPMENT MODES                       │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  WEB GAMES (Code-Only)                                          │
+│  Claude writes code → Browser runs game                         │
+│  Engines: Phaser, Babylon.js, Three.js, React Three Fiber       │
+│                                                                 │
+│  3D TOOLS (MCP-Controlled)                                      │
+│  Claude sends commands → Tools execute on your machine          │
+│  Tools: Blender (51 tools), Unity, Unreal (experimental)        │
+│                                                                 │
+│  HYBRID (Best of Both)                                          │
+│  Create assets in Blender → Export to web game engine           │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Quick Start for Game Dev
+
+```
+Web 2D Game:  3D-GameDev/WebGameEngines.md → Phaser section
+Web 3D Game:  3D-GameDev/WebGameEngines.md → Babylon.js section
+3D Modeling:  3D-GameDev/MCPSetupGuide.md → Set up Blender MCP
+Unity Game:   3D-GameDev/MCPSetupGuide.md → Set up Unity MCP
+Unreal Game:  3D-GameDev/MCPSetupGuide.md → Set up Unreal MCP
+```
+
+See `3D-GameDev/README.md` for full documentation.
+
+---
+
 ## Getting Started
 
 1. Read `DesignPlaybook.md` for core principles
@@ -349,10 +398,11 @@ See `Memory/README.md` for full documentation.
 | Templates | 1 |
 | Patterns | 14 |
 | Memory | 5 |
+| 3D-GameDev | 8 |
 | Evaluation | 4 |
 | Core docs | 4 |
 | README | 1 |
-| **Total** | **54** |
+| **Total** | **62** |
 
 ---
 
