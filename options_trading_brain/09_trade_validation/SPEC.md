@@ -57,14 +57,15 @@ This module is **pure validation logic**. It reads upstream state and produces a
 | **Context freshness checks** | Verify inputs are still valid and fresh |
 | **Regime drift detection** | Check if regime has changed since signal |
 | **Liquidity drift detection** | Check if liquidity has deteriorated |
-| **Kill-switch enforcement** | Honor global and per-symbol kill switches |
-| **Stand-down enforcement** | Honor risk state modes |
+| **Kill-switch enforcement (ENTRY only)** | Block ENTRY signals when kill-switch active; EXIT and STAND_DOWN signals ALWAYS pass |
+| **Stand-down enforcement** | Honor risk state modes (EXIT signals still allowed) |
 | **Circuit-breaker enforcement** | Honor system-level circuit breakers |
 | **Event blackout enforcement** | Block trades during earnings/FOMC/etc. |
 | **Duplicate execution prevention** | Prevent same signal from executing twice |
 | **Validation outcome production** | APPROVED, REJECTED, or DEFERRED |
 | **Validation event logging** | Record all validation attempts |
 | **Retry management** | Handle DEFERRED signals with retry logic |
+| **Exit-safe guarantee** | EXIT_FULL, EXIT_PARTIAL, and STAND_DOWN signals are NEVER blocked by kill-switch |
 
 ### 2.2) This Module Does NOT Own
 
@@ -519,21 +520,30 @@ Any hard gate failure results in immediate REJECTED outcome.
 ```
 HARD GATES (in evaluation order):
 
-1. GLOBAL_KILL_SWITCH_GATE
+1. GLOBAL_KILL_SWITCH_GATE (ENTRY SIGNALS ONLY)
+   Applies: signal_type in [ENTRY_LONG, ENTRY_SHORT, SQUEEZE_FAST_RELEASE, SQUEEZE_CONFIRMED_RELEASE]
+   Bypassed: signal_type in [EXIT_FULL, EXIT_PARTIAL, STAND_DOWN] — ALWAYS PASS
    Check: ConfigContract.get_bool("validation.kill_switch") == false
    Check: RiskState.kill_switch_active == false
-   Failure: REJECTED
+   Failure: REJECTED (ENTRY only)
    Reason: "global_kill_switch_active"
+   Note: EXIT and STAND_DOWN signals are NEVER blocked by this gate
 
-2. SYMBOL_KILL_SWITCH_GATE
+2. SYMBOL_KILL_SWITCH_GATE (ENTRY SIGNALS ONLY)
+   Applies: signal_type in [ENTRY_LONG, ENTRY_SHORT, SQUEEZE_FAST_RELEASE, SQUEEZE_CONFIRMED_RELEASE]
+   Bypassed: signal_type in [EXIT_FULL, EXIT_PARTIAL, STAND_DOWN] — ALWAYS PASS
    Check: ConfigContract.get_bool("validation.kill_switch.{symbol}") == false
-   Failure: REJECTED
+   Failure: REJECTED (ENTRY only)
    Reason: "symbol_kill_switch_active: {symbol}"
+   Note: EXIT and STAND_DOWN signals are NEVER blocked by this gate
 
-3. STAND_DOWN_GATE
+3. STAND_DOWN_GATE (ENTRY SIGNALS ONLY)
+   Applies: signal_type in [ENTRY_LONG, ENTRY_SHORT, SQUEEZE_FAST_RELEASE, SQUEEZE_CONFIRMED_RELEASE]
+   Bypassed: signal_type in [EXIT_FULL, EXIT_PARTIAL, STAND_DOWN] — ALWAYS PASS
    Check: RiskState.risk_mode != STAND_DOWN
-   Failure: REJECTED
+   Failure: REJECTED (ENTRY only)
    Reason: "risk_mode_stand_down"
+   Note: EXIT signals are ALWAYS allowed in STAND_DOWN mode (this is the intended behavior)
 
 4. REDUCE_ONLY_GATE (for ENTRY signals)
    Check: IF signal_type in [ENTRY_*, SQUEEZE_*]:
@@ -542,10 +552,13 @@ HARD GATES (in evaluation order):
    Failure: REJECTED
    Reason: "reduce_only_no_entries"
 
-5. CIRCUIT_BREAKER_GATE
+5. CIRCUIT_BREAKER_GATE (ENTRY SIGNALS ONLY)
+   Applies: signal_type in [ENTRY_LONG, ENTRY_SHORT, SQUEEZE_FAST_RELEASE, SQUEEZE_CONFIRMED_RELEASE]
+   Bypassed: signal_type in [EXIT_FULL, EXIT_PARTIAL, STAND_DOWN] — ALWAYS PASS
    Check: RiskState.circuit_breaker_active == false
-   Failure: REJECTED
+   Failure: REJECTED (ENTRY only)
    Reason: "circuit_breaker_active: {reason}"
+   Note: EXIT signals are ALWAYS allowed when circuit breaker is active
 
 6. SIGNAL_TTL_GATE
    Check: Clock.now_utc() < SignalIntent.expiry_timestamp_utc
@@ -718,9 +731,11 @@ Phase 4: SOFT CHECKS (warn/defer)
 PRECEDENCE RULES:
 - Gates evaluated in order; first hard failure stops evaluation
 - Soft gates only evaluated if all hard gates pass
-- STAND_DOWN overrides everything except KILL_SWITCH
-- KILL_SWITCH is absolute (even EXIT signals blocked)
-- Duplicate check always runs regardless of other gates
+- EXIT_SAFE GUARANTEE (ABSOLUTE): EXIT_FULL, EXIT_PARTIAL, and STAND_DOWN signals
+  bypass kill-switch, circuit-breaker, and stand-down gates unconditionally
+- For ENTRY signals: KILL_SWITCH > STAND_DOWN > CIRCUIT_BREAKER > all other gates
+- STAND_DOWN mode blocks ENTRY signals but allows all EXIT signals
+- Duplicate check always runs regardless of other gates (applies to all signal types)
 ```
 
 ---
@@ -855,7 +870,29 @@ ALGORITHM:
 4. EVALUATE HARD GATES (Phase 1-3)
    gate_results = []
 
+   # EXIT-SAFE CHECK (ABSOLUTE PRIORITY)
+   is_exit_signal = signal_type IN [EXIT_FULL, EXIT_PARTIAL, STAND_DOWN]
+   exit_safe_gates = [
+     "GLOBAL_KILL_SWITCH_GATE",
+     "SYMBOL_KILL_SWITCH_GATE",
+     "STAND_DOWN_GATE",
+     "CIRCUIT_BREAKER_GATE"
+   ]
+
    FOR each hard_gate in HARD_GATES_ORDERED:
+     # EXIT signals automatically bypass kill-switch and safety gates
+     IF is_exit_signal AND hard_gate.gate_id IN exit_safe_gates:
+       result = ValidationGateResult(
+         gate_id=hard_gate.gate_id,
+         gate_name=hard_gate.name,
+         gate_type=HARD,
+         passed=true,  # FORCED PASS for EXIT signals
+         impact=NONE,
+         check_description="EXIT_SAFE_BYPASS: EXIT signals are never blocked by this gate"
+       )
+       gate_results.append(result)
+       CONTINUE  # Skip actual gate evaluation
+
      result = evaluate_gate(hard_gate, context)
      gate_results.append(result)
 
@@ -1288,6 +1325,8 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 | **Max retries exhausted** | Retry logic | REJECTED | INFO: "retries_exhausted" |
 | **Rate limit exceeded** | Request validation | REJECTED | WARN: "rate_limit" |
 | **Write failure** | Store write | Log error, continue | ERROR: "write_failed" |
+| **EXIT signal blocked by kill-switch (BUG)** | Gate 1-2 blocking EXIT signal | CRITICAL BUG — EXIT signals must NEVER be blocked | CRITICAL: "exit_safe_violation" |
+| **Kill-switch misconfiguration** | Kill-switch blocking EXIT or STAND_DOWN | Alert operations, override gate to PASS | CRITICAL: "exit_safe_override_applied" |
 
 ---
 
@@ -1335,8 +1374,10 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 
 - [x] Deny-by-default philosophy documented
 - [x] Duplicate execution prevention (Gate 9)
-- [x] Kill switch honored absolutely
+- [x] Kill switch honored for ENTRY signals
+- [x] EXIT-SAFE GUARANTEE: EXIT_FULL, EXIT_PARTIAL, and STAND_DOWN signals are NEVER blocked by kill-switch, stand-down, or circuit-breaker gates
 - [x] All failures logged
+- [x] Exit-safe violation detection and alerting
 
 ### 12.7) Test Plan
 
@@ -1352,6 +1393,7 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 | **Drift Detection** | Regime drift; liquidity drift |
 | **Deny-by-Default** | Missing data → REJECT; unknown state → REJECT |
 | **End-to-End** | Full validation flow; write contract |
+| **EXIT-SAFE (CRITICAL)** | EXIT_FULL with kill-switch active → APPROVED; EXIT_PARTIAL with kill-switch active → APPROVED; STAND_DOWN signal with kill-switch active → APPROVED; EXIT signal with circuit-breaker active → APPROVED; ENTRY signal with kill-switch active → REJECTED; verify exit-safe bypass logged correctly |
 
 ---
 
@@ -1398,7 +1440,8 @@ Type: SPEC
 Summary:
 Add trade validation specification defining the final gate before execution.
 Implements deny-by-default validation with 22 gates, 3 outcomes, and full
-state machine for validation lifecycle.
+state machine for validation lifecycle. EXIT-SAFE GUARANTEE: EXIT and STAND_DOWN
+signals are NEVER blocked by kill-switch, circuit-breaker, or stand-down gates.
 
 Contents:
 - 6 canonical schemas (TradeValidationRequest, TradeValidationResult, ValidationGateResult, TradeValidationState, TradeValidationProvenance, TradeValidationMetrics)
@@ -1407,9 +1450,11 @@ Contents:
 - 3 outcomes (APPROVED, REJECTED, DEFERRED)
 - 5-state machine with retry logic
 - Deterministic validation algorithm
+- EXIT-SAFE bypass for EXIT_FULL, EXIT_PARTIAL, and STAND_DOWN signals
 
 Key Features:
 - Deny-by-default philosophy
+- EXIT-SAFE GUARANTEE (kill-switch/circuit-breaker never block exits)
 - Duplicate execution prevention
 - Regime and liquidity drift detection
 - Configurable retry with backoff
@@ -1429,7 +1474,7 @@ Files:
 - options_trading_brain/09_trade_validation/SPEC.md
 
 Commit Message:
-[OptionsBrain] 09_trade_validation (COMMIT-0013): final gate validation, 22 gates, deny-by-default, retry state machine
+[OptionsBrain] 09_trade_validation: finalize validation gates with exit-safe kill-switch behavior
 
 CONTRACT LOCKED - Changes require PATCH document
 ```
