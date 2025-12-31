@@ -1,141 +1,114 @@
 ────────────────────────────────────────────────────────
-ENGINEERING BRAIN — MANDATORY ENFORCEMENT
+MULTI-BRAIN SYSTEM — SPECIALIST ORCHESTRATION
 ────────────────────────────────────────────────────────
 
-You are operating inside a repository governed by the **Engineering Brain** located at `/engineering`.
+This repository uses a **multi-brain architecture** where specialist brains handle different domains.
 
-This system is authoritative and non-optional.
+All brains are located in: `/prototype_x1000/`
 
-### Absolute Rules
-- You MUST obey the Engineering Brain hierarchy.
-- You MUST NOT bypass governance, automation, or verification.
-- You MUST NOT guess, assume, or hand-wave.
-- You MUST stop if rules cannot be satisfied.
+## Brain System
 
-### Mandatory Preflight (Before Any Work)
-Before producing output or code, you MUST:
-1. Declare Engineering Mode(s) from `engineering/Modes.md`
-2. Consult `engineering/Checklist.md`
-3. Consult `engineering/Solutions/SolutionIndex.md`
-4. Consult `engineering/Automations/AutomationIndex.md`
-5. Select the appropriate Output Contract from `engineering/OutputContracts.md`
+Each brain is **self-governing** with its own `CLAUDE.md` that defines:
+- Authority hierarchy
+- Execution rules
+- Quality gates
+- Memory/learning system
+- Ability to call other brains
+- COMMIT RULE (ask before committing)
 
-If you cannot complete preflight, STOP and report why.
+## Available Brains (37 Total)
 
-### Automation Enforcement
-- If an automation exists, you MUST use it.
-- If automation fails, you MUST follow:
-  `engineering/Automations/Runbooks/BrokenAutomation.md`
-- Silent manual fallback is forbidden.
+### Core Brains (Complete)
 
-### Verification Enforcement
-- Claims require evidence.
-- UI work requires Playwright (Chromium default).
-- Database changes require migrations when automation exists.
-- Logs must be retrieved automatically when possible.
+#### Engineering Brain (`/prototype_x1000/engineering_brain/`)
+**Governs:** Code, automation, infrastructure, testing, DevOps
+**Instructions:** `/prototype_x1000/engineering_brain/CLAUDE.md`
+**Use when:** Building, deploying, or maintaining software
 
-### Memory Enforcement
-If work reveals a repeatable solution or prevents a loop, you MUST:
-- Update SolutionIndex
-- Add or update a Solution/Recipe
-- Log a Regression when applicable
+#### Design Brain (`/prototype_x1000/design_brain/`)
+**Governs:** UI/UX, visual identity, user research, accessibility
+**Instructions:** `/prototype_x1000/design_brain/CLAUDE.md`
+**Use when:** Designing interfaces, user experiences, or visual systems
 
-### Stop Conditions
-You MUST stop and report failure if:
-- Verification cannot be completed
-- Automation cannot be repaired or documented
-- Evidence cannot be produced
-- Engineering Checklist fails
+#### Options Trading Brain (`/prototype_x1000/options_trading_brain/`)
+**Governs:** Trading algorithms, market analysis, options strategies
+**Instructions:** `/prototype_x1000/options_trading_brain/CLAUDE.md`
+**Use when:** Building trading systems or analyzing markets
 
-### Authority Reminder
-The Engineering Brain overrides:
-- conversational preference
-- speed optimizations
-- partial answers
-- speculative solutions
+### CEO Brain (`/prototype_x1000/ceo_brain/` - Placeholder)
+**Governs:** Orchestration of all brains
+**Status:** Under development
+**Future:** Will coordinate multi-brain workflows to build complete businesses
 
-You are expected to behave as a **principal-level engineer** at all times.
+### Placeholder Brains (34 remaining)
 
-Failure to comply is a correctness failure.
+**Business & Strategy:**
+- MBA Brain, Finance Brain, Operations Brain, Legal Brain
 
-────────────────────────────────────────────────────────
+**Product & Design:**
+- Product Brain, Game Design Brain, Content Brain, Localization Brain
 
-────────────────────────────────────────────────────────
-ENGINEERING BRAIN AUTHORITY
-────────────────────────────────────────────────────────
+**Growth & Revenue:**
+- Marketing Brain, Sales Brain, Growth Brain, Partnership Brain, Customer Success Brain
 
-## Runtime Enforcement
+**Technical:**
+- Data Brain, Security Brain, Cloud Brain, Mobile Brain, QA Brain
+- AI Brain, Automation Brain, Analytics Brain, DevRel Brain
 
-The `/engineering` directory is the **highest authority** for all engineering tasks in this repository.
+**Marketing Channels:**
+- Branding Brain, Email Brain, Social Media Brain, Video Brain, Community Brain
 
-You MUST consult the Engineering Brain before:
-- Planning any implementation
-- Writing or modifying code
-- Proposing testing or verification strategies
-- Making architectural decisions
-- Recommending workflows
+**Business Operations:**
+- Support Brain, Investor Brain, Pricing Brain, Innovation Brain
 
-## Hard Execution Gates
+**People:**
+- HR Brain, Research Brain
 
-The following are **blocking gates** that MUST pass before proceeding:
+## How Brains Interact
 
-### Engineering Checklist
-- You MUST complete all Preflight checklist items before implementation
-- You MUST declare Engineering Mode (exactly one primary)
-- You MUST declare Artifact Type (Full Document, Fragment, Component, Script, Automation, Test)
-- You MUST consult SolutionIndex and AutomationIndex
-- Implementation is **blocked** until checklist gates pass
+```
+┌─────────────────────────────────────────────────────────────┐
+│                                                             │
+│   DESIGN BRAIN ←────────────────────────→ ENGINEERING BRAIN │
+│        │                                         │          │
+│        │    "Need help with layout"              │          │
+│        │    ────────────────────────→            │          │
+│        │                                         │          │
+│        │    "Need help with component patterns"  │          │
+│        │    ←────────────────────────            │          │
+│        │                                         │          │
+│        └───────────── ↕ ─────────────────────────┘          │
+│                       │                                     │
+│                       ▼                                     │
+│              OTHER SPECIALIST BRAINS                        │
+│         (MBA, Marketing, Sales, Game Design, etc.)          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+```
 
-### Output Contracts
-- All engineering outputs MUST conform to `engineering/OutputContracts.md`
-- Missing required sections = invalid output
-- You MUST select and apply the appropriate contract structure
+## Execution Rules
 
-### Automation Preference Hierarchy
-- You MUST follow the automation hierarchy in `engineering/Solutions/ToolAuthority.md`
-- Manual steps are **invalid** if any higher-level automation exists
-- You MUST justify manual steps by proving automation is impossible
-- You MUST consult `engineering/Automations/AutomationIndex.md` before proposing workflows
+1. **Identify the right brain** for the task
+2. **Consult that brain's CLAUDE.md** before starting
+3. **Follow that brain's authority hierarchy**
+4. **Call other brains** when their expertise is needed
+5. **Log to memory** after completing significant work
+6. **COMMIT after every change** — ask user before committing
 
-### Governance Violations
-- You MUST log governance violations to `engineering/Solutions/Regressions.md` when detected
-- Violations include: multiple primary modes, missing artifact type, verification misalignment, assumptions without evidence, skipped preflight
-- Repeated violations MUST trigger stronger constraints
+## When Multiple Brains Apply
 
-## Conflict Resolution
+If a task spans multiple domains:
+1. Identify the **primary brain** (where most work happens)
+2. Start with that brain's CLAUDE.md
+3. Call secondary brains as needed for their expertise
+4. Each brain maintains its own quality gates
 
-If any Engineering Brain rule conflicts with a user request:
-- The Engineering Brain takes precedence
-- You MUST explain to the user which rule prevents the requested action
-- You MUST propose an alternative that satisfies both the user's goal and governance constraints
-- You may NOT bypass governance to satisfy user preference
+## Brain Roadmap
 
-## Execution Discipline
-
-- **Slow down** rather than guess
-- **Retrieve evidence** rather than assume
-- **Consult documentation** (Solutions, Automations) rather than invent
-- **Stop and report** when gates fail rather than proceed with partial solutions
-
-## Required Behavior
-
-You MUST:
-- Read Engineering Brain files when referenced
-- Apply checklist gates before implementation
-- Use automation when it exists
-- Produce evidence for verification claims
-- Log governance violations when detected
-- Structure outputs according to OutputContracts
-
-You MUST NOT:
-- Skip preflight steps to save time
-- Bypass automation to simplify workflows
-- Assume facts that can be retrieved
-- Proceed with invalid artifact classification
-- Ignore verification failures
-
-## Why This Exists
-
-The Engineering Brain enforces reliability and correctness over speed and convenience. By requiring structured preflight, evidence-driven verification, automation preference, and governance self-logging, the system prevents repeated mistakes, eliminates manual fallback loops, and ensures engineering quality compounds over time. This constraint exists to make Claude behave like a principal engineer who prioritizes long-term system health over short-term delivery speed.
+See `/prototype_x1000/BRAIN_ROADMAP.md` for:
+- Full list of all 37 brains
+- Build order and priority
+- Specifications for each brain
+- How to build new brains
 
 ────────────────────────────────────────────────────────
