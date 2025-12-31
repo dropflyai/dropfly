@@ -1,0 +1,138 @@
+# RIO ALLEN
+**Full-Stack Software Engineer**
+
+📧 [your-email@example.com] | 💼 [linkedin.com/in/yourprofile] | 🌐 [github.com/yourusername] | 📍 Remote (US-based)
+
+---
+
+## PROFESSIONAL SUMMARY
+
+Full-stack software engineer with 3+ years building production applications across web, mobile, and AI-powered systems. Experienced in developing algorithmic trading platforms, SaaS products, and real-time data processing systems. Strong foundation in Python, TypeScript/React, and cloud infrastructure with proven ability to ship complete products from concept to production.
+
+**Core Competencies:** Full-Stack Development • Python & TypeScript • React & Next.js • AWS & Cloud Infrastructure • API Design • Mobile Development (iOS) • AI/ML Integration • Database Architecture • Automated Testing
+
+---
+
+## TECHNICAL SKILLS
+
+**Languages:** Python, TypeScript, JavaScript, Swift, SQL, Bash
+**Frontend:** React, Next.js 15, Tailwind CSS, HTML5, CSS3, responsive design
+**Backend:** Node.js, FastAPI, Express, RESTful APIs, WebSocket
+**Mobile:** React Native (Expo), Swift/SwiftUI, Capacitor
+**Databases:** PostgreSQL, Supabase, SQLite, Redis, Vector DBs (Weaviate)
+**Cloud & DevOps:** AWS (EC2, S3), Vercel, Docker, CI/CD, GitHub Actions
+**AI/ML:** Claude API, OpenAI, RAG systems, vector embeddings
+**Testing:** Playwright, Jest, end-to-end testing, manual QA
+**Tools:** Git, npm, FFmpeg, OpenCV, n8n automation
+
+---
+
+## PROFESSIONAL EXPERIENCE
+
+### Full-Stack Software Engineer (Independent)
+**Self-Employed / Contract** | *2022 - Present*
+
+**TradeFly AI - Algorithmic Options Trading Platform**
+- Developed real-time options trading platform processing market data for 20+ stocks with automated signal generation
+- Implemented Black-Scholes pricing model with Greeks calculations (Delta, Gamma, Theta, Vega, Rho) for institutional-grade risk metrics
+- Built multi-timeframe technical analysis engine using RSI, MACD, Bollinger Bands, and candlestick pattern recognition
+- Designed WebSocket-based real-time dashboard with Next.js frontend and Python backend (14,779 lines of production code)
+- Integrated Polygon.io market data API with async Python pipeline for sub-second data processing
+- Deployed production system on AWS EC2 with automated deployment pipeline
+- **Technologies:** Python, Next.js, TypeScript, PostgreSQL, AWS EC2, WebSocket, Polygon.io API
+
+**LeadFly AI - Lead Intelligence & Enrichment Platform**
+- Architected multi-source data enrichment pipeline integrating Apollo, Clay, Clearbit, and Proxycurl APIs
+- Implemented duplicate detection system achieving 99.2% accuracy using 5+ algorithms (fuzzy matching, soundex, fingerprint analysis)
+- Built AI-powered competitive intelligence engine using Claude 3.5 Sonnet for strategic lead analysis
+- Designed async Python pipeline with PostgreSQL, Weaviate vector database, and Redis caching
+- Created risk assessment engine with behavioral pattern analysis and temporal proximity detection
+- **Technologies:** Python, PostgreSQL, Weaviate, Redis, Claude API, async/await patterns
+
+**WatermarkRemover - AI-Powered Video Processing Suite**
+- Developed computer vision-based watermark removal tool supporting 5 removal methods using OpenCV inpainting algorithms
+- Built social media cropper supporting 40+ platform-specific presets with FFmpeg video processing
+- Implemented video format converter handling 8 formats and 5 codecs with AI compression intelligence
+- Integrated 6 cloud storage providers (Google Drive, Dropbox, Airtable, Supabase, AWS S3)
+- Created freemium SaaS business model ($9.99 Pro, $49.99 Enterprise tiers)
+- **Technologies:** Python, OpenCV, Node.js, FFmpeg, Next.js, AWS S3, computer vision
+
+**VoiceFly - AI Voice Agent Platform**
+- Built voice appointment scheduling platform supporting multiple industries (salons, restaurants, services)
+- Integrated Vapi voice AI with n8n automation workflows for multi-step booking processes
+- Developed Next.js frontend with 258 production files and comprehensive state management
+- Connected to calendar, booking, and CRM systems via REST APIs
+- **Technologies:** Next.js, TypeScript, Vapi AI, n8n, API integration
+
+**Mobile Applications**
+- **TradeFly iOS:** Native Swift app with real-time trading signals and portfolio tracking, deployed to App Store
+- **FitFly:** React Native fitness tracking app with workout management and gamification using Firebase and Expo
+- Implemented production deployment pipelines using EAS (Expo Application Services) and Xcode Cloud
+- **Technologies:** Swift, SwiftUI, React Native, Expo, Firebase, App Store deployment
+
+**Additional SaaS Projects (15+ Production Applications):**
+- TipFly AI (social media analytics), LawFly (legal practice management), HomeFly AI (property management)
+- MathFly (educational platform), Curriculum Pilot (AI art generation), PDF Editor iOS
+- Deployed production systems using Vercel, Supabase, AWS with automated CI/CD pipelines
+
+---
+
+## KEY PROJECTS & CONTRIBUTIONS
+
+**Engineering Infrastructure & Automation**
+- Designed "Engineering Brain" system using SQLite for institutional memory and pattern recognition across 50+ projects
+- Created systematic engineering governance framework with automated deployment workflows
+- Built CLI-driven database migration tools eliminating manual dashboard operations
+- Implemented comprehensive testing strategy using Playwright for end-to-end verification
+
+**Real-Time Systems**
+- Developed WebSocket-based trading dashboard with sub-second market data updates
+- Built async Python pipelines processing concurrent API requests across multiple data sources
+- Optimized database queries and implemented Redis caching for high-traffic applications
+
+**AI/ML Integration**
+- Integrated Claude 3.5 Sonnet and OpenAI APIs into production applications
+- Implemented RAG (Retrieval-Augmented Generation) systems using vector databases
+- Built semantic search capabilities using Weaviate for intelligent data retrieval
+
+---
+
+## EDUCATION
+
+**[Your Degree]** | [University Name] | [Year] *(Optional - include if you have relevant degree)*
+
+**Relevant Coursework / Self-Study:**
+- Algorithms & Data Structures
+- Computer Vision (OpenCV)
+- Quantitative Finance & Options Pricing Models
+- System Design & Architecture
+- Cloud Computing (AWS Solutions Architect concepts)
+
+---
+
+## CERTIFICATIONS & CONTINUOUS LEARNING *(Optional - if applicable)*
+
+- AWS Cloud Practitioner *(if you have it)*
+- React & Next.js Advanced Patterns
+- Algorithmic Trading & Quantitative Analysis
+- Python for Data Science & Machine Learning
+
+---
+
+## ACHIEVEMENTS
+
+- Built and deployed 40+ applications across web, mobile, and AI platforms
+- Achieved 99.2% accuracy in duplicate detection algorithms for lead intelligence system
+- Deployed multiple iOS applications to App Store with production user base
+- Developed institutional-grade algorithmic trading system processing real-time market data
+- Created systematic engineering process resulting in zero production incidents across 15+ SaaS deployments
+
+---
+
+## PROFESSIONAL INTERESTS
+
+Algorithmic Trading Systems • AI/ML Applications • Real-Time Data Processing • System Architecture • Financial Technology • Computer Vision • Mobile Development
+
+---
+
+*References available upon request*
