@@ -22,21 +22,21 @@ All brains are located in: `/prototype_x1000/`
 
 ## Available Specialist Brains (37 Total)
 
-### Current Brains (2 Complete + 1 In Progress)
+### Current Brains (3 Complete + 1 In Progress)
 
 | Brain | Location | Specialty | Status |
 |-------|----------|-----------|--------|
 | Engineering Brain | `/prototype_x1000/engineering_brain/` | Code, automation, infrastructure, DevOps | Complete |
 | Design Brain | `/prototype_x1000/design_brain/` | UI/UX, visual identity, user research | Complete |
+| MBA Brain | `/prototype_x1000/mba_brain/` | Business strategy, operations, leadership | Complete |
 | Options Trading Brain | `/prototype_x1000/options_trading_brain/` | Trading algorithms, market analysis | In Progress |
 | CEO Brain | `/prototype_x1000/ceo_brain/` | Orchestration | Placeholder |
 
-### Planned Brains (34 Placeholder Folders)
+### Planned Brains (33 Placeholder Folders)
 
 **Business & Strategy**
 | Brain | Specialty |
 |-------|-----------|
-| MBA Brain | Business strategy, finance, operations, scaling |
 | Finance Brain | Accounting, budgeting, financial modeling, fundraising |
 | Operations Brain | Supply chain, logistics, process optimization |
 | Legal Brain | Contracts, compliance, IP protection |

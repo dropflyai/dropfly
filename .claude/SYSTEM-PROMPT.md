@@ -35,15 +35,20 @@ Each brain is **self-governing** with its own `CLAUDE.md` that defines:
 **Instructions:** `/prototype_x1000/options_trading_brain/CLAUDE.md`
 **Use when:** Building trading systems or analyzing markets
 
+#### MBA Brain (`/prototype_x1000/mba_brain/`)
+**Governs:** Business strategy, operations, leadership, finance, marketing
+**Instructions:** `/prototype_x1000/mba_brain/CLAUDE.md`
+**Use when:** Strategic decisions, business planning, organizational design
+
 ### CEO Brain (`/prototype_x1000/ceo_brain/` - Placeholder)
 **Governs:** Orchestration of all brains
 **Status:** Under development
 **Future:** Will coordinate multi-brain workflows to build complete businesses
 
-### Placeholder Brains (34 remaining)
+### Placeholder Brains (33 remaining)
 
 **Business & Strategy:**
-- MBA Brain, Finance Brain, Operations Brain, Legal Brain
+- Finance Brain, Operations Brain, Legal Brain
 
 **Product & Design:**
 - Product Brain, Game Design Brain, Content Brain, Localization Brain
