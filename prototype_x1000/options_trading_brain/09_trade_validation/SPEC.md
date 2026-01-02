@@ -227,6 +227,21 @@ Logger:
   - log(level, message, context)
 ```
 
+### 3.6) From 02_data_store (Position Store)
+
+```
+PositionSnapshot (read-only, optional):
+  - symbol: string                   # REQUIRED
+  - direction: enum[LONG, SHORT]     # REQUIRED
+  - open_quantity: int               # REQUIRED. Current open position size
+  - entry_decision_id: string        # REQUIRED. Links to original sizing decision
+  - last_updated: datetime           # REQUIRED
+
+Note: If position_store is unavailable, fallback to
+PositionSizingDecision.quantity from the original entry signal.
+This input is used by EXIT_EXPOSURE_GATE to validate exit quantities.
+```
+
 ---
 
 ## 4) Canonical Output Schemas
@@ -585,6 +600,39 @@ HARD GATES (in evaluation order):
    Failure: REJECTED
    Reason: "duplicate_execution_attempt"
 
+9.5. EXIT_EXPOSURE_GATE (EXIT SIGNALS ONLY)
+     Applies: signal_type in [EXIT_FULL, EXIT_PARTIAL]
+     Skipped: signal_type NOT in [EXIT_FULL, EXIT_PARTIAL]
+
+     Check: Verify exit does not exceed open position
+
+     Validation:
+       1. Query current open position for (symbol, direction)
+          - Source: 02_data_store → position_store (read-only)
+          - If position_store unavailable: Use PositionSizingDecision.quantity from original entry
+
+       2. For EXIT_PARTIAL:
+          - exit_quantity <= open_position_quantity
+          - exit_quantity > 0
+
+       3. For EXIT_FULL:
+          - exit_quantity == open_position_quantity
+          - OR exit_quantity == 0 (interpreted as "close all")
+
+       4. For any exit:
+          - open_position_quantity > 0 (position must exist)
+
+     Fallback (if position lookup fails):
+       - Log WARNING: "position_lookup_failed"
+       - Allow exit with flag "position_unverified"
+       - Set quantity = min(requested_quantity, sizing_decision.quantity)
+
+     Failure: REJECTED
+     Reason: "exit_exceeds_position" or "no_position_to_exit"
+
+     Note: This gate ensures exits are REDUCE-ONLY operations. Prevents
+     malformed exit signals from creating unintended short positions.
+
 10. REGIME_MISMATCH_GATE
     Compare: SignalContextSnapshot.regime_classification.regime_type
              vs current RegimeClassification.regime_type
@@ -609,8 +657,25 @@ HARD GATES (in evaluation order):
 12. QUOTE_FRESHNESS_GATE
     Check: NormalizedQuote.timestamp_utc > Clock.now_utc() - max_quote_age
     Default: max_quote_age = 30,000 ms (30 seconds)
-    Failure: REJECTED
-    Reason: "stale_quote_data: {age_ms}ms"
+
+    EXIT-SAFE FALLBACK (for EXIT_FULL, EXIT_PARTIAL, STAND_DOWN signals):
+      IF quote is stale OR missing:
+        1. Attempt fallback: Use last_price from SignalContextSnapshot
+        2. IF fallback available AND age < 120,000 ms (2 minutes):
+           - PASS with flag "quote_fallback_used"
+           - Log WARNING: "exit_using_fallback_price"
+        3. IF fallback unavailable OR age >= 120,000 ms:
+           - PASS with flag "quote_unavailable_exit"
+           - Log WARNING: "exit_without_quote_verification"
+           - Note: Exits proceed anyway; market order implied
+
+    For ENTRY signals:
+      Failure: REJECTED
+      Reason: "stale_quote_data: {age_ms}ms"
+
+    Note: Exits are allowed with degraded quote data because closing
+    positions during market stress is more important than perfect
+    price verification.
 
 13. BAR_FRESHNESS_GATE
     Check: NormalizedBar.timestamp_utc within expected range for timeframe
@@ -710,6 +775,7 @@ Phase 2: SIGNAL/SIZING VALIDITY (instant reject)
   7. SIGNAL_LIFECYCLE_GATE
   8. SIZING_APPROVAL_GATE
   9. DUPLICATE_EXECUTION_GATE
+  9.5. EXIT_EXPOSURE_GATE (exit signals only — validates exit_qty <= open_qty)
 
 Phase 3: MARKET CONDITIONS (instant reject)
   10. REGIME_MISMATCH_GATE
@@ -842,6 +908,14 @@ ALGORITHM:
    - Check all required fields present
    - Check signal_id exists and matches SignalIntent
    - Check decision_id exists and matches PositionSizingDecision
+
+   EXIT-SPECIFIC SCHEMA VALIDATION (if signal_type in [EXIT_FULL, EXIT_PARTIAL]):
+   - Check signal_direction == NEUTRAL (exits must be directionally neutral)
+   - Check entry_price_zone is null or empty (exits don't have entry zones)
+   - Check quantity > 0 (cannot exit zero)
+   - IF EXIT_PARTIAL: Check 0 < quantity < total_position_size
+   - IF EXIT_FULL: Check quantity == total_position_size OR quantity == 0 (close all)
+   - IF any check fails: blocking_reason = "exit_schema_invalid: {details}"
 
    IF validation fails:
      RETURN TradeValidationResult(
@@ -1327,6 +1401,12 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 | **Write failure** | Store write | Log error, continue | ERROR: "write_failed" |
 | **EXIT signal blocked by kill-switch (BUG)** | Gate 1-2 blocking EXIT signal | CRITICAL BUG — EXIT signals must NEVER be blocked | CRITICAL: "exit_safe_violation" |
 | **Kill-switch misconfiguration** | Kill-switch blocking EXIT or STAND_DOWN | Alert operations, override gate to PASS | CRITICAL: "exit_safe_override_applied" |
+| **Exit exceeds position** | Gate 9.5 check | REJECTED immediately | WARN: "exit_exceeds_position" |
+| **No position to exit** | Gate 9.5 check | REJECTED immediately | WARN: "no_position_to_exit" |
+| **Position lookup failed** | Gate 9.5 fallback | PASS with flag "position_unverified" | WARN: "position_lookup_failed" |
+| **Exit with quote fallback** | Gate 12 fallback | PASS with flag "quote_fallback_used" | WARN: "exit_using_fallback_price" |
+| **Exit without quote verification** | Gate 12 fallback (extreme) | PASS with flag "quote_unavailable_exit" | WARN: "exit_without_quote_verification" |
+| **Exit schema invalid** | Step 2 validation | REJECTED immediately | ERROR: "exit_schema_invalid" |
 
 ---
 
@@ -1378,6 +1458,9 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 - [x] EXIT-SAFE GUARANTEE: EXIT_FULL, EXIT_PARTIAL, and STAND_DOWN signals are NEVER blocked by kill-switch, stand-down, or circuit-breaker gates
 - [x] All failures logged
 - [x] Exit-safe violation detection and alerting
+- [x] EXIT_EXPOSURE_GATE (9.5) ensures exits cannot exceed open position
+- [x] Quote fallback allows exits during degraded market data conditions
+- [x] Exit-specific schema validation prevents malformed exit signals
 
 ### 12.7) Test Plan
 
@@ -1394,6 +1477,9 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 | **Deny-by-Default** | Missing data → REJECT; unknown state → REJECT |
 | **End-to-End** | Full validation flow; write contract |
 | **EXIT-SAFE (CRITICAL)** | EXIT_FULL with kill-switch active → APPROVED; EXIT_PARTIAL with kill-switch active → APPROVED; STAND_DOWN signal with kill-switch active → APPROVED; EXIT signal with circuit-breaker active → APPROVED; ENTRY signal with kill-switch active → REJECTED; verify exit-safe bypass logged correctly |
+| **EXIT-EXPOSURE (CRITICAL)** | EXIT_PARTIAL with qty > position → REJECTED; EXIT_FULL with qty != position → REJECTED (unless qty == 0); EXIT with no open position → REJECTED; EXIT with position lookup failure → PASS with "position_unverified" flag; verify reduce-only guarantee enforced |
+| **EXIT-QUOTE-FALLBACK** | EXIT with fresh quote → normal flow; EXIT with stale quote (< 2 min) → PASS with "quote_fallback_used"; EXIT with no quote available → PASS with "quote_unavailable_exit"; ENTRY with stale quote → REJECTED |
+| **EXIT-SCHEMA** | EXIT with direction != NEUTRAL → REJECTED; EXIT with entry_price_zone set → REJECTED; EXIT with quantity == 0 and type EXIT_PARTIAL → REJECTED; valid EXIT_FULL with qty=0 (close all) → PASS |
 
 ---
 
@@ -1423,8 +1509,8 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 
 | Limitation | Impact | Mitigation |
 |------------|--------|------------|
-| No real-time quote streaming | May use slightly stale quotes | Freshness gates with tight thresholds |
-| No position awareness | Can't validate against existing positions | Relies on 10_risk_management checks |
+| No real-time quote streaming | May use slightly stale quotes | Freshness gates with tight thresholds; EXIT-SAFE fallback for exits |
+| Position lookup may fail | EXIT_EXPOSURE_GATE cannot verify qty | Fallback allows exit with "position_unverified" flag |
 | Static event calendar | May miss dynamic events | Config-driven blackout fallback |
 | No ML confidence adjustment | Confidence decay is linear | Conservative decay rate |
 
@@ -1433,20 +1519,27 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 ## 14) Proposed Git Commit
 
 ```
-Commit ID: COMMIT-0013
+Commit ID: COMMIT-0013 + PATCH_0013A
 Module: 09_trade_validation
-Type: SPEC
+Type: SPEC + PATCH
 
 Summary:
-Add trade validation specification defining the final gate before execution.
-Implements deny-by-default validation with 22 gates, 3 outcomes, and full
-state machine for validation lifecycle. EXIT-SAFE GUARANTEE: EXIT and STAND_DOWN
-signals are NEVER blocked by kill-switch, circuit-breaker, or stand-down gates.
+Trade validation specification with EXIT-SAFE guarantee and exit safety constraints.
+Implements deny-by-default validation with 22+ gates, 3 outcomes, and full
+state machine for validation lifecycle.
+
+EXIT-SAFE GUARANTEE: EXIT and STAND_DOWN signals are NEVER blocked by
+kill-switch, circuit-breaker, or stand-down gates.
+
+EXIT SAFETY CONSTRAINTS (PATCH_0013A):
+- EXIT_EXPOSURE_GATE (9.5): Prevents exit_qty > open_position_qty
+- Quote fallback for exits during degraded market data
+- Exit-specific schema validation prevents malformed exits
 
 Contents:
-- 6 canonical schemas (TradeValidationRequest, TradeValidationResult, ValidationGateResult, TradeValidationState, TradeValidationProvenance, TradeValidationMetrics)
-- 14 hard gates (kill switch, stand down, circuit breaker, TTL, lifecycle, sizing, duplicate, regime, liquidity, freshness, events)
-- 8 soft gates (confidence decay, regime drift, liquidity thinning, volatility spike, MTF alignment, signal age, sizing age, accumulated penalty)
+- 6 canonical schemas + PositionSnapshot input
+- 15 hard gates (incl. EXIT_EXPOSURE_GATE 9.5)
+- 8 soft gates
 - 3 outcomes (APPROVED, REJECTED, DEFERRED)
 - 5-state machine with retry logic
 - Deterministic validation algorithm
@@ -1455,6 +1548,8 @@ Contents:
 Key Features:
 - Deny-by-default philosophy
 - EXIT-SAFE GUARANTEE (kill-switch/circuit-breaker never block exits)
+- EXIT_EXPOSURE_GATE ensures reduce-only for exits
+- Quote fallback allows exits during market stress
 - Duplicate execution prevention
 - Regime and liquidity drift detection
 - Configurable retry with backoff
@@ -1472,9 +1567,10 @@ Downstream Consumers:
 
 Files:
 - options_trading_brain/09_trade_validation/SPEC.md
+- options_trading_brain/09_trade_validation/PATCH_0013A.md
 
 Commit Message:
-[OptionsBrain] 09_trade_validation: finalize validation gates with exit-safe kill-switch behavior
+[OptionsBrain] 09_trade_validation PATCH_0013A: exit safety constraints
 
 CONTRACT LOCKED - Changes require PATCH document
 ```
