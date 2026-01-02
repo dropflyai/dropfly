@@ -231,15 +231,71 @@ Logger:
 
 ```
 PositionSnapshot (read-only, optional):
+  - position_id: string              # REQUIRED. Unique position identifier
+  - position_key: string | null      # OPTIONAL. Deterministic hash key
   - symbol: string                   # REQUIRED
   - direction: enum[LONG, SHORT]     # REQUIRED
   - open_quantity: int               # REQUIRED. Current open position size
   - entry_decision_id: string        # REQUIRED. Links to original sizing decision
+  - strategy_id: string              # REQUIRED. Strategy that opened position
+  - contracts: OptionContractRef[] | null  # OPTIONAL. For multi-leg positions
+  - opened_at: datetime              # REQUIRED. When position was opened
   - last_updated: datetime           # REQUIRED
 
-Note: If position_store is unavailable, fallback to
-PositionSizingDecision.quantity from the original entry signal.
-This input is used by EXIT_EXPOSURE_GATE to validate exit quantities.
+Note: PositionSnapshot MUST include at least one deterministic identifier
+(position_id or position_key) for EXIT_POSITION_BINDING_GATE resolution.
+```
+
+### 3.7) Position Binding Schemas
+
+```
+PositionBindingKey:
+  # Primary Identifiers (at least one required)
+  - position_id: string | null       # Provider/broker/internal ID if available
+  - position_key: string | null      # Deterministic hash key if position_id not available
+
+  # Context (for validation/matching)
+  - symbol: string                   # REQUIRED. Must match signal.symbol
+  - strategy_id: string              # REQUIRED. Must match signal.strategy_id
+  - timeframe: string | null         # OPTIONAL. For additional disambiguation
+  - mode: string | null              # OPTIONAL. Strategy mode if applicable
+
+  # Multi-leg Position Support
+  - contracts: OptionContractRef[] | null
+    # Required for multi-leg options positions if no position_id/position_key
+    # Each contract ref contains: underlying, expiration, strike, right (C/P), multiplier
+
+  # Disambiguation
+  - opened_at: datetime | null       # OPTIONAL. For multiple similar positions opened at different times
+
+VALIDATION RULE:
+  At least one of the following MUST be present:
+    - position_id, OR
+    - position_key, OR
+    - contracts (non-empty array)
+  If none present → EXIT signal is invalid (exit_position_binding_missing)
+
+
+OptionContractRef:
+  - underlying: string               # REQUIRED. e.g., "AAPL"
+  - expiration: date                 # REQUIRED. e.g., "2026-01-17"
+  - strike: float                    # REQUIRED. e.g., 150.00
+  - right: enum[CALL, PUT]           # REQUIRED
+  - multiplier: int                  # REQUIRED. Usually 100 for equity options
+
+CANONICAL CONTRACT IDENTITY:
+  underlying + expiration + strike + right + multiplier
+  This tuple uniquely identifies a contract for matching purposes.
+
+
+MULTI-LEG CONTRACT MATCHING SEMANTICS:
+  - Matching MUST be exact set match, order-independent
+  - For spreads/combos: all legs must match exactly
+    - Same count of contracts
+    - Same contract identities (using canonical tuple above)
+  - Order of contracts in array does NOT affect matching
+  - If contracts provided and set match fails → treated as 0 matches
+  - Partial matches are NOT allowed (all-or-nothing)
 ```
 
 ---
@@ -277,6 +333,13 @@ TradeValidationRequest:
   - sizing_approved: bool          # REQUIRED
   - quantity: int                  # REQUIRED
   - risk_amount: float             # REQUIRED
+
+  # Position Binding (for EXIT signals)
+  - position_binding: PositionBindingKey | null
+    # REQUIRED for EXIT_FULL, EXIT_PARTIAL
+    # Optional/null for all other signal types (ENTRY_*, SQUEEZE_*, STAND_DOWN)
+    # STAND_DOWN is portfolio/symbol-level safety signaling and does not target
+    # a specific position; binding not required.
 
   # Request Metadata
   - request_source: string         # REQUIRED. e.g., "execution_engine", "paper_trader"
@@ -600,38 +663,97 @@ HARD GATES (in evaluation order):
    Failure: REJECTED
    Reason: "duplicate_execution_attempt"
 
+9.6. EXIT_POSITION_BINDING_GATE (EXIT SIGNALS ONLY)
+     Applies: signal_type in [EXIT_FULL, EXIT_PARTIAL]
+     Skipped: signal_type NOT in [EXIT_FULL, EXIT_PARTIAL]
+     Note: STAND_DOWN does NOT require binding (portfolio/symbol-level safety signal)
+
+     Goal: Ensure exit is bound to exactly one open position
+
+     Inputs:
+       - TradeValidationRequest (contains signal + position_binding)
+       - PositionSnapshot (read-only; from 02_data_store)
+
+     Pre-Checks:
+       1. Verify position_binding is present
+          IF missing → REJECT (exit_position_binding_missing)
+
+       2. Verify binding context matches signal:
+          - position_binding.symbol == signal.symbol
+          - position_binding.strategy_id == signal.strategy_id
+          IF mismatch → REJECT (exit_position_binding_mismatch)
+
+       3. Verify at least one identifier present:
+          - position_id present, OR
+          - position_key present, OR
+          - contracts present and non-empty
+          IF none present → REJECT (exit_position_binding_missing)
+
+     Position Resolution:
+       1. IF PositionSnapshot unavailable:
+          - IF config.exit_requires_position_snapshot == true:
+            → DEFER (exit_position_snapshot_missing)
+          - ELSE:
+            → PASS with flag "position_unverified" and penalty 0.20
+
+       2. Resolve target positions from PositionSnapshot:
+          - IF position_id present → exact match on position_id
+          - ELSE IF position_key present → exact match on position_key
+          - ELSE match by:
+            - symbol (exact)
+            - strategy_id (exact)
+            - contracts (exact set match, order-independent per Section 3.7)
+            - opened_at (if provided, within ± opened_at_match_window_seconds)
+
+     Match Evaluation:
+       - 0 matches → REJECT (no_position_to_exit)
+       - >1 matches:
+         - IF config.exit_ambiguous_behavior == "REJECT":
+           → REJECT (exit_position_ambiguous)
+         - ELSE:
+           → DEFER (exit_position_ambiguous)
+       - 1 match → PASS
+         - Store resolved position reference for Gate 9.5
+
+     Config:
+       - exit_requires_position_snapshot: bool (default: true)
+       - exit_ambiguous_behavior: "REJECT" | "DEFER" (default: "REJECT")
+       - opened_at_match_window_seconds: int (default: 600)
+
+     Failure: REJECTED or DEFERRED (per logic above)
+
+     Note: This gate runs BEFORE EXIT_EXPOSURE_GATE (9.5) because
+     you must identify WHICH position before validating exit quantity.
+
 9.5. EXIT_EXPOSURE_GATE (EXIT SIGNALS ONLY)
      Applies: signal_type in [EXIT_FULL, EXIT_PARTIAL]
      Skipped: signal_type NOT in [EXIT_FULL, EXIT_PARTIAL]
 
-     Check: Verify exit does not exceed open position
+     Prerequisite: Gate 9.6 MUST have passed (position bound and resolved)
 
-     Validation:
-       1. Query current open position for (symbol, direction)
-          - Source: 02_data_store → position_store (read-only)
-          - If position_store unavailable: Use PositionSizingDecision.quantity from original entry
+     Check: Verify exit quantity does not exceed bound position quantity
+
+     Validation (using resolved position from Gate 9.6):
+       1. Get open_position_quantity from resolved PositionSnapshot
 
        2. For EXIT_PARTIAL:
-          - exit_quantity <= open_position_quantity
           - exit_quantity > 0
+          - exit_quantity < open_position_quantity (strict less-than for partial)
 
        3. For EXIT_FULL:
           - exit_quantity == open_position_quantity
           - OR exit_quantity == 0 (interpreted as "close all")
 
-       4. For any exit:
-          - open_position_quantity > 0 (position must exist)
-
-     Fallback (if position lookup fails):
-       - Log WARNING: "position_lookup_failed"
-       - Allow exit with flag "position_unverified"
+     Fallback (if position lookup failed in 9.6 with permissive config):
+       - Use PositionSizingDecision.quantity from original entry as proxy
+       - Log WARNING: "exit_exposure_using_sizing_proxy"
        - Set quantity = min(requested_quantity, sizing_decision.quantity)
 
      Failure: REJECTED
-     Reason: "exit_exceeds_position" or "no_position_to_exit"
+     Reason: "exit_exceeds_position" or "exit_partial_invalid_quantity"
 
-     Note: This gate ensures exits are REDUCE-ONLY operations. Prevents
-     malformed exit signals from creating unintended short positions.
+     Note: Position existence is validated by Gate 9.6. This gate focuses
+     solely on quantity validation for the bound position.
 
 10. REGIME_MISMATCH_GATE
     Compare: SignalContextSnapshot.regime_classification.regime_type
@@ -775,7 +897,11 @@ Phase 2: SIGNAL/SIZING VALIDITY (instant reject)
   7. SIGNAL_LIFECYCLE_GATE
   8. SIZING_APPROVAL_GATE
   9. DUPLICATE_EXECUTION_GATE
-  9.5. EXIT_EXPOSURE_GATE (exit signals only — validates exit_qty <= open_qty)
+  9.6. EXIT_POSITION_BINDING_GATE (exit signals only — binds to exactly one position)
+  9.5. EXIT_EXPOSURE_GATE (exit signals only — validates exit_qty for bound position)
+
+  Note: Gate 9.6 runs BEFORE 9.5 because you must identify WHICH position
+  (binding) before validating exit quantity (exposure).
 
 Phase 3: MARKET CONDITIONS (instant reject)
   10. REGIME_MISMATCH_GATE
@@ -1402,11 +1528,15 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 | **EXIT signal blocked by kill-switch (BUG)** | Gate 1-2 blocking EXIT signal | CRITICAL BUG — EXIT signals must NEVER be blocked | CRITICAL: "exit_safe_violation" |
 | **Kill-switch misconfiguration** | Kill-switch blocking EXIT or STAND_DOWN | Alert operations, override gate to PASS | CRITICAL: "exit_safe_override_applied" |
 | **Exit exceeds position** | Gate 9.5 check | REJECTED immediately | WARN: "exit_exceeds_position" |
-| **No position to exit** | Gate 9.5 check | REJECTED immediately | WARN: "no_position_to_exit" |
-| **Position lookup failed** | Gate 9.5 fallback | PASS with flag "position_unverified" | WARN: "position_lookup_failed" |
+| **No position to exit** | Gate 9.6 check (0 matches) | REJECTED immediately | WARN: "no_position_to_exit" |
+| **Position lookup failed** | Gate 9.6 fallback | PASS with flag "position_unverified" | WARN: "position_lookup_failed" |
 | **Exit with quote fallback** | Gate 12 fallback | PASS with flag "quote_fallback_used" | WARN: "exit_using_fallback_price" |
 | **Exit without quote verification** | Gate 12 fallback (extreme) | PASS with flag "quote_unavailable_exit" | WARN: "exit_without_quote_verification" |
 | **Exit schema invalid** | Step 2 validation | REJECTED immediately | ERROR: "exit_schema_invalid" |
+| **Exit position binding missing** | Gate 9.6 check | REJECTED immediately | ERROR: "exit_position_binding_missing" |
+| **Exit position binding mismatch** | Gate 9.6 check (symbol/strategy_id mismatch) | REJECTED immediately | ERROR: "exit_position_binding_mismatch" |
+| **Exit position ambiguous** | Gate 9.6 check (>1 positions match) | REJECTED or DEFERRED (config) | WARN: "exit_position_ambiguous" |
+| **Exit position snapshot missing** | Gate 9.6 check (no PositionSnapshot available) | DEFERRED (default) or PASS+penalty | WARN: "exit_position_snapshot_missing" |
 
 ---
 
@@ -1423,7 +1553,7 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 
 ### 12.2) Gate Coverage
 
-- [x] 14 hard gates defined and ordered
+- [x] 16 hard gates defined and ordered (incl. 9.5 EXIT_EXPOSURE, 9.6 EXIT_POSITION_BINDING)
 - [x] 8 soft gates defined and ordered
 - [x] Evaluation order explicitly specified
 - [x] Precedence rules documented (kill switch > stand down > etc.)
@@ -1461,6 +1591,11 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 - [x] EXIT_EXPOSURE_GATE (9.5) ensures exits cannot exceed open position
 - [x] Quote fallback allows exits during degraded market data conditions
 - [x] Exit-specific schema validation prevents malformed exit signals
+- [x] EXIT_POSITION_BINDING_GATE (9.6) ensures exits bind to exactly one position
+- [x] Multi-leg contract matching uses exact set match (order-independent)
+- [x] Ambiguous exits (>1 matches) are REJECTED or DEFERRED (configurable)
+- [x] STAND_DOWN signals do NOT require position binding (portfolio-level)
+- [x] Gate 9.6 runs BEFORE Gate 9.5 (bind first, then check quantity)
 
 ### 12.7) Test Plan
 
@@ -1480,6 +1615,7 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 | **EXIT-EXPOSURE (CRITICAL)** | EXIT_PARTIAL with qty > position → REJECTED; EXIT_FULL with qty != position → REJECTED (unless qty == 0); EXIT with no open position → REJECTED; EXIT with position lookup failure → PASS with "position_unverified" flag; verify reduce-only guarantee enforced |
 | **EXIT-QUOTE-FALLBACK** | EXIT with fresh quote → normal flow; EXIT with stale quote (< 2 min) → PASS with "quote_fallback_used"; EXIT with no quote available → PASS with "quote_unavailable_exit"; ENTRY with stale quote → REJECTED |
 | **EXIT-SCHEMA** | EXIT with direction != NEUTRAL → REJECTED; EXIT with entry_price_zone set → REJECTED; EXIT with quantity == 0 and type EXIT_PARTIAL → REJECTED; valid EXIT_FULL with qty=0 (close all) → PASS |
+| **EXIT-POSITION-BINDING (CRITICAL)** | Exit with valid position_id → APPROVED; Exit with valid position_key → APPROVED; Exit with contracts-only binding (exact set match) → APPROVED; Exit with contracts binding (order-independent match) → APPROVED; Exit with missing position_binding → REJECTED; Exit with binding mismatch (symbol differs) → REJECTED; Exit with binding mismatch (strategy_id differs) → REJECTED; Exit resolves to 0 positions → REJECTED (no_position_to_exit); Exit resolves to >1 positions (REJECT config) → REJECTED (exit_position_ambiguous); Exit resolves to >1 positions (DEFER config) → DEFERRED; PositionSnapshot missing with strict config → DEFERRED; PositionSnapshot missing with permissive config → PASS with penalty 0.20; STAND_DOWN signal without binding → APPROVED (binding not required); Multi-leg partial contracts match → REJECTED (0 matches) |
 
 ---
 
@@ -1519,14 +1655,14 @@ WRITE CONTRACT (09_trade_validation → 02_data_store):
 ## 14) Proposed Git Commit
 
 ```
-Commit ID: COMMIT-0013 + PATCH_0013A
+Commit ID: COMMIT-0013 + PATCH_0013A + PATCH_0013B
 Module: 09_trade_validation
 Type: SPEC + PATCH
 
 Summary:
-Trade validation specification with EXIT-SAFE guarantee and exit safety constraints.
-Implements deny-by-default validation with 22+ gates, 3 outcomes, and full
-state machine for validation lifecycle.
+Trade validation specification with EXIT-SAFE guarantee, exit safety constraints,
+and position binding. Implements deny-by-default validation with 23 gates,
+3 outcomes, and full state machine for validation lifecycle.
 
 EXIT-SAFE GUARANTEE: EXIT and STAND_DOWN signals are NEVER blocked by
 kill-switch, circuit-breaker, or stand-down gates.
@@ -1536,9 +1672,16 @@ EXIT SAFETY CONSTRAINTS (PATCH_0013A):
 - Quote fallback for exits during degraded market data
 - Exit-specific schema validation prevents malformed exits
 
+EXIT POSITION BINDING (PATCH_0013B):
+- EXIT_POSITION_BINDING_GATE (9.6): Ensures exits bind to exactly one position
+- PositionBindingKey schema with multi-leg contract support
+- Exact set match semantics for multi-leg positions (order-independent)
+- Gate 9.6 runs BEFORE 9.5 (bind first, then check quantity)
+- STAND_DOWN exempt from binding (portfolio-level signal)
+
 Contents:
-- 6 canonical schemas + PositionSnapshot input
-- 15 hard gates (incl. EXIT_EXPOSURE_GATE 9.5)
+- 7 canonical schemas (incl. PositionBindingKey, OptionContractRef)
+- 16 hard gates (incl. EXIT_POSITION_BINDING 9.6, EXIT_EXPOSURE 9.5)
 - 8 soft gates
 - 3 outcomes (APPROVED, REJECTED, DEFERRED)
 - 5-state machine with retry logic
@@ -1548,6 +1691,7 @@ Contents:
 Key Features:
 - Deny-by-default philosophy
 - EXIT-SAFE GUARANTEE (kill-switch/circuit-breaker never block exits)
+- EXIT_POSITION_BINDING ensures exits target exactly one position
 - EXIT_EXPOSURE_GATE ensures reduce-only for exits
 - Quote fallback allows exits during market stress
 - Duplicate execution prevention
@@ -1568,9 +1712,10 @@ Downstream Consumers:
 Files:
 - options_trading_brain/09_trade_validation/SPEC.md
 - options_trading_brain/09_trade_validation/PATCH_0013A.md
+- options_trading_brain/09_trade_validation/PATCH_0013B.md
 
 Commit Message:
-[OptionsBrain] 09_trade_validation PATCH_0013A: exit safety constraints
+[OptionsBrain] 09_trade_validation PATCH_0013B: exit position binding gate
 
 CONTRACT LOCKED - Changes require PATCH document
 ```
