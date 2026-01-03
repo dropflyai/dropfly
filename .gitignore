@@ -157,13 +157,21 @@ $RECYCLE.BIN/
 # PROJECT-SPECIFIC PATTERNS
 # ========================================
 
-# Nested projects
-hoa-community-app/
-shift-project/
-
 # Large video files
 DropFly-PROJECTS/optic-studios/public/videos/*.mp4
-DropFly-PROJECTS/pdf-editor-ios/
-DropFly-PROJECTS/*/
-douglass-hicks-law/
-vapi-nail-salon-agent/
+
+# iOS build artifacts (large)
+DropFly-PROJECTS/*/DerivedData/
+DropFly-PROJECTS/*/.build/
+
+# ========================================
+# CREDENTIALS FOLDER RULES
+# ========================================
+
+# Ignore all .env files in credentials folders
+**/credentials/.env*
+!**/credentials/.env.example
+!**/credentials/.env.template
+
+# ALWAYS commit KEYS.md (documentation, not secrets)
+!**/credentials/KEYS.md
