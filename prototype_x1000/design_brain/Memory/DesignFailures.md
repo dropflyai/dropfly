@@ -34,21 +34,29 @@ Description of the design that failed.
 **Why It Failed:**
 Root cause analysis.
 
-**What Should Have Been Done:**
-The better approach (known now).
-
-**How to Detect This Failure Mode:**
-Warning signs to watch for in future designs.
-
-**Category:**
+**Failure Category:** (check all that apply)
 [ ] Usability - Users couldn't figure it out
+[ ] Trust - Design didn't inspire confidence
+[ ] Conversion - Users didn't take desired action
 [ ] Accessibility - Failed accessibility standards
 [ ] Performance - Too slow/heavy
-[ ] Visual - Looked wrong for context
+[ ] Visual/Taste - Looked wrong for context
 [ ] Content - Copy/messaging didn't work
 [ ] Flow - Journey was broken
 [ ] Technical - Couldn't be implemented
 [ ] Stakeholder - Didn't meet business needs
+
+**What Should Have Been Done:**
+The better approach (known now).
+
+**What Changed After Failure:**
+Specific revisions made to fix the issue.
+
+**How to Detect This Failure Mode:**
+Warning signs to watch for in future designs.
+
+**Prevention Rule:**
+One-line rule to prevent this in the future.
 ```
 
 ---

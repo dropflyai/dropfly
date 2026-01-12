@@ -12,9 +12,19 @@ If quality is not measurable, it is not enforced.
 Each screen must be scored across the following dimensions.
 Score each category from **1 (poor)** to **5 (excellent)**.
 
-If ANY category scores below **4**, refactor is required.
+### Hard Fail Dimensions
+These dimensions are critical. Score <3 = immediate refactor required:
+- **Accessibility**
+- **Usability (Clarity)**
+- **Clarity**
 
-No exceptions.
+### Passing Criteria
+- Average score across all dimensions ≥ 4.0
+- No hard-fail dimension < 3
+- Originality is NOT a hard fail — evaluated holistically
+
+### Originality Note
+Originality is evaluated holistically, not stylistically. Novel combinations, interaction logic, and conceptual framing qualify as originality.
 
 ---
 
@@ -164,12 +174,72 @@ Score <4 → fix accessibility issues before proceeding.
 
 ---
 
+## 9. ORIGINALITY / CUSTOMNESS
+
+**Question:**
+Does the design feel custom and intentional rather than template-assembled?
+
+### What to Check
+- Unique layout structure (not default template)
+- Unique hierarchy decisions (not generic)
+- Signature move present (memorable element)
+- Brand alignment (reflects user's vision)
+- No "UI kit" vibes (doesn't look kit-assembled)
+
+### Scoring Guide
+- **5** — Highly distinctive, memorable, clearly custom
+- **4** — Noticeably custom with clear signature element
+- **3** — Some customization but could be more distinctive
+- **2** — Generic, could be any product
+- **1** — Pure template, no customization
+
+### Fail Condition (BUILD/SHIP phases)
+**Score <3 in BUILD or SHIP phase → REFACTOR REQUIRED**
+
+This dimension has a stricter threshold for production work.
+
+### Reference
+See `Originality/AntiTemplateGates.md` for detailed criteria.
+See `Originality/CustomnessChecklist.md` for final verification.
+
+---
+
 ## FINAL UX SCORE DECISION
 
-- Any score <4 → **REFRACTOR REQUIRED**
-- All scores ≥4 → **UI MAY SHIP**
+**Hard Fail Dimensions (Accessibility, Usability, Clarity):**
+- Score <3 → **IMMEDIATE REFACTOR REQUIRED**
+
+**All Dimensions:**
+- Average score ≥ 4.0 → **UI MAY SHIP**
+- Average score < 4.0 → **REFACTOR REQUIRED**
+
+**Originality:**
+- NOT a hard fail
+- Evaluated holistically (novel combinations, interaction logic, conceptual framing qualify)
+- Score <3 triggers review, not automatic failure
 
 Scores must be stated explicitly before final output.
+
+### Score Card Template
+
+```markdown
+## UX Score: [Screen/Project Name]
+
+| Dimension | Score | Notes |
+|-----------|-------|-------|
+| Clarity | /5 | |
+| Hierarchy | /5 | |
+| Speed to Action | /5 | |
+| State Completeness | /5 | |
+| Cognitive Load | /5 | |
+| Copy Quality | /5 | |
+| Mode Alignment | /5 | |
+| Accessibility | /5 | |
+| Originality | /5 | |
+
+**Verdict:** PASS / REFACTOR REQUIRED
+**Issues:** [if any]
+```
 
 ---
 

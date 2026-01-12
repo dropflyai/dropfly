@@ -36,9 +36,23 @@ If an element does not support one of these, it should not exist.
 
 ---
 
-## MODE-SPECIFIC DESIGN RULES
+## DESIGN MODES (MANDATORY)
+
+One mode MUST be declared or inferred at the start of every design task.
+If ambiguous, ask the user. Mode determines which UX rules are enforced.
+
+**Rules:**
+- One mode MUST be declared or inferred per project
+- If ambiguous, ask the user
+- Mode determines which UX rules are enforced
+- MODE must be stated at the start of every design task
+
+---
 
 ### MODE_SAAS
+- Customer-facing SaaS products
+- Public-facing UX
+- Conversion, retention, trust are mandatory concerns
 - Optimize for approachability and comprehension
 - Prioritize onboarding and empty states
 - Density: low → medium
@@ -53,6 +67,9 @@ Avoid:
 ---
 
 ### MODE_INTERNAL
+- Internal tools, admin panels, dashboards
+- Efficiency > marketing
+- Reduced brand expression allowed
 - Optimize for speed and efficiency
 - Density: medium → high
 - Fewer explanations, more data
@@ -67,6 +84,8 @@ Avoid:
 ---
 
 ### MODE_AGENTIC
+- Agent tools, automation UIs, control surfaces
+- Explainability, state clarity, error prevention prioritized
 - Optimize for transparency and trust
 - Show system state clearly at all times
 - Timelines, logs, and confidence indicators are first-class
@@ -186,6 +205,48 @@ Before finalizing any UI, ask:
 - Would a senior designer approve this?
 
 If not, refactor.
+
+---
+
+## PROGRESSIVE QUESTIONING RULE (MANDATORY)
+
+When gathering information from the user:
+- Ask **ONLY ONE question at a time**
+- Never ask multi-part or compound questions
+- Wait for the answer before asking the next question
+- Continue until sufficient information exists to proceed
+- Then proceed without unnecessary confirmation
+
+**Bad:** "What's the target audience, what industry, and what's the brand personality?"
+**Good:** "What industry is this product for?"
+
+This rule applies to all phases: Discovery, Research, Brand, and ad-hoc design tasks.
+
+---
+
+## HANDOFF PACKET REQUIREMENT (BUILD/SHIP)
+
+Before any design is handed off for implementation, produce a **Handoff Packet** containing:
+
+1. **Design DNA Summary** — Core visual/interaction language (from `ReferenceLab/DesignDNA.md`)
+2. **Component Spec Deltas** — Any deviations from standard `ComponentSpec.md`
+3. **Token Changes** — Custom tokens defined for this project (colors, spacing, type)
+4. **Interaction Rules** — Hover, focus, active, loading, error states
+5. **Accessibility Notes** — Any special considerations or requirements
+6. **Signature Move** — The unique element that differentiates this design
+
+This packet must be saved to `Memory/ReferenceDNA/[ProjectName]/` for consistency across screens.
+
+---
+
+## CROSS-REFERENCES TO NEW SYSTEMS
+
+| System | Location | Purpose |
+|--------|----------|---------|
+| Reference Analysis | `ReferenceLab/` | Analyze user-provided references, extract Design DNA |
+| Originality Gates | `Originality/` | Prevent generic/template outputs |
+| Behavioral UX | `BehavioralUX.md` | Marketing psychology, conversion, trust |
+| MCP Governance | `MCP-Governance.md` | Tool usage rules for image analysis |
 
 ---
 

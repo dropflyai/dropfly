@@ -397,12 +397,44 @@ See `3D-GameDev/README.md` for full documentation.
 | Tokens | 5 |
 | Templates | 1 |
 | Patterns | 14 |
-| Memory | 5 |
+| Memory | 6 |
+| ReferenceLab | 4 |
+| Originality | 2 |
 | 3D-GameDev | 8 |
 | Evaluation | 4 |
-| Core docs | 4 |
+| Core docs | 6 |
 | README | 1 |
-| **Total** | **62** |
+| **Total** | **71** |
+
+---
+
+## New Systems (vNext Upgrade)
+
+### Reference Analysis (`ReferenceLab/`)
+Analyze user-provided reference images to extract "Design DNA":
+- `ReferenceIntake.md` — How to collect references
+- `VisualTeardownSchema.md` — Structured extraction checklist
+- `DesignDNA.md` — Output specification
+- `SimilarityAndEthics.md` — Derivative work rules
+
+### Originality Gates (`Originality/`)
+Prevent generic, template-like outputs:
+- `AntiTemplateGates.md` — 5 hard gates for BUILD/SHIP
+- `CustomnessChecklist.md` — Final verification before output
+
+### Behavioral UX (`BehavioralUX.md`)
+Marketing and psychology integration:
+- Attention & friction management
+- Trust-building patterns
+- Conversion architecture
+- Ethical retention hooks
+- No dark patterns rule
+
+### MCP Governance (`MCP-Governance.md`)
+Rules for using external tools:
+- Image analysis only when images provided
+- No hallucination rule
+- Logging requirements
 
 ---
 

@@ -203,4 +203,76 @@ How to stand out visually:
 
 ---
 
+## Token Decisions Log
+
+Track design token choices and their rationale:
+
+### Type Scale Decisions
+
+| Project | Scale Approach | Base Size | Ratio | Result |
+|---------|----------------|-----------|-------|--------|
+| | | | | |
+
+### Spacing Cadence Decisions
+
+| Project | Base Unit | Scale | Section Rhythm | Result |
+|---------|-----------|-------|----------------|--------|
+| | | | | |
+
+### Color Strategy Decisions
+
+| Project | Primary | Accent | Neutrals | Contrast Level | Result |
+|---------|---------|--------|----------|----------------|--------|
+| | | | | | |
+
+---
+
+## Component Rules Log
+
+Track component decisions:
+
+### Button Styles
+
+| Project | Fill Style | Radius | Sizing | Result |
+|---------|------------|--------|--------|--------|
+| | | | | |
+
+### Card Styles
+
+| Project | Shadow | Border | Radius | Padding | Result |
+|---------|--------|--------|--------|---------|--------|
+| | | | | | |
+
+### Input Styles
+
+| Project | Border Style | Focus State | Error State | Result |
+|---------|--------------|-------------|-------------|--------|
+| | | | | |
+
+---
+
+## Interaction Rules Log
+
+Track interaction pattern decisions:
+
+### Hover Effects
+
+| Project | Button Hover | Card Hover | Link Hover | Result |
+|---------|--------------|------------|------------|--------|
+| | | | | |
+
+### Focus States
+
+| Project | Style | Color | Offset | Result |
+|---------|-------|-------|--------|--------|
+| | | | | |
+
+### Transitions
+
+| Project | Micro Timing | Standard Timing | Easing | Result |
+|---------|--------------|-----------------|--------|--------|
+| | | | | |
+
+---
+
 <!-- Log style decisions below this line -->

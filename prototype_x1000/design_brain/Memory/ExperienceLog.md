@@ -13,6 +13,24 @@ After 200 projects, the agent has seen more designs than most human designers.
 
 ---
 
+## MANDATORY LOGGING (SHIP Phase)
+
+**After every SHIP phase, the following MUST be logged:**
+
+| Required Field | Description |
+|----------------|-------------|
+| Project name | Name/identifier of the project |
+| Design mode | MODE_SAAS / MODE_INTERNAL / MODE_AGENTIC |
+| Reference sources | URLs or "User upload" or "None — original design" |
+| Design DNA summary | Grid, typography, color, signature move |
+| What worked | Successful patterns, decisions, approaches |
+| What did not work | Failed approaches, issues encountered |
+| What to reuse or avoid | Lessons for future projects |
+
+**This logging is MANDATORY after SHIP phase. Failure to log = incomplete task.**
+
+---
+
 ## Required Format
 
 Each completed design MUST log:
@@ -29,6 +47,17 @@ Each completed design MUST log:
 **Brief:**
 What was the design challenge or requirement?
 
+**Reference Links Used:**
+- [URL or "User upload: description"]
+- [URL or "None — original design"]
+
+**Design DNA Summary:**
+- Grid: [key decisions]
+- Typography: [key decisions]
+- Color: [key decisions]
+- Signature move: [what made it unique]
+(Full DNA saved to: Memory/ReferenceDNA/[ProjectName]/)
+
 **Approaches Tried:**
 - Approach 1: [what was tried] → [result/feedback]
 - Approach 2: [what was tried] → [result/feedback]
@@ -38,6 +67,12 @@ What was shipped? (Include screenshot link if possible)
 
 **Why It Worked:**
 What made this solution effective?
+
+**What Didn't Work:**
+Issues encountered and how they were resolved.
+
+**What to Reuse Next Time:**
+Specific patterns, tokens, or approaches worth repeating.
 
 **Pattern Observed:**
 Generalizable lesson that applies beyond this project.

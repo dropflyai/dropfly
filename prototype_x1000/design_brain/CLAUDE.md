@@ -52,15 +52,33 @@ For new projects, follow this sequence:
 
 ---
 
-## UI Modes (Mandatory Selection)
+## DESIGN MODES (MANDATORY)
 
-Before designing, select exactly one mode:
+One mode MUST be declared or inferred at the start of every design task.
+If ambiguous, ask the user. Mode determines which UX rules are enforced.
 
-| Mode | Use For | Density |
-|------|---------|---------|
-| MODE_SAAS | Customer-facing product | Low-Medium |
-| MODE_INTERNAL | Internal tools | Medium-High |
-| MODE_AGENTIC | Automation/AI UI | Medium |
+### MODE_SAAS
+- Customer-facing SaaS products
+- Public-facing UX
+- Conversion, retention, trust are mandatory concerns
+- Density: Low → Medium
+
+### MODE_INTERNAL
+- Internal tools, admin panels, dashboards
+- Efficiency > marketing
+- Reduced brand expression allowed
+- Density: Medium → High
+
+### MODE_AGENTIC
+- Agent tools, automation UIs, control surfaces
+- Explainability, state clarity, error prevention prioritized
+- Density: Medium
+
+**Rules:**
+- One mode MUST be declared or inferred per project
+- If ambiguous, ask the user
+- Mode determines which UX rules are enforced
+- MODE must be stated at the start of every design task
 
 ---
 
