@@ -165,25 +165,59 @@ DropFly-PROJECTS/
 
 ## Database Schema (Shared Learning)
 
+### 3-Tier Architecture
+
+The unified brain memory system uses a 3-tier table structure:
+
+```
+TIER 1: UNIVERSAL TABLES (All 37 brains)
+├── shared_experiences    → Task outcomes, learnings
+├── shared_patterns       → Reusable solutions
+└── shared_failures       → Failures + post-mortems
+
+TIER 2: BRAIN-SPECIFIC TABLES
+├── Design Brain
+│   ├── design_dna        → Extracted design languages
+│   ├── design_references → Reference images + teardowns
+│   ├── design_ux_scores  → UX score evaluations
+│   └── design_style_decisions → Typography, color, etc.
+├── Engineering Brain
+│   ├── eng_architecture_decisions → ADRs
+│   └── eng_tech_debt     → Technical debt tracking
+├── Product Brain
+│   ├── product_features  → Feature specifications
+│   └── product_user_research → User research findings
+├── Trading Brain
+│   ├── trading_strategies → Strategy definitions
+│   └── trading_signals   → Trade signals + outcomes
+└── MBA Brain
+    ├── mba_strategic_decisions → Business decisions
+    └── mba_competitor_analysis → Competitor intel
+
+TIER 3: ORCHESTRATION (CEO Brain)
+├── ceo_task_delegations  → Task routing
+├── ceo_brain_collaborations → Multi-brain workflows
+└── ceo_conflict_resolutions → Conflict resolution logs
+```
+
+### Setup Instructions
+
+**Full migration file:** `unified-brain-memory-migration.sql`
+**Credentials location:** `credentials/`
+
+```bash
+# Setup Supabase credentials
+cp credentials/.env.template credentials/.env
+# Edit with your Supabase project values
+
+# Run migration
+./run-brain-migration.sh
+```
+
+### Example Queries
+
 ```sql
 -- All projects log here, all brains can read via agent
-CREATE TABLE shared_experiences (
-  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  project TEXT NOT NULL,           -- 'tradefly', 'pdf-editor'
-  brain_used TEXT NOT NULL,        -- 'engineering', 'design', 'mba'
-  category TEXT NOT NULL,          -- 'success', 'failure', 'pattern'
-  summary TEXT NOT NULL,
-  details JSONB,
-  tags TEXT[],
-  created_at TIMESTAMP DEFAULT NOW()
-);
-
--- Index for fast lookups
-CREATE INDEX idx_experiences_tags ON shared_experiences USING GIN(tags);
-CREATE INDEX idx_experiences_category ON shared_experiences(category);
-CREATE INDEX idx_experiences_brain ON shared_experiences(brain_used);
-
--- Example queries agent uses:
 
 -- "What dark mode failures have we seen?"
 SELECT * FROM shared_experiences
@@ -192,14 +226,25 @@ AND category = 'failure';
 
 -- "What patterns has design brain identified?"
 SELECT * FROM shared_experiences
-WHERE brain_used = 'design'
+WHERE brain_type = 'design'
 AND category = 'pattern';
 
 -- "Recent learnings for this project"
 SELECT * FROM shared_experiences
-WHERE project = 'tradefly'
+WHERE project_id = 'tradefly'
 ORDER BY created_at DESC
 LIMIT 10;
+
+-- "Design DNA for recent projects"
+SELECT project_name, grid_system, typography_scale, color_tokens
+FROM design_dna
+ORDER BY created_at DESC
+LIMIT 5;
+
+-- "Unresolved tech debt"
+SELECT * FROM eng_tech_debt
+WHERE status = 'identified'
+ORDER BY priority_score DESC;
 ```
 
 ---
