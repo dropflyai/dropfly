@@ -1,6 +1,6 @@
 # DropFly Project Registry
 
-Last Updated: 2024-12-31
+Last Updated: 2025-01-14
 
 ---
 
@@ -27,6 +27,7 @@ Last Updated: 2024-12-31
 | socialfly | Web App | Planned | - | Social media management |
 | VoiceFly-Enterprise | Tool | In Progress | - | Voice AI enterprise solution |
 | voicefly-app | Mobile App | In Progress | - | Voice assistant app |
+| housing-benefits-gps | Web App | In Progress | - | Crisis navigation app for safety-net programs |
 
 ---
 
