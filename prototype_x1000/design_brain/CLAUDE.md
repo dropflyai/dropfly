@@ -1,6 +1,181 @@
 # DESIGN BRAIN — Authoritative Operating System
 
+> **STATUS: FROZEN** — This brain is a read-only tool as of 2025-01-14.
+> No modifications to brain files. All memory → Supabase. All projects → DropFly-PROJECTS/.
+
 This file governs all design work when operating within this brain.
+
+---
+
+## CRITICAL: FROZEN BRAIN PROTOCOL
+
+**This brain is FROZEN and operates as a READ-ONLY TOOL.**
+
+### What This Means
+
+1. **Brain folders are reference only** — Do not create, modify, or save files in any brain folder
+2. **All project files → `DropFly-PROJECTS/`** — Never store project work in brain folders
+3. **All memory → Supabase** — No local memory files; use Supabase tables
+4. **Brain governance files are immutable** — These rules cannot be changed
+
+### What You CAN Do
+
+- Read brain files for guidance
+- Follow brain protocols and rules
+- Create project files in `DropFly-PROJECTS/`
+- Log memory to Supabase
+
+### What You CANNOT Do
+
+- Create files in brain folders
+- Modify brain governance files
+- Store project outputs in brain folders
+- Use local Memory/ files (deprecated)
+
+---
+
+## PROJECT SAVE PROTOCOL
+
+**All project files MUST be saved to `DropFly-PROJECTS/`, NEVER to brain folders.**
+
+### Project Structure
+
+```
+DropFly-PROJECTS/[project-name]/
+├── .claude/                    # Claude instructions (copy from PROJECT-TEMPLATE)
+├── credentials/                # API keys, secrets (NOT in git)
+├── docs/
+│   └── design/                 # ← Design handoff files go HERE
+│       ├── DesignTokens.md
+│       ├── ComponentSpec.md
+│       ├── ScreenSpec.md
+│       └── HandoffChecklist.md
+├── scripts/
+├── src/
+└── README.md
+```
+
+### Design Handoff Location
+
+When completing design work, save all handoff files to:
+```
+DropFly-PROJECTS/[project-name]/docs/design/
+```
+
+**Standard handoff files:**
+- `DesignTokens.md` — Colors, typography, spacing, icons
+- `ComponentSpec.md` — Component specifications
+- `ScreenSpec.md` — Screen layouts and behaviors
+- `HandoffChecklist.md` — Engineering implementation guide
+
+### Creating New Projects
+
+1. Create folder: `DropFly-PROJECTS/[project-name]/`
+2. Follow structure from `PROJECT-TEMPLATE/`
+3. Add entry to `PROJECT-REGISTRY.md`
+4. Create design docs in `docs/design/`
+
+---
+
+## SUPABASE MEMORY PROTOCOL
+
+**All memory MUST be logged to Supabase, NOT to local files.**
+
+### Database: ai-brains-memory (Supabase)
+
+### Design Brain Tables
+
+| Table | Purpose | When to Use |
+|-------|---------|-------------|
+| `design_dna` | Project design systems | After completing design system |
+| `design_references` | Reference teardowns | After analyzing references |
+| `design_ux_scores` | UX quality scores | After scoring screens |
+| `design_style_decisions` | Style decisions | After making design decisions |
+
+### Shared Tables (All Brains)
+
+| Table | Purpose | When to Use |
+|-------|---------|-------------|
+| `shared_experiences` | Task completion logs | After every design task |
+| `shared_patterns` | Reusable patterns | When pattern applies to 3+ projects |
+| `shared_failures` | Failure logs | When design fails or is rejected |
+
+### How to Log to Supabase
+
+**Log a design experience:**
+```sql
+INSERT INTO shared_experiences (
+  brain_type,
+  project_id,
+  category,
+  task_summary,
+  problem,
+  solution,
+  outcome,
+  lessons_learned,
+  tags
+) VALUES (
+  'design',
+  'project-name',
+  'success',
+  'Created design system for [project]',
+  'User needed [X]',
+  'Designed [Y] with [Z] approach',
+  'Handoff complete, ready for engineering',
+  'Key insight learned',
+  ARRAY['design-system', 'mobile-first', 'accessibility']
+);
+```
+
+**Log design DNA:**
+```sql
+INSERT INTO design_dna (
+  project_id,
+  project_name,
+  color_tokens,
+  typography_scale,
+  spacing_tokens,
+  component_styles,
+  signature_move,
+  tags
+) VALUES (
+  'project-name',
+  'Project Display Name',
+  '{"primary": "#2D6A4F", "secondary": "#95D5B2"}',
+  '{"h1": "28px", "body": "17px"}',
+  '{"sm": "8px", "md": "16px", "lg": "24px"}',
+  '{"button_radius": "12px", "card_radius": "16px"}',
+  'Dignity-first design for crisis users',
+  ARRAY['sage-palette', 'mobile-first']
+);
+```
+
+**Log a style decision:**
+```sql
+INSERT INTO design_style_decisions (
+  project_id,
+  decision_type,
+  decision,
+  rationale,
+  alternatives_considered,
+  tags
+) VALUES (
+  'project-name',
+  'color_palette',
+  'Sage Trust palette with #2D6A4F primary',
+  'Calm, growth-oriented, accessible for crisis users',
+  '[{"name": "Deep Teal", "rejected_reason": "Too tech-forward"}, {"name": "Calm Blue", "rejected_reason": "Too institutional"}]',
+  ARRAY['color', 'accessibility']
+);
+```
+
+### Memory Logging Requirements
+
+After EVERY design task:
+1. Log to `shared_experiences` with task summary
+2. Log to `design_dna` if design system was created
+3. Log to `design_style_decisions` for major decisions
+4. Log to `shared_patterns` if pattern is reusable
 
 ---
 
@@ -22,11 +197,14 @@ You operate as a **senior product designer + UI engineer** at all times.
 
 ## Authority Hierarchy
 
-1. `DesignPlaybook.md` — Core design laws (highest authority)
-2. `ComponentSpec.md` — Component contracts
-3. `Patterns/*` — UI patterns
-4. `Tokens/*` — Design tokens
-5. `eval/*` — Quality enforcement
+1. **FROZEN BRAIN PROTOCOL** — Highest authority (this section)
+2. **PROJECT SAVE PROTOCOL** — Where to save files
+3. **SUPABASE MEMORY PROTOCOL** — How to log memory
+4. `DesignPlaybook.md` — Core design laws
+5. `ComponentSpec.md` — Component contracts
+6. `Patterns/*` — UI patterns
+7. `Tokens/*` — Design tokens
+8. `eval/*` — Quality enforcement
 
 Lower levels may not contradict higher levels.
 
@@ -139,12 +317,23 @@ Reference /prototype_x1000/engineering_brain/Automations/Recipes/ for automation
 
 ---
 
-## Memory Enforcement
+## Memory Enforcement (DEPRECATED — USE SUPABASE)
 
-After completing design work, log to:
-- `Memory/ExperienceLog.md` — Every design task
-- `Memory/DesignPatterns.md` — Extracted patterns (if 3+ similar)
-- `Memory/DesignFailures.md` — Failed designs and lessons
+~~After completing design work, log to:~~
+~~- `Memory/ExperienceLog.md` — Every design task~~
+~~- `Memory/DesignPatterns.md` — Extracted patterns (if 3+ similar)~~
+~~- `Memory/DesignFailures.md` — Failed designs and lessons~~
+
+**LOCAL MEMORY FILES ARE DEPRECATED.**
+
+Use Supabase tables instead:
+- `shared_experiences` — Every design task
+- `shared_patterns` — Extracted patterns
+- `shared_failures` — Failed designs and lessons
+- `design_dna` — Design systems
+- `design_style_decisions` — Style decisions
+
+See **SUPABASE MEMORY PROTOCOL** section above.
 
 ---
 
@@ -186,6 +375,8 @@ You MUST stop and present options if:
 - You MUST declare UI mode before designing
 - You MUST include all required states
 - You MUST call specialist brains when their expertise is needed
+- You MUST save project files to `DropFly-PROJECTS/`, NOT brain folders
+- You MUST log memory to Supabase, NOT local files
 - You do not decorate — you clarify
 - You do not chase trends — you optimize outcomes
 
@@ -204,10 +395,13 @@ You MUST stop and present options if:
 NEVER leave changes uncommitted.
 NEVER batch multiple unrelated changes.
 ALWAYS ask before committing.
+NEVER commit to brain folders (brain is frozen).
+ONLY commit to project folders in DropFly-PROJECTS/.
 ```
 
 This rule applies to ALL work done under this brain.
 
 ---
 
-**This brain is authoritative and self-governing.**
+**This brain is authoritative, self-governing, and FROZEN.**
+**Last updated: 2025-01-14**
