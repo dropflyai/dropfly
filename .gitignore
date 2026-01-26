@@ -160,6 +160,7 @@ $RECYCLE.BIN/
 # Projects have their own repos - don't track in monorepo
 DropFly-PROJECTS/AI-TimeTrack-POC/
 DropFly-PROJECTS/black -cipher-project/
+DropFly-PROJECTS/bookfly/
 DropFly-PROJECTS/content-creation/
 DropFly-PROJECTS/cozypaws/
 DropFly-PROJECTS/Curriculum-pilot-mvp/
