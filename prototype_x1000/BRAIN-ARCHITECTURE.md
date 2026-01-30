@@ -298,6 +298,99 @@ CEO Brain is still frozen (rules only), but its rules govern how to combine othe
 
 ---
 
+## Agent Runtime Layer (NEW)
+
+The brain system now includes a **runtime agent layer** powered by Anthropic SDK.
+Agents read frozen brain guidance and execute tasks autonomously.
+
+### Agent Architecture
+
+```
+USER REQUEST
+     │
+     ▼
+┌─────────────┐
+│  CEO AGENT  │  ← Orchestrator (claude-opus-4)
+└──────┬──────┘
+       │ tool_use calls
+   ┌───┼───┬───────────┐
+   │   │   │           │
+   ▼   ▼   ▼           ▼
+┌────┐┌────┐┌────┐ ┌──────────┐
+│ENG ││DES ││MBA │ │BRAIN     │
+│    ││    ││    │ │BUILDER   │
+└─┬──┘└─┬──┘└─┬──┘ └────┬─────┘
+  │     │     │          │
+  └─────┴─────┴──────────┘
+              │
+              ▼
+      ┌───────────────┐
+      │   SUPABASE    │
+      │ (auto-logged) │
+      └───────────────┘
+```
+
+### Agent Components
+
+| Component | Location | Purpose |
+|-----------|----------|---------|
+| **BaseAgent** | `agents/core/` | Base class with brain loading + tools |
+| **CEOAgent** | `agents/ceo/` | Orchestrator using claude-opus-4 |
+| **EngineeringAgent** | `agents/specialists/` | Code, APIs, infrastructure |
+| **DesignAgent** | `agents/specialists/` | UI/UX, visual design |
+| **MBAAgent** | `agents/specialists/` | Business strategy |
+| **BrainBuilderAgent** | `agents/brain_builder/` | Meta-agent for new brains |
+| **AutoLogger** | `agents/memory/` | Automatic task logging |
+| **PatternExtractor** | `agents/memory/` | Extract patterns from experiences |
+
+### Model Selection
+
+| Agent | Model | Reason |
+|-------|-------|--------|
+| CEO | claude-opus-4 | Best reasoning for orchestration |
+| Specialists | claude-sonnet-4 | Cost-effective execution |
+| Brain Builder | claude-opus-4 | Complex generation tasks |
+
+### Agent Database Tables
+
+```sql
+-- Track agent executions
+agent_runs (id, agent_type, task_input, task_output, success, tool_calls, tokens_used)
+
+-- Track brain generation
+brain_builds (id, brain_name, validation_passed, files_created)
+
+-- Track CEO routing
+ceo_task_delegations (id, task_input, decomposed_tasks, delegated_to, success)
+
+-- Track multi-agent workflows
+ceo_brain_collaborations (id, parent_agent, child_agent, task_description, success)
+```
+
+### Usage
+
+**CLI:**
+```bash
+px1000 orchestrate "Build a landing page"
+px1000 run engineering "Create REST API"
+px1000 build-brain product -d "product management" -c "Roadmapping"
+```
+
+**Python:**
+```python
+from prototype_x1000.agents import CEOAgent, EngineeringAgent
+
+ceo = CEOAgent()
+result = ceo.orchestrate("Build a landing page with signup form")
+```
+
+**MCP Server:**
+Add to Claude Desktop config for direct tool access.
+
+See `agents/README.md` for full documentation.
+
+---
+
 ## Why This Architecture
 
 | Benefit | Explanation |
