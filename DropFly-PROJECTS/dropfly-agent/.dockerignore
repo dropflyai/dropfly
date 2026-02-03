@@ -1,0 +1,44 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__
+*.py[cod]
+*.egg-info
+.eggs
+dist
+build
+.venv
+venv
+
+# IDE
+.vscode
+.idea
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Infrastructure (not needed in container)
+infrastructure/terraform/
+infrastructure/scripts/
+
+# Tests (not needed in production image)
+tests/
+
+# Docs
+*.md
+!CLAUDE.md
+
+# OS
+.DS_Store
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Workspaces (mounted at runtime)
+workspaces/

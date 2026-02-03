@@ -1,0 +1,31 @@
+# DropFly Agent — Caddy reverse proxy config
+# Replace {$DOMAIN} with your domain or use the env var
+#
+# Usage with docker compose:
+#   DOMAIN=agent.dropfly.io docker compose --profile with-https up -d
+
+{$DOMAIN:localhost} {
+    # Reverse proxy to the agent gateway
+    reverse_proxy agent:8420
+
+    # WebSocket support
+    @websocket {
+        header Connection *Upgrade*
+        header Upgrade websocket
+    }
+    reverse_proxy @websocket agent:8420
+
+    # Logging
+    log {
+        output file /data/access.log
+        format json
+    }
+
+    # Security headers
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+        -Server
+    }
+}
