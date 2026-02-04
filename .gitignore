@@ -157,61 +157,9 @@ $RECYCLE.BIN/
 # PROJECT-SPECIFIC PATTERNS
 # ========================================
 
-# Projects have their own repos - don't track in monorepo
-DropFly-PROJECTS/AI-TimeTrack-POC/
-DropFly-PROJECTS/black -cipher-project/
-DropFly-PROJECTS/bookfly/
-DropFly-PROJECTS/content-creation/
-DropFly-PROJECTS/cozypaws/
-DropFly-PROJECTS/Curriculum-pilot-mvp/
-DropFly-PROJECTS/Curriculum-pilot-mvv/
-DropFly-PROJECTS/day-trading-signal-agent/
-DropFly-PROJECTS/douglass-hicks-law/
-DropFly-PROJECTS/DropFly-FORTRESS-Security/
-DropFly-PROJECTS/DropFly-WebOps-Agent/
-DropFly-PROJECTS/dropfly-website/
-DropFly-PROJECTS/epnac-ai-demo/
-DropFly-PROJECTS/FitFly/
-DropFly-PROJECTS/hoa-community-app/
-DropFly-PROJECTS/homefly-projects/
-DropFly-PROJECTS/homeflyai/
-DropFly-PROJECTS/knowledge-engine/
-DropFly-PROJECTS/lawfly-framework/
-DropFly-PROJECTS/lawfly-pro/
-DropFly-PROJECTS/MathFly-Universal-Math-Platform/
-DropFly-PROJECTS/mikes-deli-demo/
-DropFly-PROJECTS/n8n-auto-updater/
-DropFly-PROJECTS/optic-studios/
-DropFly-PROJECTS/OS-App-Builder/
-DropFly-PROJECTS/pdf-editor/
-DropFly-PROJECTS/pdf-editor-ios/
-DropFly-PROJECTS/personal-learning-consulting/
-DropFly-PROJECTS/portfolio/
-DropFly-PROJECTS/productivity-mastery-app/
-DropFly-PROJECTS/socialfly/
-DropFly-PROJECTS/socialsync-empire/
-DropFly-PROJECTS/storm-burger-demo/
-DropFly-PROJECTS/tipfly-ai/
-DropFly-PROJECTS/trading/
-DropFly-PROJECTS/TradeFly-Backend/
-DropFly-PROJECTS/TradeFly-Frontend/
-DropFly-PROJECTS/TradeFly-iOS/
-DropFly-PROJECTS/vapi-nail-salon-agent/
-DropFly-PROJECTS/voicefly-app/
-DropFly-PROJECTS/VoiceFly-Enterprise/
-DropFly-PROJECTS/watermark-remover/
-
-# Shared folders in DropFly-PROJECTS (track these)
-!DropFly-PROJECTS/docs/
-!DropFly-PROJECTS/scripts/
-!DropFly-PROJECTS/packages/
-!DropFly-PROJECTS/templates/
-!DropFly-PROJECTS/tools/
-!DropFly-PROJECTS/apps/
-!DropFly-PROJECTS/assets/
-!DropFly-PROJECTS/ideas/
-!DropFly-PROJECTS/infrastructure/
-!DropFly-PROJECTS/prompts/
+# ALL projects have their own repos — never track in this workspace
+DropFly-PROJECTS/*/
+prototype_x1000/
 
 # ========================================
 # CREDENTIALS FOLDER RULES
