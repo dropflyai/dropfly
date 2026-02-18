@@ -1,119 +1,114 @@
 ────────────────────────────────────────────────────────
-MULTI-BRAIN SYSTEM — SPECIALIST ORCHESTRATION
+MULTI-BRAIN SYSTEM — CEO ORCHESTRATION
 ────────────────────────────────────────────────────────
 
-This repository uses a **multi-brain architecture** where specialist brains handle different domains.
+**ALL TASKS ROUTE THROUGH CEO BRAIN.**
 
-All brains are located in: `/prototype_x1000/`
+This repository uses a 37-brain architecture where CEO Brain orchestrates all specialist brains.
 
-## Brain System
-
-Each brain is **self-governing** with its own `CLAUDE.md` that defines:
-- Authority hierarchy
-- Execution rules
-- Quality gates
-- Memory/learning system
-- Ability to call other brains
-- COMMIT RULE (ask before committing)
-
-## Available Brains (37 Total)
-
-### Core Brains (Complete)
-
-#### Engineering Brain (`/prototype_x1000/engineering_brain/`)
-**Governs:** Code, automation, infrastructure, testing, DevOps
-**Instructions:** `/prototype_x1000/engineering_brain/CLAUDE.md`
-**Use when:** Building, deploying, or maintaining software
-
-#### Design Brain (`/prototype_x1000/design_brain/`)
-**Governs:** UI/UX, visual identity, user research, accessibility
-**Instructions:** `/prototype_x1000/design_brain/CLAUDE.md`
-**Use when:** Designing interfaces, user experiences, or visual systems
-
-#### Options Trading Brain (`/prototype_x1000/options_trading_brain/`)
-**Governs:** Trading algorithms, market analysis, options strategies
-**Instructions:** `/prototype_x1000/options_trading_brain/CLAUDE.md`
-**Use when:** Building trading systems or analyzing markets
-
-#### MBA Brain (`/prototype_x1000/mba_brain/`)
-**Governs:** Business strategy, operations, leadership, finance, marketing
-**Instructions:** `/prototype_x1000/mba_brain/CLAUDE.md`
-**Use when:** Strategic decisions, business planning, organizational design
-
-### CEO Brain (`/prototype_x1000/ceo_brain/` - Placeholder)
-**Governs:** Orchestration of all brains
-**Status:** Under development
-**Future:** Will coordinate multi-brain workflows to build complete businesses
-
-### Placeholder Brains (33 remaining)
-
-**Business & Strategy:**
-- Finance Brain, Operations Brain, Legal Brain
-
-**Product & Design:**
-- Product Brain, Game Design Brain, Content Brain, Localization Brain
-
-**Growth & Revenue:**
-- Marketing Brain, Sales Brain, Growth Brain, Partnership Brain, Customer Success Brain
-
-**Technical:**
-- Data Brain, Security Brain, Cloud Brain, Mobile Brain, QA Brain
-- AI Brain, Automation Brain, Analytics Brain, DevRel Brain
-
-**Marketing Channels:**
-- Branding Brain, Email Brain, Social Media Brain, Video Brain, Community Brain
-
-**Business Operations:**
-- Support Brain, Investor Brain, Pricing Brain, Innovation Brain
-
-**People:**
-- HR Brain, Research Brain
-
-## How Brains Interact
+## The Rule
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                                                             │
-│   DESIGN BRAIN ←────────────────────────→ ENGINEERING BRAIN │
-│        │                                         │          │
-│        │    "Need help with layout"              │          │
-│        │    ────────────────────────→            │          │
-│        │                                         │          │
-│        │    "Need help with component patterns"  │          │
-│        │    ←────────────────────────            │          │
-│        │                                         │          │
-│        └───────────── ↕ ─────────────────────────┘          │
-│                       │                                     │
-│                       ▼                                     │
-│              OTHER SPECIALIST BRAINS                        │
-│         (MBA, Marketing, Sales, Game Design, etc.)          │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
+USER → CEO BRAIN → [37 Specialist Brains] → Complete Output
+         ↑
+    ONLY ENTRY POINT
 ```
 
-## Execution Rules
+1. **All requests come to CEO Brain**
+2. **CEO Brain analyzes and decomposes tasks**
+3. **CEO Brain delegates to specialist brains**
+4. **CEO Brain synthesizes final output**
 
-1. **Identify the right brain** for the task
-2. **Consult that brain's CLAUDE.md** before starting
-3. **Follow that brain's authority hierarchy**
-4. **Call other brains** when their expertise is needed
-5. **Log to memory** after completing significant work
-6. **COMMIT after every change** — ask user before committing
+## To Start Any Task
 
-## When Multiple Brains Apply
+Load CEO Brain: `/prototype_x1000/ceo_brain/CLAUDE.md`
 
-If a task spans multiple domains:
-1. Identify the **primary brain** (where most work happens)
-2. Start with that brain's CLAUDE.md
-3. Call secondary brains as needed for their expertise
-4. Each brain maintains its own quality gates
+The CEO Brain will automatically:
+- Analyze the task
+- Identify required specialists
+- Decompose into subtasks
+- Delegate to specialists
+- Synthesize results
 
-## Brain Roadmap
+## Available Commands
 
-See `/prototype_x1000/BRAIN_ROADMAP.md` for:
-- Full list of all 37 brains
-- Build order and priority
-- Specifications for each brain
-- How to build new brains
+```bash
+# CEO orchestrates the task (recommended)
+px1000 orchestrate "Build a SaaS product for X"
+
+# Route through CEO with brain hint
+px1000 run engineering "Create an API"
+
+# List all 37 brains
+px1000 brains
+
+# Check system status
+px1000 status
+```
+
+## DO NOT
+
+- Directly invoke specialist brains (bypass CEO)
+- Use `--direct` flag unless specifically testing
+- Call individual brain CLAUDE.md files without CEO context
+
+## All 37 Brains
+
+### Core (Complete)
+- **engineering** - Code, APIs, infrastructure, DevOps
+- **design** - UI/UX, visual design, user research
+- **mba** - Business strategy, operations, leadership
+- **options_trading** - Trading algorithms, market analysis
+- **ceo** - Orchestration of all brains
+
+### Business & Strategy
+- **finance** - Accounting, budgeting, financial modeling
+- **operations** - Supply chain, logistics, optimization
+- **legal** - Contracts, compliance, IP protection
+
+### Product & Design
+- **product** - Product strategy, roadmapping, PRDs
+- **game_design** - Game mechanics, player psychology
+- **content** - Copywriting, SEO, storytelling
+- **localization** - i18n, l10n, translation
+
+### Growth & Revenue
+- **marketing** - Growth, acquisition, brand positioning
+- **sales** - Sales process, closing, pipeline
+- **growth** - Growth hacking, viral loops, PLG
+- **partnership** - Business development, alliances
+- **customer_success** - Onboarding, retention, churn
+
+### Technical
+- **data** - Analytics, ML/AI, data pipelines
+- **security** - Cybersecurity, compliance, auditing
+- **cloud** - AWS, GCP, Azure, infrastructure
+- **mobile** - iOS, Android, React Native
+- **qa** - Testing, automation, quality gates
+- **ai** - LLMs, ML models, prompting
+- **automation** - Workflow, n8n, Zapier
+- **analytics** - Metrics, dashboards, insights
+- **devrel** - Developer relations, documentation
+
+### Marketing Channels
+- **branding** - Brand identity, visual systems
+- **email** - Email marketing, drip campaigns
+- **social_media** - Social platforms, engagement
+- **video** - Video content, production
+- **community** - Community building, moderation
+
+### Business Operations
+- **support** - Customer support, ticketing
+- **investor** - Fundraising, pitch decks
+- **pricing** - Pricing strategy, monetization
+- **innovation** - R&D, new ventures
+
+### People
+- **hr** - Hiring, culture, team building
+- **research** - Market research, competitor analysis
+
+## Brain Location
+
+All brains: `/prototype_x1000/`
 
 ────────────────────────────────────────────────────────

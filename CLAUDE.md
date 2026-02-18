@@ -1,16 +1,58 @@
-# CEO BRAIN — Master Orchestrator (Placeholder)
+# CEO BRAIN — Master Orchestrator
 
-This will be the master brain that orchestrates all specialist brains.
+**ALL TASKS ROUTE THROUGH CEO BRAIN.**
+
+The CEO Brain is the single entry point for the entire PX1000 system. It orchestrates all 37 specialist brains to build complete businesses.
 
 ---
 
-## Status: PLACEHOLDER
+## Quick Start
 
-This brain is under development. It will eventually:
-- Orchestrate all specialist brains
-- Delegate tasks to the right brain
-- Coordinate multi-brain workflows
-- Build entire businesses using specialist expertise
+```bash
+# Orchestrate any task (CEO handles everything)
+px1000 orchestrate "Build a SaaS product for X"
+
+# Run with brain hint (still routes through CEO)
+px1000 run engineering "Create an API"
+
+# List all brains
+px1000 brains
+
+# Check status
+px1000 status
+```
+
+---
+
+## Architecture
+
+```
+                         ┌─────────────────┐
+                         │    CEO BRAIN    │
+        USER ──────────► │  (orchestrator) │ ◄──── ONLY ENTRY POINT
+                         └────────┬────────┘
+                                  │
+    ┌──────────┬──────────┬──────┴───────┬──────────┬──────────┐
+    │          │          │              │          │          │
+    ▼          ▼          ▼              ▼          ▼          ▼
+┌────────┐ ┌────────┐ ┌────────┐   ┌────────┐ ┌────────┐ ┌────────┐
+│ENGINEER│ │ DESIGN │ │  MBA   │   │PRODUCT │ │MARKETNG│ │ SALES  │
+└────────┘ └────────┘ └────────┘   └────────┘ └────────┘ └────────┘
+    │          │          │              │          │          │
+    └──────────┴──────────┴──────────────┴──────────┴──────────┘
+                    + 31 more specialist brains
+```
+
+---
+
+## How It Works
+
+1. **User submits task** → CEO Brain receives it
+2. **CEO analyzes** → Identifies required specialists
+3. **CEO decomposes** → Breaks into subtasks
+4. **CEO delegates** → Routes to specialist brains
+5. **Specialists execute** → Each brain handles its domain
+6. **CEO synthesizes** → Combines results into final output
 
 ---
 
@@ -20,28 +62,28 @@ All brains are located in: `/prototype_x1000/`
 
 ---
 
-## Available Specialist Brains (37 Total)
+## All 37 Brains
 
-### Current Brains (3 Complete + 1 In Progress)
+### Core Brains (Complete)
 
 | Brain | Location | Specialty | Status |
 |-------|----------|-----------|--------|
+| CEO Brain | `/prototype_x1000/ceo_brain/` | Orchestration | **Active** |
 | Engineering Brain | `/prototype_x1000/engineering_brain/` | Code, automation, infrastructure, DevOps | Complete |
 | Design Brain | `/prototype_x1000/design_brain/` | UI/UX, visual identity, user research | Complete |
 | MBA Brain | `/prototype_x1000/mba_brain/` | Business strategy, operations, leadership | Complete |
-| Options Trading Brain | `/prototype_x1000/options_trading_brain/` | Trading algorithms, market analysis | In Progress |
-| CEO Brain | `/prototype_x1000/ceo_brain/` | Orchestration | Placeholder |
+| Options Trading Brain | `/prototype_x1000/options_trading_brain/` | Trading algorithms, market analysis | Complete |
 
-### Planned Brains (33 Placeholder Folders)
+### Business & Strategy
 
-**Business & Strategy**
 | Brain | Specialty |
 |-------|-----------|
 | Finance Brain | Accounting, budgeting, financial modeling, fundraising |
 | Operations Brain | Supply chain, logistics, process optimization |
 | Legal Brain | Contracts, compliance, IP protection |
 
-**Product & Design**
+### Product & Design
+
 | Brain | Specialty |
 |-------|-----------|
 | Product Brain | Product strategy, roadmapping, prioritization |
@@ -49,7 +91,8 @@ All brains are located in: `/prototype_x1000/`
 | Content Brain | Copywriting, content strategy, SEO, storytelling |
 | Localization Brain | i18n, l10n, regional adaptation, translation |
 
-**Growth & Revenue**
+### Growth & Revenue
+
 | Brain | Specialty |
 |-------|-----------|
 | Marketing Brain | Growth, acquisition, retention, brand positioning |
@@ -58,7 +101,8 @@ All brains are located in: `/prototype_x1000/`
 | Partnership Brain | Business development, alliances, integrations |
 | Customer Success Brain | Onboarding, retention, support, churn prevention |
 
-**Technical**
+### Technical
+
 | Brain | Specialty |
 |-------|-----------|
 | Data Brain | Analytics, ML/AI, data pipelines |
@@ -71,7 +115,8 @@ All brains are located in: `/prototype_x1000/`
 | Analytics Brain | Metrics, dashboards, reporting, insights |
 | DevRel Brain | Developer relations, documentation, community |
 
-**Marketing Channels**
+### Marketing Channels
+
 | Brain | Specialty |
 |-------|-----------|
 | Branding Brain | Brand identity, visual systems, brand voice |
@@ -80,7 +125,8 @@ All brains are located in: `/prototype_x1000/`
 | Video Brain | Video content, production, distribution |
 | Community Brain | Community building, moderation, engagement |
 
-**Business Operations**
+### Business Operations
+
 | Brain | Specialty |
 |-------|-----------|
 | Support Brain | Customer support, ticketing, knowledge base |
@@ -88,76 +134,22 @@ All brains are located in: `/prototype_x1000/`
 | Pricing Brain | Pricing strategy, packaging, monetization |
 | Innovation Brain | R&D, new ventures, experimentation |
 
-**People**
+### People
+
 | Brain | Specialty |
 |-------|-----------|
 | HR Brain | Hiring, culture, team building |
 | Research Brain | Market research, competitor analysis, trends |
+
+---
+
+## Brain Principles
 
 Each brain is **self-governing** with its own `CLAUDE.md`.
 
 Each brain can **call other brains** when it needs their expertise.
 
 Each brain has a **COMMIT RULE** — must ask before committing changes.
-
----
-
-## Architecture
-
-```
-                         ┌─────────────────┐
-                         │    CEO BRAIN    │
-                         │  (orchestrator) │
-                         └────────┬────────┘
-                                  │
-    ┌──────────┬──────────┬──────┴───────┬──────────┬──────────┐
-    │          │          │              │          │          │
-    ▼          ▼          ▼              ▼          ▼          ▼
-┌────────┐ ┌────────┐ ┌────────┐   ┌────────┐ ┌────────┐ ┌────────┐
-│ENGINEER│ │ DESIGN │ │  MBA   │   │TRADING │ │MARKETNG│ │ SALES  │
-│  BRAIN │ │  BRAIN │ │ BRAIN  │   │ BRAIN  │ │ BRAIN  │ │ BRAIN  │
-└────────┘ └────────┘ └────────┘   └────────┘ └────────┘ └────────┘
-    │          │          │              │          │          │
-    └──────────┴──────────┴──────────────┴──────────┴──────────┘
-                    (all brains can call each other)
-
-Additional: AI, Automation, Analytics, Cloud, Mobile, Security, QA,
-            Product, Game Design, Content, Legal, HR, and 20+ more...
-```
-
----
-
-## Future Capabilities
-
-When complete, the CEO Brain will:
-
-1. **Receive high-level business goals**
-   - "Build a SaaS product for X"
-   - "Create a mobile app that does Y"
-
-2. **Decompose into specialist tasks**
-   - Design Brain: Research users, create UI
-   - Engineering Brain: Build backend, deploy
-   - Other brains: Domain-specific work
-
-3. **Coordinate execution**
-   - Manage dependencies between brains
-   - Resolve conflicts
-   - Ensure quality gates pass
-
-4. **Deliver complete products**
-   - From idea to deployed product
-   - Using all specialist expertise
-
----
-
-## Current Usage
-
-Until the CEO Brain is complete:
-
-- Use `/prototype_x1000/engineering_brain/CLAUDE.md` for engineering work
-- Use `/prototype_x1000/design_brain/CLAUDE.md` for design work
-- Brains will call each other as needed
 
 ---
 
@@ -169,8 +161,14 @@ See `/prototype_x1000/BRAIN_ROADMAP.md` for:
 - Specifications for each brain
 - How to build a new brain
 
-**Next brain to build:** Product Brain
+---
+
+## DO NOT
+
+- **Bypass CEO** — Never invoke specialist brains directly
+- **Use --direct** — Only for debugging, not production use
+- **Load individual CLAUDE.md** — Always go through CEO
 
 ---
 
-**This placeholder will evolve into the master orchestrator.**
+**CEO Brain is the master orchestrator. All work flows through it.**
