@@ -218,6 +218,9 @@ verify_mobile_expo() {
             print_fail "app.json is invalid JSON"
         fi
     fi
+
+    # Run Maestro mobile UI tests
+    run_maestro_test
 }
 
 verify_web_nextjs() {
@@ -535,7 +538,7 @@ verify_library_python() {
 }
 
 # ============================================
-# TRIPLE VERIFY (Playwright)
+# TRIPLE VERIFY (Playwright) - WEB
 # ============================================
 
 run_triple_verify() {
@@ -564,6 +567,129 @@ run_triple_verify() {
     else
         print_skip "triple-verify.py not found - skipping Playwright verification"
     fi
+}
+
+# ============================================
+# MAESTRO VERIFICATION - MOBILE
+# ============================================
+
+run_maestro_test() {
+    print_section "Maestro Mobile UI Testing"
+
+    # Already in PROJECT_DIR from parent function
+
+    # Check if Maestro is installed
+    if ! command -v maestro &> /dev/null; then
+        print_info "Maestro not installed. Installing..."
+        if curl -Ls "https://get.maestro.mobile.dev" | bash 2>&1; then
+            export PATH="$PATH:$HOME/.maestro/bin"
+            print_pass "Maestro installed"
+        else
+            print_skip "Could not install Maestro - skipping mobile UI tests"
+            return
+        fi
+    else
+        print_pass "Maestro is installed"
+    fi
+
+    # Check for Maestro flow files
+    MAESTRO_DIR=""
+    if [ -d ".maestro" ]; then
+        MAESTRO_DIR=".maestro"
+    elif [ -d "maestro" ]; then
+        MAESTRO_DIR="maestro"
+    elif [ -d "e2e/maestro" ]; then
+        MAESTRO_DIR="e2e/maestro"
+    fi
+
+    if [ -z "$MAESTRO_DIR" ]; then
+        print_skip "No Maestro flows found (.maestro/, maestro/, or e2e/maestro/)"
+        print_info "To add Maestro tests, create a .maestro/ directory with .yaml flow files"
+        return
+    fi
+
+    print_pass "Maestro flows found in: $MAESTRO_DIR"
+
+    # Count flow files
+    FLOW_COUNT=$(find "$MAESTRO_DIR" -name "*.yaml" -o -name "*.yml" 2>/dev/null | wc -l | tr -d ' ')
+    print_info "Found $FLOW_COUNT Maestro flow file(s)"
+
+    if [ "$FLOW_COUNT" -eq 0 ]; then
+        print_skip "No .yaml flow files found in $MAESTRO_DIR"
+        return
+    fi
+
+    # Determine test mode (headed vs headless)
+    MAESTRO_MODE="${MAESTRO_MODE:-headless}"
+
+    # Run Maestro tests
+    print_info "Running Maestro tests in $MAESTRO_MODE mode..."
+
+    if [ "$MAESTRO_MODE" = "headed" ]; then
+        # Headed mode - requires simulator/emulator running
+        print_info "Headed mode: Ensure iOS Simulator or Android Emulator is running"
+        if maestro test "$MAESTRO_DIR" 2>&1; then
+            print_pass "Maestro tests passed (headed)"
+        else
+            print_fail "Maestro tests failed (headed)"
+        fi
+    else
+        # Headless mode - uses Maestro Cloud or local headless
+        if maestro test "$MAESTRO_DIR" --no-ansi 2>&1; then
+            print_pass "Maestro tests passed (headless)"
+        else
+            print_fail "Maestro tests failed (headless)"
+        fi
+    fi
+
+    # Collect Maestro screenshots/recordings if available
+    if [ -d ".maestro/reports" ]; then
+        cp -r ".maestro/reports" "$EVIDENCE_DIR/maestro-reports" 2>/dev/null || true
+        print_info "Maestro reports copied to evidence directory"
+    fi
+}
+
+# ============================================
+# MAESTRO FLOW GENERATOR
+# ============================================
+
+generate_sample_maestro_flow() {
+    local flow_dir="$1"
+
+    mkdir -p "$flow_dir"
+
+    # Create a sample flow file
+    cat > "$flow_dir/smoke-test.yaml" << 'MAESTRO_FLOW'
+# Maestro Smoke Test Flow
+# Run with: maestro test .maestro/
+
+appId: ${APP_ID}
+
+---
+# Launch the app
+- launchApp
+
+# Wait for app to load
+- extendedWaitUntil:
+    visible: ".*"
+    timeout: 10000
+
+# Take a screenshot
+- takeScreenshot: "app-launch"
+
+# Assert app loaded successfully
+- assertVisible:
+    text: ".*"
+
+# Basic navigation smoke test
+- tapOn:
+    text: ".*"
+    optional: true
+
+- takeScreenshot: "after-tap"
+MAESTRO_FLOW
+
+    print_info "Created sample Maestro flow: $flow_dir/smoke-test.yaml"
 }
 
 # ============================================

@@ -48,7 +48,27 @@ VERIFICATION EVIDENCE:
 - Exit code: [0 or 1]
 - Screenshot paths: [if applicable]
 - Test results: [pass/fail counts]
+
+BRAINS USED:
+- CEO Brain (orchestrator)
+- [List each brain consulted/used]
+- [Include what each brain contributed]
 ```
+
+### Brain Usage Reporting — MANDATORY
+
+Every task completion MUST report which brains were used:
+
+```
+BRAINS USED:
+- CEO Brain: Orchestrated task decomposition and delegation
+- Research Brain: Conducted industry and competitor analysis
+- Engineering Brain: Implemented the feature code
+- QA Brain: Defined test strategy and ran verification
+- [etc.]
+```
+
+**Why this matters:** If you cannot list the brains used, you probably didn't use the system correctly. This transparency ensures the brain system is actually being utilized.
 
 ### If Exit Code is 1 (FAILURE):
 
@@ -56,6 +76,26 @@ VERIFICATION EVIDENCE:
 2. **FIX** the failures identified
 3. **RE-RUN** verification
 4. **ONLY** claim success when exit code is 0
+
+### Verification Loop — MANDATORY
+
+```
+┌─────────────────────────────────────────────────┐
+│                                                 │
+│   VERIFY → FAIL? → FIX → RE-VERIFY → REPEAT    │
+│      │                                    │     │
+│      └──── PASS? → CLAIM SUCCESS ─────────┘     │
+│                                                 │
+└─────────────────────────────────────────────────┘
+```
+
+**There is NO shortcut. If verification fails:**
+- Go back
+- Fix the issue
+- Run verification again
+- Repeat until exit code is 0
+
+**This loop continues until success. No exceptions.**
 
 ### Verification Skip Declaration
 
@@ -134,6 +174,63 @@ Only confirm completion when exit code is 0 and you include evidence.
 The CEO Brain is the single entry point for the entire PX1000 system. It orchestrates all 37 specialist brains to build complete businesses.
 
 Location: `/DropFly-PROJECTS/prototype_x1000/ceo_brain/`
+
+---
+
+## NEW PROJECT PROTOCOL — RESEARCH FIRST
+
+When user says "start a new project" or similar, follow this exact sequence:
+
+### Phase 1: Information Gathering
+
+CEO Brain enters discovery mode. Ask:
+- What is the project/product/business idea?
+- What problem does it solve?
+- Who is the target user/customer?
+- What are your constraints (time, budget, tech)?
+- Any existing assets or requirements?
+
+**DO NOT proceed to Phase 2 until answers are clear.**
+
+### Phase 2: Deep Research (Parallel Agents)
+
+Spawn these research agents SIMULTANEOUSLY:
+
+| Agent | Brain | Research Focus |
+|-------|-------|----------------|
+| Industry Analyst | Research Brain | Industry analysis, market size, trends, key players |
+| Competitor Intel | Research Brain | Competitor landscape, strengths/weaknesses, gaps |
+| Business Strategist | MBA Brain | Business model, revenue model, operations structure |
+| Market Analyst | Marketing Brain | Target demographics, positioning, go-to-market |
+| Financial Modeler | Finance Brain | Cost structure, pricing strategy, funding needs |
+| Product Strategist | Product Brain | Feature requirements, roadmap, MVP scope |
+| Legal Advisor | Legal Brain | Compliance requirements, IP considerations, risks |
+
+**All agents run in parallel. Wait for ALL to complete.**
+
+### Phase 3: Business Plan Synthesis
+
+CEO Brain consolidates all research into:
+- Executive summary
+- Market analysis
+- Business model
+- Product requirements
+- Go-to-market strategy
+- Financial projections
+- Risk assessment
+- Implementation roadmap
+
+**Present plan to user for approval before ANY execution.**
+
+### Phase 4: Execution
+
+Only after research is complete AND user approves:
+- Engineering Brain builds
+- Design Brain designs
+- QA Brain tests
+- All brains verify their work
+
+**NEVER skip research. NEVER start building without a plan.**
 
 ---
 
