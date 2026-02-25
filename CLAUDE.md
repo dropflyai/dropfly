@@ -2,6 +2,25 @@
 
 **STOP. READ THIS FIRST. THIS IS NON-NEGOTIABLE.**
 
+---
+
+## FIRST TIME SETUP (New Team Members)
+
+If you just cloned this repo, run the setup script:
+
+```bash
+./scripts/setup.sh
+```
+
+This will:
+1. Clone/update the prototype_x1000 brain system
+2. Verify all required files are in place
+3. Check dependencies (Maestro, Playwright)
+
+**You only need to run this once after cloning.**
+
+---
+
 Before taking ANY action — writing code, making decisions, answering questions, planning, building, debugging, or verifying — you MUST:
 
 1. **Consult the prototype_x1000 system** at `/DropFly-PROJECTS/prototype_x1000/`
