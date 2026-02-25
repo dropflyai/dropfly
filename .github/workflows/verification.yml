@@ -1,0 +1,336 @@
+name: PX1000 Verification Pipeline
+
+on:
+  pull_request:
+    branches: [main, master]
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+    inputs:
+      project_path:
+        description: 'Path to project to verify (relative to repo root)'
+        required: false
+        default: '.'
+      url:
+        description: 'URL for web verification (if applicable)'
+        required: false
+
+env:
+  NODE_VERSION: '20'
+  PYTHON_VERSION: '3.11'
+
+jobs:
+  # ============================================
+  # LAYER 1: AUTOMATED TESTING
+  # ============================================
+  layer-1-tests:
+    name: "Layer 1: Automated Tests"
+    runs-on: ubuntu-latest
+
+    outputs:
+      project_type: ${{ steps.detect.outputs.project_type }}
+      has_tests: ${{ steps.detect.outputs.has_tests }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: '**/package-lock.json'
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Detect project type
+        id: detect
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+
+          # Detect project type
+          if [ -f "app.json" ] && grep -q "expo" package.json 2>/dev/null; then
+            echo "project_type=mobile-expo" >> $GITHUB_OUTPUT
+          elif [ -f "next.config.js" ] || [ -f "next.config.mjs" ]; then
+            echo "project_type=web-nextjs" >> $GITHUB_OUTPUT
+          elif [ -f "vite.config.js" ] || [ -f "vite.config.ts" ]; then
+            echo "project_type=web-vite" >> $GITHUB_OUTPUT
+          elif [ -f "package.json" ]; then
+            echo "project_type=library-node" >> $GITHUB_OUTPUT
+          else
+            echo "project_type=unknown" >> $GITHUB_OUTPUT
+          fi
+
+          # Check if tests exist
+          if [ -f "package.json" ] && grep -q '"test"' package.json; then
+            echo "has_tests=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_tests=false" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Install dependencies
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          if [ -f "$PROJECT_PATH/package.json" ]; then
+            cd "$PROJECT_PATH"
+            npm ci || npm install
+          fi
+
+      - name: TypeScript check
+        if: success()
+        continue-on-error: false
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+          if [ -f "tsconfig.json" ]; then
+            npx tsc --noEmit
+            echo "TypeScript check passed"
+          else
+            echo "No tsconfig.json - skipping TypeScript check"
+          fi
+
+      - name: ESLint check
+        if: success()
+        continue-on-error: false
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+          if [ -f "package.json" ] && grep -q '"lint"' package.json; then
+            npm run lint
+            echo "ESLint check passed"
+          else
+            echo "No lint script - skipping ESLint"
+          fi
+
+      - name: Run tests
+        if: success() && steps.detect.outputs.has_tests == 'true'
+        continue-on-error: false
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+          npm test -- --ci --passWithNoTests
+
+      - name: Security audit
+        if: success()
+        continue-on-error: true
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+          if [ -f "package.json" ]; then
+            npm audit --production || echo "Audit found issues (non-blocking)"
+          fi
+
+      - name: Layer 1 Summary
+        if: always()
+        run: |
+          echo "============================================"
+          echo "LAYER 1: AUTOMATED TESTS COMPLETE"
+          echo "============================================"
+          echo "Project Type: ${{ steps.detect.outputs.project_type }}"
+          echo "Has Tests: ${{ steps.detect.outputs.has_tests }}"
+          echo "Status: ${{ job.status }}"
+
+  # ============================================
+  # LAYER 2: EVIDENCE COLLECTION
+  # ============================================
+  layer-2-evidence:
+    name: "Layer 2: Evidence Collection"
+    runs-on: ubuntu-latest
+    needs: layer-1-tests
+    if: success() && (needs.layer-1-tests.outputs.project_type == 'web-nextjs' || needs.layer-1-tests.outputs.project_type == 'web-vite')
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+          npm ci || npm install
+
+      - name: Install Playwright
+        run: |
+          pip install playwright
+          playwright install chromium
+
+      - name: Build project
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+          npm run build
+
+      - name: Start server and run triple-verify
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+
+          # Start server in background
+          if [ -f "next.config.js" ] || [ -f "next.config.mjs" ]; then
+            npm start &
+            SERVER_PID=$!
+            sleep 10
+            URL="http://localhost:3000"
+          elif [ -f "vite.config.js" ] || [ -f "vite.config.ts" ]; then
+            npm run preview &
+            SERVER_PID=$!
+            sleep 5
+            URL="http://localhost:4173"
+          fi
+
+          # Override URL if provided
+          if [ -n "${{ github.event.inputs.url }}" ]; then
+            URL="${{ github.event.inputs.url }}"
+          fi
+
+          # Run triple-verify
+          if [ -f "scripts/automation/triple-verify.py" ]; then
+            python3 scripts/automation/triple-verify.py "$URL"
+          elif [ -f "${{ github.workspace }}/PROJECT-TEMPLATE/scripts/automation/triple-verify.py" ]; then
+            python3 "${{ github.workspace }}/PROJECT-TEMPLATE/scripts/automation/triple-verify.py" "$URL"
+          else
+            echo "Warning: triple-verify.py not found"
+          fi
+
+          # Cleanup
+          if [ -n "$SERVER_PID" ]; then
+            kill $SERVER_PID 2>/dev/null || true
+          fi
+
+      - name: Upload screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-screenshots
+          path: /tmp/verify-*.png
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Layer 2 Summary
+        if: always()
+        run: |
+          echo "============================================"
+          echo "LAYER 2: EVIDENCE COLLECTION COMPLETE"
+          echo "============================================"
+          echo "Screenshots uploaded as artifacts"
+          echo "Status: ${{ job.status }}"
+
+  # ============================================
+  # LAYER 3: MERGE GATE
+  # ============================================
+  layer-3-gate:
+    name: "Layer 3: Verification Gate"
+    runs-on: ubuntu-latest
+    needs: [layer-1-tests, layer-2-evidence]
+    if: always()
+
+    steps:
+      - name: Evaluate Gate
+        run: |
+          echo "============================================"
+          echo "LAYER 3: VERIFICATION GATE"
+          echo "============================================"
+
+          LAYER1_STATUS="${{ needs.layer-1-tests.result }}"
+          LAYER2_STATUS="${{ needs.layer-2-evidence.result }}"
+
+          echo "Layer 1 (Automated Tests): $LAYER1_STATUS"
+          echo "Layer 2 (Evidence Collection): $LAYER2_STATUS"
+
+          # Layer 1 must pass
+          if [ "$LAYER1_STATUS" != "success" ]; then
+            echo ""
+            echo "GATE RESULT: BLOCKED"
+            echo "Reason: Layer 1 (Automated Tests) failed"
+            echo ""
+            exit 1
+          fi
+
+          # Layer 2 must pass or be skipped (for non-web projects)
+          if [ "$LAYER2_STATUS" != "success" ] && [ "$LAYER2_STATUS" != "skipped" ]; then
+            echo ""
+            echo "GATE RESULT: BLOCKED"
+            echo "Reason: Layer 2 (Evidence Collection) failed"
+            echo ""
+            exit 1
+          fi
+
+          echo ""
+          echo "GATE RESULT: PASSED"
+          echo "All verification layers passed."
+          echo ""
+
+      - name: Gate Summary
+        if: always()
+        run: |
+          echo ""
+          echo "========================================"
+          if [ "${{ job.status }}" == "success" ]; then
+            echo "  VERIFICATION GATE: PASSED"
+            echo "  Safe to merge."
+          else
+            echo "  VERIFICATION GATE: FAILED"
+            echo "  DO NOT merge until issues are fixed."
+          fi
+          echo "========================================"
+
+  # ============================================
+  # MOBILE PROJECT VERIFICATION
+  # ============================================
+  verify-mobile:
+    name: "Mobile Verification"
+    runs-on: ubuntu-latest
+    needs: layer-1-tests
+    if: needs.layer-1-tests.outputs.project_type == 'mobile-expo'
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install dependencies
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+          npm ci || npm install
+
+      - name: Run Expo Doctor
+        continue-on-error: true
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+          npx expo-doctor || echo "Expo doctor found issues"
+
+      - name: Validate app.json
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+          python3 -c "import json; json.load(open('app.json'))"
+          echo "app.json is valid JSON"
+
+      - name: Check EAS build config
+        if: hashFiles('**/eas.json') != ''
+        run: |
+          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
+          cd "$PROJECT_PATH"
+          python3 -c "import json; json.load(open('eas.json'))"
+          echo "eas.json is valid JSON"
