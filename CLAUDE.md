@@ -23,9 +23,70 @@ This will:
 
 Before taking ANY action — writing code, making decisions, answering questions, planning, building, debugging, or verifying — you MUST:
 
-1. **Consult the prototype_x1000 system** at `/DropFly-PROJECTS/prototype_x1000/`
-2. **Follow the established protocols** for the relevant brain
-3. **Use the proper channels** — no shortcuts, no improvising
+1. **Query the Memory System** at `/DropFly-PROJECTS/prototype_x1000/memory/`
+2. **Consult the prototype_x1000 system** at `/DropFly-PROJECTS/prototype_x1000/`
+3. **Follow the established protocols** for the relevant brain
+4. **Use the proper channels** — no shortcuts, no improvising
+
+---
+
+## MEMORY SYSTEM — LEARN FROM THE PAST
+
+**Before ANY work, query memory:**
+```
+1. QUERY: "Has this been tried before?"
+2. SURFACE: Related successes, failures, learnings
+3. APPLY: What worked, avoid what failed
+4. WARN: If approach previously failed
+```
+
+**After ANY work, log to memory:**
+```
+1. LOG decisions with rationale
+2. LOG failures with root cause
+3. LOG successes as patterns
+4. LOG learnings for future
+```
+
+**Location:** `/DropFly-PROJECTS/prototype_x1000/memory/`
+
+---
+
+## AGENT TEAMS — COLLABORATIVE INTELLIGENCE
+
+Each brain can spawn **departmental teams** of specialized agents:
+
+```
+Engineering Brain Team: Frontend, Backend, DevOps, Security, Architecture
+Design Brain Team: UX Research, UI Design, Accessibility, Brand
+Research Brain Team: Industry Analyst, Competitor Intel, User Research
+Marketing Brain Team: Growth, Content, Social, Paid Ads, Analytics
+[etc. for all 37 brains]
+```
+
+**Teams collaborate by:**
+- Challenging each other's ideas
+- Debating approaches with evidence
+- Reaching consensus or escalating
+- Logging all discussions to memory
+
+**See:** `/DropFly-PROJECTS/prototype_x1000/ceo_brain/02_orchestration/agent_teams.md`
+
+---
+
+## COLLABORATION PROTOCOL
+
+Agents must challenge each other:
+
+```
+1. PROPOSE: "I suggest X because..."
+2. CHALLENGE: "What about Y? X might fail because..."
+3. DEFEND/ADAPT: Incorporate feedback or change approach
+4. RESOLVE: Agree on final approach
+5. LOG: Document decision and rationale
+```
+
+**See:** `/DropFly-PROJECTS/prototype_x1000/ceo_brain/02_orchestration/collaboration_protocol.md`
 
 ---
 
@@ -200,56 +261,95 @@ Location: `/DropFly-PROJECTS/prototype_x1000/ceo_brain/`
 
 When user says "start a new project" or similar, follow this exact sequence:
 
-### Phase 1: Information Gathering
+### Phase 1: Information Gathering (ONE QUESTION AT A TIME)
 
-CEO Brain enters discovery mode. Ask:
-- What is the project/product/business idea?
-- What problem does it solve?
-- Who is the target user/customer?
-- What are your constraints (time, budget, tech)?
-- Any existing assets or requirements?
+**CRITICAL: Ask ONE question, wait for response, then ask next.**
+**CRITICAL: Every question includes RECOMMENDATIONS with explanations.**
 
-**DO NOT proceed to Phase 2 until answers are clear.**
+```
+Question 1: "What are you building?"
+→ Include recommendations: SaaS, Mobile App, Marketplace, etc.
+→ Explain pros/cons of each
+→ WAIT for response
 
-### Phase 2: Deep Research (Parallel Agents)
+Question 2: "What problem does this solve?"
+→ Include problem types: Hair on Fire, Painkiller, Vitamin
+→ Help user validate the problem
+→ WAIT for response
 
-Spawn these research agents SIMULTANEOUSLY:
+Question 3: "Who is your target customer?"
+→ Include options: B2B, B2C, Enterprise, SMB, etc.
+→ Explain implications of each
+→ WAIT for response
 
-| Agent | Brain | Research Focus |
-|-------|-------|----------------|
-| Industry Analyst | Research Brain | Industry analysis, market size, trends, key players |
-| Competitor Intel | Research Brain | Competitor landscape, strengths/weaknesses, gaps |
-| Business Strategist | MBA Brain | Business model, revenue model, operations structure |
-| Market Analyst | Marketing Brain | Target demographics, positioning, go-to-market |
-| Financial Modeler | Finance Brain | Cost structure, pricing strategy, funding needs |
-| Product Strategist | Product Brain | Feature requirements, roadmap, MVP scope |
-| Legal Advisor | Legal Brain | Compliance requirements, IP considerations, risks |
+Question 4: "What are your constraints?"
+→ Include timeline, budget, tech preferences
+→ Recommend based on their situation
+→ WAIT for response
 
-**All agents run in parallel. Wait for ALL to complete.**
+Question 5: "What do you already have?"
+→ Existing assets, expertise, network
+→ WAIT for response
+```
 
-### Phase 3: Business Plan Synthesis
+**Before Phase 2: QUERY MEMORY for similar projects and learnings.**
 
-CEO Brain consolidates all research into:
+### Phase 2: Deep Research (Departmental Agent Teams)
+
+Each brain spawns a TEAM of specialized agents that collaborate:
+
+```
+Research Department → Industry Analyst, Competitor Intel, User Research
+Business Strategy Department → Business Model, Operations, Strategy
+Marketing Department → Demographics, Positioning, GTM
+Finance Department → Financial Model, Pricing, Funding
+Product Department → Requirements, UX, Roadmap
+Legal Department → Compliance, IP, Risk
+
+ALL TEAMS WORK IN PARALLEL.
+TEAMS CHALLENGE EACH OTHER.
+ALL DISCUSSIONS LOGGED TO MEMORY.
+```
+
+### Phase 3: Cross-Department Challenge Session
+
+Before finalizing:
+- Each department presents findings
+- Other departments challenge with evidence
+- Resolve conflicts through debate
+- CEO Brain facilitates and breaks ties
+- Document all decisions and rationale
+
+### Phase 4: Business Plan Synthesis
+
+CEO Brain consolidates all research into comprehensive plan:
 - Executive summary
-- Market analysis
-- Business model
-- Product requirements
-- Go-to-market strategy
-- Financial projections
-- Risk assessment
+- Market analysis (from Research)
+- Competitive landscape (from Research)
+- Business model (from MBA)
+- Marketing strategy (from Marketing)
+- Financial projections (from Finance)
+- Product requirements (from Product)
+- Legal considerations (from Legal)
+- **Learnings Applied** (from Memory)
 - Implementation roadmap
+- Risk assessment
 
 **Present plan to user for approval before ANY execution.**
 
-### Phase 4: Execution
+### Phase 5: Execution
 
 Only after research is complete AND user approves:
-- Engineering Brain builds
-- Design Brain designs
-- QA Brain tests
-- All brains verify their work
+- Engineering Brain spawns dev team
+- Design Brain spawns design team
+- QA Brain spawns test team
+- All teams collaborate and challenge
+- All verification protocols apply
+- All work logged to memory
 
-**NEVER skip research. NEVER start building without a plan.**
+**NEVER skip research. NEVER start building without a plan. NEVER ignore past learnings.**
+
+**Full protocol:** `/DropFly-PROJECTS/prototype_x1000/ceo_brain/CLAUDE.md`
 
 ---
 
