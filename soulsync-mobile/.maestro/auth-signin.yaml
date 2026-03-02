@@ -1,0 +1,25 @@
+appId: com.soulsync.app
+name: "Auth - Sign In Flow"
+---
+- launchApp
+- waitForAnimationToEnd
+
+# Tap Sign In
+- tapOn:
+    text: "Sign In"
+
+- waitForAnimationToEnd
+
+# Verify sign in screen
+- assertVisible:
+    text: "Welcome Back"
+
+- takeScreenshot: "04_signin_screen"
+
+# Verify form elements exist
+- assertVisible:
+    text: "Email"
+- assertVisible:
+    text: "Password"
+- assertVisible:
+    text: "Sign In"

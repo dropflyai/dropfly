@@ -84,7 +84,13 @@ export default function SignUpScreen() {
       } else {
         Alert.alert(
           'Check your email',
-          'We sent you a confirmation link. Please verify your email to continue.'
+          'We sent you a confirmation link. Please verify your email to continue.',
+          [
+            {
+              text: 'OK',
+              onPress: () => router.replace('/(auth)/sign-in'),
+            },
+          ]
         );
       }
     } catch (error: unknown) {

@@ -4,12 +4,12 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useFonts } from 'expo-font';
 import { Stack, router, useSegments, useRootNavigationState } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import 'react-native-reanimated';
+// import 'react-native-reanimated';
 
 import { useAuthStore, useOnboardingStore } from '@/lib/store';
 import { supabase } from '@/lib/supabase';
 import { Colors } from '@/constants/theme';
-import { useNotifications } from '@/hooks/useNotifications';
+// import { useNotifications } from '@/hooks/useNotifications';
 import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 // Re-export expo-router's ErrorBoundary for route-level error handling
@@ -141,8 +141,9 @@ export default function RootLayout() {
 function RootLayoutNav() {
   const isReady = useProtectedRoute();
 
-  // Initialize push notifications
-  useNotifications();
+  // Note: useNotifications disabled temporarily - native module issue
+  // TODO: Re-enable after fixing NativeEventEmitter crash
+  // useNotifications();
 
   if (!isReady) {
     return (

@@ -1,0 +1,37 @@
+appId: com.soulsync.app
+name: "Full App Verification Suite"
+---
+# Master verification flow - runs all checks
+
+# 1. App Launch
+- launchApp
+- waitForAnimationToEnd
+- assertVisible:
+    text: "Find Your Person"
+- takeScreenshot: "verify_01_launch"
+
+# 2. Sign Up Screen
+- tapOn:
+    text: "Sign Up"
+- waitForAnimationToEnd
+- assertVisible:
+    text: "Create Account"
+- takeScreenshot: "verify_02_signup"
+
+# 3. Back to welcome
+- tapOn:
+    id: ".*back.*"
+    optional: true
+- back
+- waitForAnimationToEnd
+
+# 4. Sign In Screen
+- tapOn:
+    text: "Sign In"
+- waitForAnimationToEnd
+- assertVisible:
+    text: "Welcome Back"
+- takeScreenshot: "verify_03_signin"
+
+# Verification complete
+- takeScreenshot: "verify_complete"

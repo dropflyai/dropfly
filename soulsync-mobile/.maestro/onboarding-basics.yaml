@@ -1,0 +1,36 @@
+appId: com.soulsync.app
+name: "Onboarding - Basics Step"
+env:
+  TEST_EMAIL: "testuser@soulsync.app"
+  TEST_PASSWORD: "TestPass123"
+---
+# This flow assumes user is logged in and on basics screen
+# For full E2E, chain this after auth flow
+
+- launchApp
+- waitForAnimationToEnd
+
+# If on welcome screen, sign in first
+- runFlow:
+    when:
+      visible: "Find Your Person"
+    commands:
+      - tapOn:
+          text: "Sign In"
+      - waitForAnimationToEnd
+      - tapOn:
+          text: "your@email.com"
+      - inputText: ${TEST_EMAIL}
+      - tapOn:
+          text: "Enter your password"
+      - inputText: ${TEST_PASSWORD}
+      - tapOn:
+          text: "Sign In"
+      - waitForAnimationToEnd
+
+# Verify basics screen (first onboarding step)
+- assertVisible:
+    text: "Let's get to know you"
+    optional: true
+
+- takeScreenshot: "05_onboarding_basics"

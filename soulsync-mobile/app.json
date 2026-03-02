@@ -69,9 +69,7 @@
       [
         "expo-notifications",
         {
-          "icon": "./assets/images/notification-icon.png",
-          "color": "#4CAF50",
-          "sounds": ["./assets/sounds/notification.wav"]
+          "color": "#4CAF50"
         }
       ],
       "expo-apple-authentication"

@@ -1,0 +1,21 @@
+appId: com.soulsync.app
+name: "App Launch Verification"
+---
+# Verify app launches successfully
+- launchApp
+
+# Wait for app to load
+- waitForAnimationToEnd
+
+# Verify welcome screen appears
+- assertVisible:
+    text: "SoulSync"
+
+- assertVisible:
+    text: "Create Account"
+
+- assertVisible:
+    text: "Sign In"
+
+# Take screenshot for verification
+- takeScreenshot: "01_welcome_screen"

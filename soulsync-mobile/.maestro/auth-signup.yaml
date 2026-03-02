@@ -1,0 +1,37 @@
+appId: com.soulsync.app
+name: "Auth - Sign Up Flow"
+---
+- launchApp
+- waitForAnimationToEnd
+
+# Tap Sign Up
+- tapOn:
+    text: "Sign Up"
+
+- waitForAnimationToEnd
+
+# Verify sign up screen
+- assertVisible:
+    text: "Create Account"
+
+- takeScreenshot: "02_signup_screen"
+
+# Fill in email
+- tapOn:
+    text: "your@email.com"
+- inputText: "test@soulsync.app"
+
+# Fill in password
+- tapOn:
+    text: "Create a strong password"
+- inputText: "TestPass123"
+
+# Fill in confirm password
+- tapOn:
+    text: "Re-enter your password"
+- inputText: "TestPass123"
+
+- takeScreenshot: "03_signup_filled"
+
+# Note: Don't actually submit to avoid creating test accounts
+# In real test, would tap "Create Account" button
