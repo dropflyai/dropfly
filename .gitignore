@@ -160,6 +160,8 @@ $RECYCLE.BIN/
 # ALL projects have their own repos — never track in this workspace
 DropFly-PROJECTS/*/
 prototype_x1000/
+prototype_x1000
+voicefly-v2/
 
 # ========================================
 # CREDENTIALS FOLDER RULES
