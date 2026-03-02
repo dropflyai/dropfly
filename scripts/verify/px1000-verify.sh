@@ -24,12 +24,63 @@ NC='\033[0m' # No Color
 # Globals
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-PROJECT_DIR="${1:-$(pwd)}"
-URL="${2:-}"
 EVIDENCE_DIR="/tmp/px1000-verify-$(date +%Y%m%d_%H%M%S)"
 OVERALL_EXIT_CODE=0
 TESTS_PASSED=0
 TESTS_FAILED=0
+
+# Flags
+ALLOW_SKIP_TESTS=false
+STRICT_MODE=true
+PROJECT_DIR=""
+URL=""
+
+# Parse arguments
+while [[ $# -gt 0 ]]; do
+    case $1 in
+        --allow-skip-tests)
+            ALLOW_SKIP_TESTS=true
+            shift
+            ;;
+        --no-strict)
+            STRICT_MODE=false
+            shift
+            ;;
+        --project)
+            PROJECT_DIR="$2"
+            shift 2
+            ;;
+        --url)
+            URL="$2"
+            shift 2
+            ;;
+        -h|--help)
+            echo "Usage: px1000-verify.sh [OPTIONS] [project-dir] [url]"
+            echo ""
+            echo "Options:"
+            echo "  --allow-skip-tests  Allow verification to pass even if no tests exist"
+            echo "  --no-strict         Don't fail on missing tests (same as --allow-skip-tests)"
+            echo "  --project DIR       Specify project directory"
+            echo "  --url URL           Specify URL for web verification"
+            echo "  -h, --help          Show this help message"
+            echo ""
+            echo "Default behavior: Fails if no tests exist (strict mode)"
+            exit 0
+            ;;
+        *)
+            # Positional arguments
+            if [ -z "$PROJECT_DIR" ]; then
+                PROJECT_DIR="$1"
+            elif [ -z "$URL" ]; then
+                URL="$1"
+            fi
+            shift
+            ;;
+    esac
+done
+
+# Default project dir to current directory
+PROJECT_DIR="${PROJECT_DIR:-$(pwd)}"
 
 # ============================================
 # UTILITY FUNCTIONS
@@ -197,7 +248,12 @@ verify_mobile_expo() {
             print_fail "Tests failed"
         fi
     else
-        print_skip "No test script - skipping tests"
+        if [ "$ALLOW_SKIP_TESTS" = true ]; then
+            print_skip "No test script - skipping tests (--allow-skip-tests)"
+        else
+            print_fail "No test script in package.json"
+            print_info "Add a 'test' script to package.json, or use --allow-skip-tests for exploratory work"
+        fi
     fi
 
     # Expo doctor check
@@ -400,7 +456,12 @@ verify_api_node() {
             print_fail "Tests failed"
         fi
     else
-        print_skip "No test script defined"
+        if [ "$ALLOW_SKIP_TESTS" = true ]; then
+            print_skip "No test script - skipping tests (--allow-skip-tests)"
+        else
+            print_fail "No test script in package.json"
+            print_info "Add a 'test' script to package.json, or use --allow-skip-tests for exploratory work"
+        fi
     fi
 
     # Security audit
@@ -453,7 +514,12 @@ verify_library_node() {
             print_fail "Tests failed"
         fi
     else
-        print_skip "No test script defined"
+        if [ "$ALLOW_SKIP_TESTS" = true ]; then
+            print_skip "No test script - skipping tests (--allow-skip-tests)"
+        else
+            print_fail "No test script in package.json"
+            print_info "Add a 'test' script to package.json, or use --allow-skip-tests for exploratory work"
+        fi
     fi
 }
 
@@ -546,6 +612,18 @@ run_triple_verify() {
 
     print_section "Triple Verification (Playwright)"
 
+    # Check if Playwright is installed (auto-install if missing)
+    if ! python3 -c "import playwright" 2>/dev/null; then
+        print_info "Playwright not installed. Installing..."
+        if pip install playwright 2>&1 || pip3 install playwright 2>&1; then
+            playwright install chromium 2>&1
+            print_pass "Playwright installed"
+        else
+            print_fail "Could not install Playwright"
+            return 1
+        fi
+    fi
+
     # Check if triple-verify.py exists
     TRIPLE_VERIFY_SCRIPT=""
 
@@ -603,8 +681,12 @@ run_maestro_test() {
     fi
 
     if [ -z "$MAESTRO_DIR" ]; then
-        print_skip "No Maestro flows found (.maestro/, maestro/, or e2e/maestro/)"
-        print_info "To add Maestro tests, create a .maestro/ directory with .yaml flow files"
+        if [ "$ALLOW_SKIP_TESTS" = true ]; then
+            print_skip "No Maestro flows found (.maestro/, maestro/, or e2e/maestro/) (--allow-skip-tests)"
+        else
+            print_fail "No Maestro flows found (.maestro/, maestro/, or e2e/maestro/)"
+            print_info "Create a .maestro/ directory with .yaml flow files, or use --allow-skip-tests"
+        fi
         return
     fi
 

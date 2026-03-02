@@ -1,0 +1,119 @@
+name: TestFlight Deploy
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'soulsync-mobile/**'
+  workflow_dispatch:
+    inputs:
+      skip_verification:
+        description: 'Skip verification (GEAR: EXPLORE only)'
+        required: false
+        default: 'false'
+        type: boolean
+
+env:
+  NODE_VERSION: '20'
+  WORKING_DIRECTORY: soulsync-mobile
+
+jobs:
+  # Layer 1: Automated Testing
+  verify:
+    name: Verification Gate
+    runs-on: ubuntu-latest
+    outputs:
+      passed: ${{ steps.verify.outputs.passed }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: npm ci
+
+      - name: Run PX1000 Verification
+        id: verify
+        uses: ./.github/actions/px1000-verify
+        with:
+          project-path: ${{ env.WORKING_DIRECTORY }}
+          skip-verification: ${{ inputs.skip_verification || 'false' }}
+
+      - name: Maestro Warning
+        run: |
+          echo "::warning::Maestro UI tests must be run locally before deployment"
+          echo "::warning::Run: cd ${{ env.WORKING_DIRECTORY }} && maestro test .maestro/"
+
+  # Layer 2: Build for TestFlight
+  build:
+    name: Build iOS
+    needs: verify
+    if: needs.verify.outputs.passed == 'true'
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+          cache-dependency-path: ${{ env.WORKING_DIRECTORY }}/package-lock.json
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install dependencies
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: npm ci
+
+      - name: Build for TestFlight
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: eas build --platform ios --profile production --non-interactive
+        env:
+          EXPO_APPLE_ID: ${{ secrets.EXPO_APPLE_ID }}
+          EXPO_ASC_APP_ID: ${{ secrets.EXPO_ASC_APP_ID }}
+
+      - name: Submit to TestFlight
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        run: eas submit --platform ios --latest --non-interactive
+        env:
+          EXPO_APPLE_ID: ${{ secrets.EXPO_APPLE_ID }}
+          EXPO_ASC_APP_ID: ${{ secrets.EXPO_ASC_APP_ID }}
+          EXPO_APPLE_APP_SPECIFIC_PASSWORD: ${{ secrets.EXPO_APPLE_APP_SPECIFIC_PASSWORD }}
+
+  # Notify on completion
+  notify:
+    name: Notify
+    needs: [verify, build]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Deployment Summary
+        run: |
+          echo "## TestFlight Deployment Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "| Stage | Status |" >> $GITHUB_STEP_SUMMARY
+          echo "|-------|--------|" >> $GITHUB_STEP_SUMMARY
+          echo "| Verification | ${{ needs.verify.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build & Deploy | ${{ needs.build.result }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Evidence" >> $GITHUB_STEP_SUMMARY
+          echo "- Workflow: ${{ github.workflow }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Run ID: ${{ github.run_id }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Commit: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- Branch: ${{ github.ref_name }}" >> $GITHUB_STEP_SUMMARY

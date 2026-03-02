@@ -81,49 +81,11 @@ jobs:
             npm ci || npm install
           fi
 
-      - name: TypeScript check
-        if: success()
-        continue-on-error: false
-        run: |
-          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
-          cd "$PROJECT_PATH"
-          if [ -f "tsconfig.json" ]; then
-            npx tsc --noEmit
-            echo "TypeScript check passed"
-          else
-            echo "No tsconfig.json - skipping TypeScript check"
-          fi
-
-      - name: ESLint check
-        if: success()
-        continue-on-error: false
-        run: |
-          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
-          cd "$PROJECT_PATH"
-          if [ -f "package.json" ] && grep -q '"lint"' package.json; then
-            npm run lint
-            echo "ESLint check passed"
-          else
-            echo "No lint script - skipping ESLint"
-          fi
-
-      - name: Run tests
-        if: success() && steps.detect.outputs.has_tests == 'true'
-        continue-on-error: false
-        run: |
-          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
-          cd "$PROJECT_PATH"
-          npm test -- --ci --passWithNoTests
-
-      - name: Security audit
-        if: success()
-        continue-on-error: true
-        run: |
-          PROJECT_PATH="${{ github.event.inputs.project_path || '.' }}"
-          cd "$PROJECT_PATH"
-          if [ -f "package.json" ]; then
-            npm audit --production || echo "Audit found issues (non-blocking)"
-          fi
+      - name: Run PX1000 Verification
+        uses: ./.github/actions/px1000-verify
+        with:
+          project-path: ${{ github.event.inputs.project_path || '.' }}
+          skip-verification: 'false'
 
       - name: Layer 1 Summary
         if: always()

@@ -29,47 +29,11 @@ jobs:
           cd DropFly-PROJECTS/pdf-editor
           npm ci
 
-      - name: Setup Python for verification
-        uses: actions/setup-python@v5
+      - name: Run PX1000 Verification
+        uses: ./.github/actions/px1000-verify
         with:
-          python-version: '3.11'
-
-      - name: Run verification checks
-        id: verification
-        run: |
-          cd DropFly-PROJECTS/pdf-editor
-          echo "============================================"
-          echo "PX1000 VERIFICATION - Pre-Build Check"
-          echo "============================================"
-
-          # TypeScript check
-          echo "Running TypeScript check..."
-          if [ -f "tsconfig.json" ]; then
-            npx tsc --noEmit
-            echo "TypeScript: PASSED"
-          fi
-
-          # ESLint check
-          echo "Running ESLint check..."
-          if npm run lint 2>/dev/null; then
-            echo "ESLint: PASSED"
-          else
-            echo "ESLint: No lint script or PASSED"
-          fi
-
-          # Run tests if available
-          echo "Running tests..."
-          if grep -q '"test"' package.json; then
-            npm test -- --ci --passWithNoTests || true
-            echo "Tests: COMPLETED"
-          else
-            echo "Tests: SKIPPED (no test script)"
-          fi
-
-          echo ""
-          echo "============================================"
-          echo "VERIFICATION: PRE-BUILD CHECKS PASSED"
-          echo "============================================"
+          project-path: DropFly-PROJECTS/pdf-editor
+          skip-verification: 'false'
 
       - name: Build Next.js app
         run: |

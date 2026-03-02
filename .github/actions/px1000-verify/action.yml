@@ -1,0 +1,54 @@
+name: 'PX1000 Verify'
+description: 'Run unified verification script - single source of truth for all CI/CD verification'
+inputs:
+  project-path:
+    description: 'Path to project directory'
+    required: false
+    default: '.'
+  skip-verification:
+    description: 'Skip strict verification (GEAR: EXPLORE only)'
+    required: false
+    default: 'false'
+outputs:
+  passed:
+    description: 'Whether verification passed'
+    value: ${{ steps.verify.outputs.passed }}
+  evidence-path:
+    description: 'Path to evidence directory'
+    value: ${{ steps.verify.outputs.evidence_path }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Run PX1000 Verification
+      id: verify
+      shell: bash
+      run: |
+        FLAGS=""
+        if [ "${{ inputs.skip-verification }}" = "true" ]; then
+          FLAGS="--allow-skip-tests"
+          echo "::warning::GEAR: EXPLORE - Verification relaxed (--allow-skip-tests)"
+        fi
+
+        EVIDENCE_DIR="${{ runner.temp }}/px1000-evidence"
+        mkdir -p "$EVIDENCE_DIR"
+
+        echo "Running: ./scripts/verify/px1000-verify.sh --project ${{ inputs.project-path }} $FLAGS"
+
+        if ./scripts/verify/px1000-verify.sh --project "${{ inputs.project-path }}" $FLAGS; then
+          echo "passed=true" >> $GITHUB_OUTPUT
+        else
+          echo "passed=false" >> $GITHUB_OUTPUT
+          exit 1
+        fi
+
+        echo "evidence_path=$EVIDENCE_DIR" >> $GITHUB_OUTPUT
+
+    - name: Upload Evidence
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: verification-evidence-${{ github.run_id }}
+        path: /tmp/px1000-verify-*/
+        retention-days: 30
+        if-no-files-found: ignore
