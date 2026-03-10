@@ -6,13 +6,15 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "x2000": "./dist/cli/index.js"
+    "x2000": "./dist/cli/x2000.js"
   },
   "scripts": {
     "build": "tsc",
+    "start": "npx tsx src/cli/x2000.ts",
+    "x2000": "npx tsx src/cli/x2000.ts",
     "dev": "ts-node src/index.ts",
-    "cli": "node --loader ts-node/esm src/cli/index.ts",
-    "cli:build": "npm run build && node dist/cli/index.js",
+    "cli": "npx tsx src/cli/x2000.ts",
+    "cli:build": "npm run build && node dist/cli/x2000.js",
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "lint": "eslint src --ext .ts",
