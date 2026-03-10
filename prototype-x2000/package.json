@@ -1,0 +1,73 @@
+{
+  "name": "prototype-x2000",
+  "version": "0.1.0",
+  "description": "Autonomous Business-Building AI Fleet - Better, smarter, faster than OpenClaw",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "bin": {
+    "x2000": "./dist/cli/index.js"
+  },
+  "scripts": {
+    "build": "tsc",
+    "dev": "ts-node src/index.ts",
+    "cli": "node --loader ts-node/esm src/cli/index.ts",
+    "cli:build": "npm run build && node dist/cli/index.js",
+    "test": "vitest",
+    "test:coverage": "vitest --coverage",
+    "lint": "eslint src --ext .ts",
+    "format": "prettier --write src/**/*.ts",
+    "typecheck": "tsc --noEmit",
+    "verify": "./scripts/verify.sh",
+    "link": "npm run build && npm link",
+    "autonomous": "npx tsx src/autonomous.ts",
+    "self-improve": "npx tsx src/autonomous.ts --self-improve",
+    "audit": "npx tsx src/autonomous.ts --audit",
+    "improve-to": "npx tsx src/improve-until-target.ts",
+    "improve-to-97": "npx tsx src/improve-until-target.ts 97"
+  },
+  "keywords": [
+    "ai",
+    "agents",
+    "autonomous",
+    "business-building",
+    "multi-agent",
+    "orchestration"
+  ],
+  "author": "DropFly",
+  "license": "MIT",
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.24.0",
+    "@inquirer/prompts": "^8.3.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "chalk": "^5.6.2",
+    "commander": "^14.0.3",
+    "dotenv": "^17.3.1",
+    "imap": "^0.8.19",
+    "mailparser": "^3.6.0",
+    "nodemailer": "^6.9.0",
+    "ora": "^9.3.0",
+    "playwright": "^1.41.0",
+    "uuid": "^9.0.0",
+    "zod": "^3.22.0"
+  },
+  "devDependencies": {
+    "@types/cli-spinners": "^1.3.3",
+    "@types/imap": "^0.8.40",
+    "@types/mailparser": "^3.4.4",
+    "@types/node": "^20.11.0",
+    "@types/nodemailer": "^6.4.14",
+    "@types/uuid": "^9.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.56.0",
+    "postgres": "^3.4.8",
+    "prettier": "^3.2.0",
+    "ts-node": "^10.9.0",
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

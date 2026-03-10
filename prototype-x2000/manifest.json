@@ -1,0 +1,118 @@
+{
+  "version": "0.1.0",
+  "generatedAt": "2026-03-10T00:26:25.441Z",
+  "brains": {
+    "count": 44,
+    "list": [
+      "ai",
+      "analytics",
+      "architecture",
+      "automation",
+      "backend",
+      "branding",
+      "ceo",
+      "cloud",
+      "community",
+      "content",
+      "customer-success",
+      "data",
+      "database",
+      "debugger",
+      "design",
+      "devops",
+      "devrel",
+      "email",
+      "engineering",
+      "finance",
+      "frontend",
+      "game-design",
+      "growth",
+      "hr",
+      "innovation",
+      "investor",
+      "legal",
+      "localization",
+      "marketing",
+      "mba",
+      "mobile",
+      "operations",
+      "options-trading",
+      "partnership",
+      "performance",
+      "pricing",
+      "product",
+      "qa",
+      "research",
+      "sales",
+      "security",
+      "social-media",
+      "support",
+      "video"
+    ]
+  },
+  "llmProviders": {
+    "count": 11,
+    "list": [
+      "anthropic",
+      "deepseek",
+      "google",
+      "groq",
+      "kimi",
+      "mistral",
+      "ollama",
+      "openai",
+      "openrouter",
+      "together",
+      "xai"
+    ]
+  },
+  "channels": {
+    "count": 13,
+    "list": [
+      "api",
+      "discord",
+      "email",
+      "imessage",
+      "irc",
+      "matrix",
+      "msteams",
+      "signal",
+      "slack",
+      "sms",
+      "telegram",
+      "voice",
+      "whatsapp"
+    ]
+  },
+  "tools": {
+    "count": 13,
+    "list": [
+      "browser",
+      "email",
+      "file-edit",
+      "file-read",
+      "file-write",
+      "git",
+      "process",
+      "resolver",
+      "shell-exec",
+      "spawn-agent",
+      "vision",
+      "web-fetch",
+      "web-search"
+    ]
+  },
+  "sandbox": {
+    "levels": [
+      "full",
+      "light",
+      "medium",
+      "none"
+    ]
+  },
+  "stats": {
+    "sourceFiles": 174,
+    "linesOfCode": 77703,
+    "designDocs": 7
+  }
+}
