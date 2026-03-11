@@ -262,7 +262,7 @@ async function dependencyStep(): Promise<boolean> {
 }
 
 async function providerStep(rl: readline.Interface): Promise<{
-  provider: 'anthropic' | 'openai' | 'ollama';
+  provider: 'claude-code' | 'anthropic' | 'openai' | 'ollama' | 'auto';
   model: string;
   useOAuth: boolean;
   apiKey?: string;
@@ -272,36 +272,102 @@ async function providerStep(rl: readline.Interface): Promise<{
   console.log('X2000 needs an AI brain to think. Choose your provider:');
   console.log('');
 
-  const provider = await select(rl, 'Which AI provider?', [
-    { value: 'anthropic', label: 'Claude (Anthropic)', description: 'Best for coding & reasoning', recommended: true },
-    { value: 'openai', label: 'GPT-4 (OpenAI)', description: 'Good general purpose' },
-    { value: 'ollama', label: 'Local (Ollama)', description: 'Free, runs on your machine' },
-  ]);
+  // Check if Claude Code CLI is available
+  let claudeCodeAvailable = false;
+  try {
+    execSync('claude --version', { stdio: 'ignore' });
+    claudeCodeAvailable = true;
+  } catch {
+    // Claude Code not installed
+  }
+
+  const providerOptions = [];
+
+  if (claudeCodeAvailable) {
+    providerOptions.push({
+      value: 'claude-code',
+      label: 'Claude Code (Your Subscription)',
+      description: 'Uses your Pro/Max subscription - no API credits!',
+      recommended: true,
+    });
+  }
+
+  providerOptions.push(
+    { value: 'auto', label: 'Auto-Detect', description: 'Automatically use the best available provider' },
+    { value: 'anthropic', label: 'Claude API', description: 'Pay-per-use API credits' },
+    { value: 'openai', label: 'GPT-4 (OpenAI)', description: 'OpenAI API' },
+    { value: 'ollama', label: 'Local (Ollama)', description: 'Free, runs on your machine' }
+  );
+
+  if (!claudeCodeAvailable) {
+    console.log('💡 TIP: Install Claude Code CLI to use your Claude subscription!');
+    console.log('   npm install -g @anthropic-ai/claude-code');
+    console.log('   Then run: claude login');
+    console.log('');
+  }
+
+  const provider = await select(rl, 'Which AI provider?', providerOptions);
 
   let model = 'claude-sonnet-4-20250514';
   let useOAuth = false;
   let apiKey: string | undefined;
 
-  if (provider === 'anthropic') {
+  if (provider === 'claude-code') {
     console.log('');
-    const authMethod = await select(rl, 'How do you want to authenticate?', [
-      { value: 'subscription', label: 'Claude Pro/Max Subscription', description: 'Use your existing subscription', recommended: true },
-      { value: 'api_key', label: 'API Key', description: 'Pay-per-use credits' },
-    ]);
+    printSuccess('Using Claude Code CLI with your subscription!');
+    printInfo('X2000 will use the `claude` command to run tasks.');
+    printInfo('Your subscription credits are used - no API charges.');
+    console.log('');
 
-    if (authMethod === 'subscription') {
-      useOAuth = true;
-      console.log('');
-      printInfo('Great! You will log in with your Claude account when you start the gateway.');
-    } else {
-      apiKey = process.env.ANTHROPIC_API_KEY;
-      if (!apiKey) {
+    // Check if Claude Code is logged in
+    try {
+      const authCheck = execSync('claude auth status 2>&1', { encoding: 'utf-8' });
+      if (authCheck.includes('Not logged in') || authCheck.includes('not authenticated')) {
+        printWarning('Claude Code is not logged in.');
         console.log('');
-        console.log('Get your API key from: https://console.anthropic.com/settings/keys');
-        apiKey = await askSecret(rl, 'Enter your Anthropic API key: ');
+        console.log('Please log in now:');
+        console.log('  claude login');
+        console.log('');
+        await ask(rl, 'Press Enter after logging in...');
       } else {
-        printSuccess(`Using API key from environment: ${apiKey.slice(0, 12)}...`);
+        printSuccess('Claude Code is authenticated!');
       }
+    } catch {
+      // Auth check failed, but that's OK - gateway will handle it
+      printInfo('Authentication will be checked when starting the gateway.');
+    }
+
+    model = 'claude-sonnet-4-20250514'; // Claude Code uses the model from your subscription
+
+  } else if (provider === 'auto') {
+    console.log('');
+    printInfo('X2000 will auto-detect available providers in this order:');
+    printInfo('  1. Claude Code CLI (uses your subscription)');
+    printInfo('  2. Anthropic API (requires API key)');
+    printInfo('  3. OpenAI API (requires API key)');
+    printInfo('  4. Ollama (local models)');
+    console.log('');
+
+    // Still ask for API key as fallback
+    apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      const wantApiKey = await confirm(rl, 'Do you want to set an API key as fallback?', false);
+      if (wantApiKey) {
+        console.log('Get your API key from: https://console.anthropic.com/settings/keys');
+        apiKey = await askSecret(rl, 'Enter your Anthropic API key (or press Enter to skip): ');
+      }
+    } else {
+      printSuccess(`Found API key in environment: ${apiKey.slice(0, 12)}...`);
+    }
+
+  } else if (provider === 'anthropic') {
+    apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      console.log('');
+      console.log('Get your API key from: https://console.anthropic.com/settings/keys');
+      apiKey = await askSecret(rl, 'Enter your Anthropic API key: ');
+    } else {
+      printSuccess(`Using API key from environment: ${apiKey.slice(0, 12)}...`);
     }
 
     console.log('');
@@ -332,7 +398,7 @@ async function providerStep(rl: readline.Interface): Promise<{
   }
 
   return {
-    provider: provider as 'anthropic' | 'openai' | 'ollama',
+    provider: provider as 'claude-code' | 'anthropic' | 'openai' | 'ollama' | 'auto',
     model,
     useOAuth,
     apiKey,
@@ -533,8 +599,20 @@ async function summaryStep(
 ): Promise<boolean> {
   printHeader('CONFIGURATION SUMMARY');
 
-  console.log(`  AI Provider:     ${config.provider} (${config.model})`);
-  console.log(`  Authentication:  ${config.useOAuth ? 'Claude Subscription (OAuth)' : 'API Key'}`);
+  const providerDesc = config.provider === 'claude-code'
+    ? 'Claude Code CLI (Your Subscription)'
+    : config.provider === 'auto'
+    ? 'Auto-Detect (Best Available)'
+    : `${config.provider.charAt(0).toUpperCase() + config.provider.slice(1)} API`;
+
+  const authDesc = config.provider === 'claude-code'
+    ? 'Your Claude Pro/Max Subscription'
+    : config.provider === 'auto'
+    ? 'Auto (Subscription → API Key)'
+    : 'API Key';
+
+  console.log(`  AI Provider:     ${providerDesc}`);
+  console.log(`  Authentication:  ${authDesc}`);
   console.log(`  Autonomy Level:  ${config.trustLevel}`);
   console.log(`  Gateway Port:    ${config.port}`);
   console.log(`  Auto-Start:      ${config.autoStart ? 'Yes' : 'No'}`);
@@ -690,7 +768,7 @@ export async function runOnboardingWizard(): Promise<X2000Config | null> {
     const gatewayConfig = await gatewayStep(rl);
 
     // Build config
-    const config: X2000Config & { useOAuth?: boolean } = {
+    const config: X2000Config = {
       port: gatewayConfig.port,
       provider: providerConfig.provider,
       model: providerConfig.model,
@@ -703,14 +781,13 @@ export async function runOnboardingWizard(): Promise<X2000Config | null> {
         email: channels.email,
       },
       trustLevel,
-      useOAuth: providerConfig.useOAuth,
     };
 
     // Show summary and confirm
     const confirmed = await summaryStep(rl, {
       provider: config.provider,
       model: config.model,
-      useOAuth: config.useOAuth || false,
+      useOAuth: config.provider === 'claude-code',
       channels: config.channels,
       trustLevel: config.trustLevel,
       port: config.port,
@@ -789,9 +866,10 @@ export async function runOnboardingWizard(): Promise<X2000Config | null> {
 // ============================================================================
 
 export async function quickSetup(options: Partial<X2000Config>): Promise<X2000Config> {
+  // Default to 'auto' which prioritizes Claude Code CLI
   const config: X2000Config = {
     port: options.port || 3000,
-    provider: options.provider || 'anthropic',
+    provider: options.provider || 'auto',
     model: options.model || 'claude-sonnet-4-20250514',
     apiKey: options.apiKey || process.env.ANTHROPIC_API_KEY,
     channels: options.channels || {},

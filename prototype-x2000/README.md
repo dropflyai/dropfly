@@ -71,9 +71,6 @@ npm start channels
 npm start channels add telegram
 npm start channels add email
 
-# Login with Claude subscription
-npm start login
-
 # Help
 npm start help
 ```
@@ -86,9 +83,27 @@ npm start help
 Checks Node.js and Git are installed.
 
 ### Step 2: AI Provider
-- **Claude Pro/Max Subscription** - Use your existing subscription (recommended)
-- **API Key** - Pay-per-use credits
-- **Ollama** - Free, local models
+
+X2000 auto-detects the best available provider:
+
+| Priority | Provider | Description |
+|----------|----------|-------------|
+| 1 | **Claude Code CLI** | Uses your Claude Pro/Max subscription - **no API credits!** |
+| 2 | Anthropic API | Pay-per-use with API key |
+| 3 | OpenAI API | GPT-4 with API key |
+| 4 | Ollama | Free, runs locally |
+
+**Recommended: Install Claude Code CLI to use your subscription!**
+
+```bash
+# Install Claude Code CLI
+npm install -g @anthropic-ai/claude-code
+
+# Log in with your Claude account
+claude login
+```
+
+Once installed, X2000 automatically uses your subscription. No API key needed.
 
 ### Step 3: Communication Channels
 Set up any combination:
@@ -117,8 +132,9 @@ Set up any combination:
 | Feature | OpenClaw | X2000 |
 |---------|----------|-------|
 | Setup time | 30+ minutes | 5 minutes |
+| Subscription usage | Requires separate Chutes auth | Uses your Claude subscription directly |
 | Credential storage | 6+ scattered locations | One unified location |
-| Auth options | 15+ confusing choices | 3 clear options |
+| Auth options | 15+ confusing choices | Auto-detect (just install `claude` CLI) |
 | Channel setup | Complex, error-prone | Step-by-step guided |
 | Error handling | Reports and waits | Fixes automatically |
 | Deployment verification | None | Built-in |
