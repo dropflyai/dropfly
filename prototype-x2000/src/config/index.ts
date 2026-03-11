@@ -14,21 +14,31 @@ export interface X2000Config {
   anthropicApiKey: string;
   supabaseUrl?: string;
   supabaseKey?: string;
-  
+
   // System Settings
   defaultTrustLevel: TrustLevel;
   maxConcurrentAgents: number;
   enableGuardrails: boolean;
   guardrailLayers: GuardrailLayer[];
-  
+
   // Memory Settings
   enableMemoryPersistence: boolean;
   memoryRetentionDays: number;
-  
+
+  // Cache Settings (Performance)
+  enableCaching: boolean;
+  cacheMaxSize: number;
+  cacheDefaultTtlMs: number;
+  enableQueryCaching: boolean;
+
+  // Parallel Execution Settings (Performance)
+  executionPoolSize: number;
+  parallelBatchTimeout: number;
+
   // Collaboration Settings
   enableCollaboration: boolean;
   maxDebateRounds: number;
-  
+
   // Logging
   logLevel: 'debug' | 'info' | 'warn' | 'error';
   enableAuditLog: boolean;
@@ -38,18 +48,28 @@ export const defaultConfig: X2000Config = {
   anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
   supabaseUrl: process.env.SUPABASE_URL,
   supabaseKey: process.env.SUPABASE_ANON_KEY,
-  
+
   defaultTrustLevel: 2,
   maxConcurrentAgents: 10,
   enableGuardrails: true,
   guardrailLayers: [1, 2, 3, 4, 5],
-  
+
   enableMemoryPersistence: true,
   memoryRetentionDays: 30,
-  
+
+  // Cache defaults (Performance)
+  enableCaching: true,
+  cacheMaxSize: 1000,
+  cacheDefaultTtlMs: 5 * 60 * 1000, // 5 minutes
+  enableQueryCaching: true,
+
+  // Parallel execution defaults (Performance)
+  executionPoolSize: 5,
+  parallelBatchTimeout: 10 * 60 * 1000, // 10 minutes
+
   enableCollaboration: true,
   maxDebateRounds: 5,
-  
+
   logLevel: 'info',
   enableAuditLog: true,
 };
@@ -65,8 +85,16 @@ export function loadConfig(): X2000Config {
     enableGuardrails: process.env.ENABLE_GUARDRAILS !== 'false',
     enableMemoryPersistence: process.env.ENABLE_MEMORY_PERSISTENCE !== 'false',
     enableCollaboration: process.env.ENABLE_COLLABORATION !== 'false',
-    logLevel: (process.env.LOG_LEVEL as any) || 'info',
+    logLevel: (process.env.LOG_LEVEL as X2000Config['logLevel']) || 'info',
     enableAuditLog: process.env.ENABLE_AUDIT_LOG !== 'false',
+    // Cache settings
+    enableCaching: process.env.ENABLE_CACHING !== 'false',
+    cacheMaxSize: parseInt(process.env.CACHE_MAX_SIZE || '1000'),
+    cacheDefaultTtlMs: parseInt(process.env.CACHE_TTL_MS || String(5 * 60 * 1000)),
+    enableQueryCaching: process.env.ENABLE_QUERY_CACHING !== 'false',
+    // Parallel execution settings
+    executionPoolSize: parseInt(process.env.EXECUTION_POOL_SIZE || '5'),
+    parallelBatchTimeout: parseInt(process.env.PARALLEL_BATCH_TIMEOUT || String(10 * 60 * 1000)),
   };
 }
 

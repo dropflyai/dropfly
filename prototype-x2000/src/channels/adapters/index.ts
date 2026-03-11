@@ -8,10 +8,15 @@
 // Telegram Adapter
 export {
   TelegramChannel,
+  TelegramAPIError,
   telegramChannel,
   createTelegramChannel,
+  startTelegramBot,
+  stopTelegramBot,
   TELEGRAM_CAPABILITIES,
   type TelegramChannelConfig,
+  type TelegramResponsePayload,
+  type CommandHandler,
 } from './telegram.js';
 
 // WhatsApp Adapter

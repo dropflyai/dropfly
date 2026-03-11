@@ -4,14 +4,25 @@
  * Central export for all agent-related functionality.
  */
 
-// Agent spawning
-export { AgentSpawner, agentSpawner, type SpawnConfig, type SpawnedAgent } from './spawn.js';
+// Agent spawning with parallel execution
+export {
+  AgentSpawner,
+  agentSpawner,
+  ExecutionPool,
+  type SpawnConfig,
+  type SpawnedAgent,
+  type ParallelExecutionConfig,
+  type ParallelExecutionResult,
+} from './spawn.js';
 
 // Session management
 export { SessionManager, sessionManager as agentSessionManager } from './session.js';
 
 // Collaboration protocol
 export { CollaborationManager, collaborationManager } from './collaboration.js';
+
+// Brain Tension Protocol
+export { BrainTensionManager, brainTensionManager } from './collaboration.js';
 
 // Agentic loop
 export {

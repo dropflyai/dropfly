@@ -3,6 +3,12 @@
  * Central hub for the forever-learning memory system
  * Manages patterns, learnings, skills, and decisions
  * Supports Supabase persistence with offline mode
+ *
+ * Performance Optimizations:
+ * - LRU cache for frequently accessed patterns
+ * - Multi-level indexing (tag, brain, type, confidence)
+ * - Batch query support
+ * - Cursor-based pagination for large result sets
  */
 
 import { v4 as uuidv4 } from 'uuid';
@@ -18,6 +24,12 @@ import type {
 import { persistenceManager, type MemoryItemType } from './persistence.js';
 import { patternExtractionEngine } from './extraction.js';
 import { config } from '../config/env.js';
+import {
+  LRUCache,
+  cacheKeys,
+  queryCacheKey,
+  CACHE_TTL,
+} from '../cache/index.js';
 
 // ============================================================================
 // Types
@@ -30,6 +42,40 @@ interface MemoryQuery {
   dateRange?: { start: Date; end: Date };
   minConfidence?: number;
   limit?: number;
+  /** Cursor for pagination (item ID to start after) */
+  cursor?: string;
+  /** Page size for pagination */
+  pageSize?: number;
+}
+
+interface PaginatedResult<T> {
+  items: T[];
+  cursor: string | null;
+  hasMore: boolean;
+  totalCount: number;
+}
+
+interface BatchQueryRequest {
+  id: string;
+  query: MemoryQuery;
+}
+
+interface BatchQueryResult {
+  id: string;
+  patterns: Pattern[];
+  learnings: Learning[];
+  skills: Skill[];
+  decisions: Decision[];
+}
+
+/** Confidence buckets for fast filtering */
+type ConfidenceBucket = 'low' | 'medium' | 'high' | 'excellent';
+
+function getConfidenceBucket(confidence: number): ConfidenceBucket {
+  if (confidence >= 0.9) return 'excellent';
+  if (confidence >= 0.7) return 'high';
+  if (confidence >= 0.5) return 'medium';
+  return 'low';
 }
 
 interface MemoryStats {
@@ -70,12 +116,30 @@ export class MemoryManager {
   private brainIndex: Map<BrainType, Set<string>> = new Map();
   private typeIndex: Map<string, Set<string>> = new Map();
 
+  // Advanced indices for performance
+  private confidenceIndex: Map<ConfidenceBucket, Set<string>> = new Map();
+  private dateIndex: Map<string, Set<string>> = new Map(); // YYYY-MM format
+  private categoryIndex: Map<string, Set<string>> = new Map(); // For skills
+
+  // LRU Caches for frequently accessed data
+  private queryCache!: LRUCache<MemorySearchResult>;
+  private patternMatchCache!: LRUCache<Pattern[]>;
+  private similarityCache!: LRUCache<Pattern[]>;
+
   // Initialization state
   private isInitialized = false;
   private initializationPromise: Promise<void> | null = null;
 
+  // Sorted arrays for fast pagination
+  private sortedPatternIds: string[] = [];
+  private sortedLearningIds: string[] = [];
+  private sortedSkillIds: string[] = [];
+  private sortedDecisionIds: string[] = [];
+  private sortedListsDirty = true;
+
   constructor() {
     this.initializeIndices();
+    this.initializeCaches();
   }
 
   private initializeIndices(): void {
@@ -83,6 +147,79 @@ export class MemoryManager {
     ['pattern', 'learning', 'skill', 'decision'].forEach((type) => {
       this.typeIndex.set(type, new Set());
     });
+
+    // Initialize confidence buckets
+    (['low', 'medium', 'high', 'excellent'] as ConfidenceBucket[]).forEach((bucket) => {
+      this.confidenceIndex.set(bucket, new Set());
+    });
+  }
+
+  private initializeCaches(): void {
+    // Query result cache - short TTL for freshness
+    this.queryCache = new LRUCache<MemorySearchResult>({
+      maxSize: 200,
+      defaultTtl: CACHE_TTL.MEMORY_QUERIES,
+      onEvict: (key, reason) => {
+        if (reason === 'ttl') {
+          console.debug(`[Memory] Query cache expired: ${key}`);
+        }
+      },
+    });
+
+    // Pattern match cache
+    this.patternMatchCache = new LRUCache<Pattern[]>({
+      maxSize: 100,
+      defaultTtl: CACHE_TTL.PATTERN_MATCHES,
+    });
+
+    // Similarity search cache
+    this.similarityCache = new LRUCache<Pattern[]>({
+      maxSize: 50,
+      defaultTtl: CACHE_TTL.PATTERN_MATCHES,
+    });
+  }
+
+  /**
+   * Invalidate caches when data changes
+   */
+  private invalidateCaches(): void {
+    this.queryCache.clear();
+    this.patternMatchCache.clear();
+    this.similarityCache.clear();
+    this.sortedListsDirty = true;
+  }
+
+  /**
+   * Rebuild sorted lists for pagination
+   */
+  private rebuildSortedLists(): void {
+    if (!this.sortedListsDirty) return;
+
+    // Sort patterns by (successRate * 0.6 + usageCount/100 * 0.4) descending
+    this.sortedPatternIds = [...this.patterns.values()]
+      .sort((a, b) => {
+        const scoreA = a.successRate * 0.6 + (a.usageCount / 100) * 0.4;
+        const scoreB = b.successRate * 0.6 + (b.usageCount / 100) * 0.4;
+        return scoreB - scoreA;
+      })
+      .map((p) => p.id);
+
+    // Sort learnings by confidence descending
+    this.sortedLearningIds = [...this.learnings.values()]
+      .sort((a, b) => b.confidence - a.confidence)
+      .map((l) => l.id);
+
+    // Sort skills by adoption count descending
+    this.sortedSkillIds = [...this.skills.values()]
+      .sort((a, b) => b.adoptedBy.length - a.adoptedBy.length)
+      .map((s) => s.id);
+
+    // Sort decisions by date descending
+    this.sortedDecisionIds = [...this.decisions.values()]
+      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+      .map((d) => d.id);
+
+    this.sortedListsDirty = false;
   }
 
   // ============================================================================
@@ -132,7 +269,10 @@ export class MemoryManager {
       const patterns = await persistenceManager.loadPatterns({ limit: 1000 });
       for (const pattern of patterns) {
         this.patterns.set(pattern.id, pattern);
-        this.indexItem(pattern.id, 'pattern', pattern.tags, pattern.createdBy);
+        this.indexItem(pattern.id, 'pattern', pattern.tags, pattern.createdBy, {
+          confidence: pattern.successRate,
+          date: pattern.createdAt,
+        });
       }
       console.log(`[Memory] Loaded ${patterns.length} patterns from Supabase`);
 
@@ -140,7 +280,10 @@ export class MemoryManager {
       const learnings = await persistenceManager.loadLearnings({ limit: 1000 });
       for (const learning of learnings) {
         this.learnings.set(learning.id, learning);
-        this.indexItem(learning.id, 'learning', learning.tags, learning.source);
+        this.indexItem(learning.id, 'learning', learning.tags, learning.source, {
+          confidence: learning.confidence,
+          date: learning.createdAt,
+        });
       }
       console.log(`[Memory] Loaded ${learnings.length} learnings from Supabase`);
 
@@ -148,9 +291,17 @@ export class MemoryManager {
       const skills = await persistenceManager.loadSkills({ limit: 1000 });
       for (const skill of skills) {
         this.skills.set(skill.id, skill);
-        this.indexItem(skill.id, 'skill', [skill.category], skill.createdBy);
+        this.indexItem(skill.id, 'skill', [skill.category], skill.createdBy, {
+          confidence: skill.successRate,
+          date: skill.createdAt,
+          category: skill.category,
+        });
       }
       console.log(`[Memory] Loaded ${skills.length} skills from Supabase`);
+
+      // Rebuild sorted lists after bulk load
+      this.sortedListsDirty = true;
+      this.rebuildSortedLists();
     } catch (error) {
       console.error('[Memory] Failed to load from persistence:', error);
     }
@@ -179,7 +330,11 @@ export class MemoryManager {
    */
   storePattern(pattern: Pattern): void {
     this.patterns.set(pattern.id, pattern);
-    this.indexItem(pattern.id, 'pattern', pattern.tags, pattern.createdBy);
+    this.indexItem(pattern.id, 'pattern', pattern.tags, pattern.createdBy, {
+      confidence: pattern.successRate,
+      date: pattern.createdAt,
+    });
+    this.invalidateCaches();
     console.log(`[Memory] Stored pattern: ${pattern.name}`);
 
     // Persist to Supabase (async, non-blocking)
@@ -283,7 +438,11 @@ export class MemoryManager {
    */
   storeLearning(learning: Learning): void {
     this.learnings.set(learning.id, learning);
-    this.indexItem(learning.id, 'learning', learning.tags, learning.source);
+    this.indexItem(learning.id, 'learning', learning.tags, learning.source, {
+      confidence: learning.confidence,
+      date: learning.createdAt,
+    });
+    this.invalidateCaches();
     console.log(`[Memory] Stored learning: ${learning.description.substring(0, 50)}...`);
 
     // Persist to Supabase (async, non-blocking)
@@ -355,7 +514,12 @@ export class MemoryManager {
    */
   storeSkill(skill: Skill): void {
     this.skills.set(skill.id, skill);
-    this.indexItem(skill.id, 'skill', [skill.category], skill.createdBy);
+    this.indexItem(skill.id, 'skill', [skill.category], skill.createdBy, {
+      confidence: skill.successRate,
+      date: skill.createdAt,
+      category: skill.category,
+    });
+    this.invalidateCaches();
     console.log(`[Memory] Stored skill: ${skill.name}`);
 
     // Persist to Supabase (async, non-blocking)
@@ -436,7 +600,10 @@ export class MemoryManager {
    */
   storeDecision(decision: Decision): void {
     this.decisions.set(decision.id, decision);
-    this.indexItem(decision.id, 'decision', [], decision.participants[0]);
+    this.indexItem(decision.id, 'decision', [], decision.participants[0], {
+      date: decision.createdAt,
+    });
+    this.invalidateCaches();
     console.log(`[Memory] Stored decision: ${decision.description.substring(0, 50)}...`);
 
     // Persist to Supabase (async, non-blocking)
@@ -832,7 +999,12 @@ export class MemoryManager {
     id: string,
     type: string,
     tags: string[],
-    brainType: BrainType
+    brainType: BrainType,
+    options?: {
+      confidence?: number;
+      date?: Date;
+      category?: string;
+    }
   ): void {
     // Add to type index
     if (!this.typeIndex.has(type)) {
@@ -853,6 +1025,376 @@ export class MemoryManager {
       this.brainIndex.set(brainType, new Set());
     }
     this.brainIndex.get(brainType)!.add(id);
+
+    // Add to confidence index
+    if (options?.confidence !== undefined) {
+      const bucket = getConfidenceBucket(options.confidence);
+      this.confidenceIndex.get(bucket)!.add(id);
+    }
+
+    // Add to date index (YYYY-MM format for month-based lookups)
+    if (options?.date) {
+      const dateKey = `${options.date.getFullYear()}-${String(options.date.getMonth() + 1).padStart(2, '0')}`;
+      if (!this.dateIndex.has(dateKey)) {
+        this.dateIndex.set(dateKey, new Set());
+      }
+      this.dateIndex.get(dateKey)!.add(id);
+    }
+
+    // Add to category index (for skills)
+    if (options?.category) {
+      if (!this.categoryIndex.has(options.category)) {
+        this.categoryIndex.set(options.category, new Set());
+      }
+      this.categoryIndex.get(options.category)!.add(id);
+    }
+
+    // Mark sorted lists as dirty
+    this.sortedListsDirty = true;
+  }
+
+  /**
+   * Remove item from all indices
+   */
+  private unindexItem(id: string, type: string): void {
+    this.typeIndex.get(type)?.delete(id);
+
+    for (const tagSet of this.tagIndex.values()) {
+      tagSet.delete(id);
+    }
+
+    for (const brainSet of this.brainIndex.values()) {
+      brainSet.delete(id);
+    }
+
+    for (const confSet of this.confidenceIndex.values()) {
+      confSet.delete(id);
+    }
+
+    for (const dateSet of this.dateIndex.values()) {
+      dateSet.delete(id);
+    }
+
+    for (const catSet of this.categoryIndex.values()) {
+      catSet.delete(id);
+    }
+
+    this.sortedListsDirty = true;
+  }
+
+  // ============================================================================
+  // Batch Query Support
+  // ============================================================================
+
+  /**
+   * Execute multiple queries in parallel with caching
+   */
+  async batchQuery(requests: BatchQueryRequest[]): Promise<BatchQueryResult[]> {
+    const results = await Promise.all(
+      requests.map(async (req) => {
+        const cacheKey = `batch:${req.id}:${queryCacheKey(req.query as Record<string, unknown>)}`;
+        const cached = this.queryCache.get(cacheKey);
+
+        if (cached) {
+          return {
+            id: req.id,
+            patterns: cached.patterns,
+            learnings: cached.learnings,
+            skills: cached.skills,
+            decisions: cached.decisions,
+          };
+        }
+
+        const searchResult = this.search(
+          req.query.tags?.join(' ') ?? '',
+          req.query
+        );
+
+        // Cache the result
+        this.queryCache.set(cacheKey, searchResult);
+
+        return {
+          id: req.id,
+          patterns: searchResult.patterns,
+          learnings: searchResult.learnings,
+          skills: searchResult.skills,
+          decisions: searchResult.decisions,
+        };
+      })
+    );
+
+    return results;
+  }
+
+  // ============================================================================
+  // Paginated Queries
+  // ============================================================================
+
+  /**
+   * Query patterns with cursor-based pagination
+   */
+  queryPatternsPaginated(query: MemoryQuery): PaginatedResult<Pattern> {
+    this.rebuildSortedLists();
+
+    const pageSize = query.pageSize ?? 20;
+    let startIndex = 0;
+
+    // Find cursor position
+    if (query.cursor) {
+      const cursorIndex = this.sortedPatternIds.indexOf(query.cursor);
+      if (cursorIndex !== -1) {
+        startIndex = cursorIndex + 1;
+      }
+    }
+
+    // Get candidate IDs using index intersection
+    let candidateIds: Set<string> | null = null;
+
+    if (query.brainType) {
+      candidateIds = this.brainIndex.get(query.brainType) ?? new Set();
+    }
+
+    if (query.tags?.length) {
+      const tagMatches = new Set<string>();
+      for (const tag of query.tags) {
+        const tagIds = this.tagIndex.get(tag);
+        if (tagIds) {
+          for (const id of tagIds) {
+            if (!candidateIds || candidateIds.has(id)) {
+              tagMatches.add(id);
+            }
+          }
+        }
+      }
+      candidateIds = tagMatches;
+    }
+
+    if (query.minConfidence !== undefined) {
+      const confBuckets: ConfidenceBucket[] = [];
+      if (query.minConfidence >= 0.9) confBuckets.push('excellent');
+      else if (query.minConfidence >= 0.7) confBuckets.push('excellent', 'high');
+      else if (query.minConfidence >= 0.5) confBuckets.push('excellent', 'high', 'medium');
+      else confBuckets.push('excellent', 'high', 'medium', 'low');
+
+      const confMatches = new Set<string>();
+      for (const bucket of confBuckets) {
+        const bucketIds = this.confidenceIndex.get(bucket);
+        if (bucketIds) {
+          for (const id of bucketIds) {
+            if (!candidateIds || candidateIds.has(id)) {
+              confMatches.add(id);
+            }
+          }
+        }
+      }
+      candidateIds = confMatches;
+    }
+
+    // Filter sorted IDs by candidates
+    const filteredIds = candidateIds
+      ? this.sortedPatternIds.filter((id) => candidateIds!.has(id))
+      : this.sortedPatternIds;
+
+    // Apply date range filter
+    let finalIds = filteredIds;
+    if (query.dateRange) {
+      finalIds = filteredIds.filter((id) => {
+        const pattern = this.patterns.get(id);
+        return (
+          pattern &&
+          pattern.createdAt >= query.dateRange!.start &&
+          pattern.createdAt <= query.dateRange!.end
+        );
+      });
+    }
+
+    // Get page
+    const pageIds = finalIds.slice(startIndex, startIndex + pageSize);
+    const items = pageIds
+      .map((id) => this.patterns.get(id))
+      .filter((p): p is Pattern => p !== undefined);
+
+    return {
+      items,
+      cursor: pageIds.length > 0 ? pageIds[pageIds.length - 1] : null,
+      hasMore: startIndex + pageSize < finalIds.length,
+      totalCount: finalIds.length,
+    };
+  }
+
+  /**
+   * Query learnings with cursor-based pagination
+   */
+  queryLearningsPaginated(query: MemoryQuery): PaginatedResult<Learning> {
+    this.rebuildSortedLists();
+
+    const pageSize = query.pageSize ?? 20;
+    let startIndex = 0;
+
+    if (query.cursor) {
+      const cursorIndex = this.sortedLearningIds.indexOf(query.cursor);
+      if (cursorIndex !== -1) {
+        startIndex = cursorIndex + 1;
+      }
+    }
+
+    // Get candidate IDs using index intersection
+    let candidateIds: Set<string> | null = null;
+
+    if (query.brainType) {
+      const brainIds = this.brainIndex.get(query.brainType);
+      const learningTypeIds = this.typeIndex.get('learning');
+      if (brainIds && learningTypeIds) {
+        candidateIds = new Set([...brainIds].filter((id) => learningTypeIds.has(id)));
+      }
+    }
+
+    if (query.tags?.length) {
+      const tagMatches = new Set<string>();
+      for (const tag of query.tags) {
+        const tagIds = this.tagIndex.get(tag);
+        if (tagIds) {
+          for (const id of tagIds) {
+            if (!candidateIds || candidateIds.has(id)) {
+              tagMatches.add(id);
+            }
+          }
+        }
+      }
+      candidateIds = tagMatches;
+    }
+
+    const filteredIds = candidateIds
+      ? this.sortedLearningIds.filter((id) => candidateIds!.has(id))
+      : this.sortedLearningIds;
+
+    // Apply confidence filter
+    let finalIds = filteredIds;
+    if (query.minConfidence !== undefined) {
+      finalIds = filteredIds.filter((id) => {
+        const learning = this.learnings.get(id);
+        return learning && learning.confidence >= query.minConfidence!;
+      });
+    }
+
+    const pageIds = finalIds.slice(startIndex, startIndex + pageSize);
+    const items = pageIds
+      .map((id) => this.learnings.get(id))
+      .filter((l): l is Learning => l !== undefined);
+
+    return {
+      items,
+      cursor: pageIds.length > 0 ? pageIds[pageIds.length - 1] : null,
+      hasMore: startIndex + pageSize < finalIds.length,
+      totalCount: finalIds.length,
+    };
+  }
+
+  /**
+   * Query skills with cursor-based pagination
+   */
+  querySkillsPaginated(query: MemoryQuery): PaginatedResult<Skill> {
+    this.rebuildSortedLists();
+
+    const pageSize = query.pageSize ?? 20;
+    let startIndex = 0;
+
+    if (query.cursor) {
+      const cursorIndex = this.sortedSkillIds.indexOf(query.cursor);
+      if (cursorIndex !== -1) {
+        startIndex = cursorIndex + 1;
+      }
+    }
+
+    let candidateIds: Set<string> | null = null;
+
+    // Use category index for fast skill lookups
+    if (query.tags?.length) {
+      const categoryMatches = new Set<string>();
+      for (const tag of query.tags) {
+        const catIds = this.categoryIndex.get(tag);
+        if (catIds) {
+          for (const id of catIds) {
+            categoryMatches.add(id);
+          }
+        }
+      }
+      candidateIds = categoryMatches;
+    }
+
+    if (query.brainType) {
+      const filteredByBrain = [...this.skills.values()]
+        .filter(
+          (s) =>
+            s.createdBy === query.brainType ||
+            s.adoptedBy.includes(query.brainType!)
+        )
+        .map((s) => s.id);
+      const brainSet = new Set(filteredByBrain);
+      candidateIds = candidateIds
+        ? new Set([...candidateIds].filter((id) => brainSet.has(id)))
+        : brainSet;
+    }
+
+    const filteredIds = candidateIds
+      ? this.sortedSkillIds.filter((id) => candidateIds!.has(id))
+      : this.sortedSkillIds;
+
+    const pageIds = filteredIds.slice(startIndex, startIndex + pageSize);
+    const items = pageIds
+      .map((id) => this.skills.get(id))
+      .filter((s): s is Skill => s !== undefined);
+
+    return {
+      items,
+      cursor: pageIds.length > 0 ? pageIds[pageIds.length - 1] : null,
+      hasMore: startIndex + pageSize < filteredIds.length,
+      totalCount: filteredIds.length,
+    };
+  }
+
+  // ============================================================================
+  // Cached Query Methods
+  // ============================================================================
+
+  /**
+   * Find similar patterns with caching
+   */
+  findSimilarPatternsCached(context: string, limit: number = 5): Pattern[] {
+    const cacheKey = cacheKeys.patternMatch(context);
+    const cached = this.similarityCache.get(cacheKey);
+
+    if (cached) {
+      return cached.slice(0, limit);
+    }
+
+    const result = this.findSimilarPatterns(context, Math.max(limit, 10));
+    this.similarityCache.set(cacheKey, result);
+
+    return result.slice(0, limit);
+  }
+
+  /**
+   * Get cache statistics
+   */
+  getCacheStats(): {
+    queryCache: { hits: number; misses: number; size: number; hitRate: number };
+    patternCache: { hits: number; misses: number; size: number; hitRate: number };
+    similarityCache: { hits: number; misses: number; size: number; hitRate: number };
+  } {
+    return {
+      queryCache: this.queryCache.getStats(),
+      patternCache: this.patternMatchCache.getStats(),
+      similarityCache: this.similarityCache.getStats(),
+    };
+  }
+
+  /**
+   * Clear all caches (useful for testing or forced refresh)
+   */
+  clearCaches(): void {
+    this.invalidateCaches();
+    console.log('[Memory] All caches cleared');
   }
 
   private extractTags(text: string): string[] {

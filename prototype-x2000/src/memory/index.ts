@@ -25,5 +25,17 @@ export { PatternExtractor, patternExtractor } from './patterns.js';
 // Skill pooling
 export { SkillPoolManager, skillPoolManager } from './skills.js';
 
+// Learning loop (closes the feedback loop)
+export {
+  LearningLoopManager,
+  learningLoopManager,
+  queryRelevantPatterns,
+  applyLearnings,
+  recordOutcome,
+  getAntiPatternFlags,
+  getStalePatterns,
+  getLearningLoopStats,
+} from './learning-loop.js';
+
 // Config
 export { config, env, getSupabaseConfig, validateSupabaseConfig } from '../config/env.js';
