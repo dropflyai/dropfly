@@ -23,16 +23,16 @@ const envSchema = z.object({
   // Memory System
   MEMORY_PERSISTENCE_ENABLED: z
     .string()
-    .transform((val) => val === 'true')
-    .default('false'),
+    .default('false')
+    .transform((val) => val === 'true'),
   MEMORY_OFFLINE_QUEUE_MAX: z
     .string()
-    .transform((val) => parseInt(val, 10))
-    .default('100'),
+    .default('100')
+    .transform((val) => parseInt(val, 10)),
   MEMORY_SYNC_INTERVAL_MS: z
     .string()
-    .transform((val) => parseInt(val, 10))
-    .default('30000'),
+    .default('30000')
+    .transform((val) => parseInt(val, 10)),
 
   // Logging
   LOG_LEVEL: z.enum(['debug', 'info', 'warn', 'error']).default('info'),

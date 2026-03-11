@@ -262,145 +262,58 @@ async function dependencyStep(): Promise<boolean> {
 }
 
 async function providerStep(rl: readline.Interface): Promise<{
-  provider: 'claude-code' | 'anthropic' | 'openai' | 'ollama' | 'auto';
   model: string;
-  useOAuth: boolean;
   apiKey?: string;
 }> {
-  printHeader('STEP 2: AI Provider');
+  printHeader('STEP 2: AI Provider (Claude Agent SDK)');
 
-  console.log('X2000 needs an AI brain to think. Choose your provider:');
+  console.log('X2000 uses the Claude Agent SDK with API key authentication.');
+  console.log('');
+  console.log('You\'ll need an Anthropic API key from:');
+  console.log('  https://console.anthropic.com/settings/keys');
   console.log('');
 
-  // Check if Claude Code CLI is available
-  let claudeCodeAvailable = false;
-  try {
-    execSync('claude --version', { stdio: 'ignore' });
-    claudeCodeAvailable = true;
-  } catch {
-    // Claude Code not installed
-  }
+  let apiKey = process.env.ANTHROPIC_API_KEY;
 
-  const providerOptions = [];
-
-  if (claudeCodeAvailable) {
-    providerOptions.push({
-      value: 'claude-code',
-      label: 'Claude Code (Your Subscription)',
-      description: 'Uses your Pro/Max subscription - no API credits!',
-      recommended: true,
-    });
-  }
-
-  providerOptions.push(
-    { value: 'auto', label: 'Auto-Detect', description: 'Automatically use the best available provider' },
-    { value: 'anthropic', label: 'Claude API', description: 'Pay-per-use API credits' },
-    { value: 'openai', label: 'GPT-4 (OpenAI)', description: 'OpenAI API' },
-    { value: 'ollama', label: 'Local (Ollama)', description: 'Free, runs on your machine' }
-  );
-
-  if (!claudeCodeAvailable) {
-    console.log('💡 TIP: Install Claude Code CLI to use your Claude subscription!');
-    console.log('   npm install -g @anthropic-ai/claude-code');
-    console.log('   Then run: claude login');
-    console.log('');
-  }
-
-  const provider = await select(rl, 'Which AI provider?', providerOptions);
-
-  let model = 'claude-sonnet-4-20250514';
-  let useOAuth = false;
-  let apiKey: string | undefined;
-
-  if (provider === 'claude-code') {
-    console.log('');
-    printSuccess('Using Claude Code CLI with your subscription!');
-    printInfo('X2000 will use the `claude` command to run tasks.');
-    printInfo('Your subscription credits are used - no API charges.');
-    console.log('');
-
-    // Check if Claude Code is logged in
-    try {
-      const authCheck = execSync('claude auth status 2>&1', { encoding: 'utf-8' });
-      if (authCheck.includes('Not logged in') || authCheck.includes('not authenticated')) {
-        printWarning('Claude Code is not logged in.');
-        console.log('');
-        console.log('Please log in now:');
-        console.log('  claude login');
-        console.log('');
-        await ask(rl, 'Press Enter after logging in...');
-      } else {
-        printSuccess('Claude Code is authenticated!');
-      }
-    } catch {
-      // Auth check failed, but that's OK - gateway will handle it
-      printInfo('Authentication will be checked when starting the gateway.');
+  if (apiKey) {
+    printSuccess(`Found API key in environment: ${apiKey.slice(0, 12)}...`);
+    const useExisting = await confirm(rl, 'Use this API key?', true);
+    if (!useExisting) {
+      apiKey = undefined;
     }
+  }
 
-    model = 'claude-sonnet-4-20250514'; // Claude Code uses the model from your subscription
-
-  } else if (provider === 'auto') {
+  if (!apiKey) {
     console.log('');
-    printInfo('X2000 will auto-detect available providers in this order:');
-    printInfo('  1. Claude Code CLI (uses your subscription)');
-    printInfo('  2. Anthropic API (requires API key)');
-    printInfo('  3. OpenAI API (requires API key)');
-    printInfo('  4. Ollama (local models)');
-    console.log('');
+    apiKey = await askSecret(rl, 'Enter your Anthropic API key: ');
 
-    // Still ask for API key as fallback
-    apiKey = process.env.ANTHROPIC_API_KEY;
     if (!apiKey) {
-      const wantApiKey = await confirm(rl, 'Do you want to set an API key as fallback?', false);
-      if (wantApiKey) {
-        console.log('Get your API key from: https://console.anthropic.com/settings/keys');
-        apiKey = await askSecret(rl, 'Enter your Anthropic API key (or press Enter to skip): ');
-      }
-    } else {
-      printSuccess(`Found API key in environment: ${apiKey.slice(0, 12)}...`);
-    }
-
-  } else if (provider === 'anthropic') {
-    apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
+      printError('API key is required for X2000 to function.');
       console.log('');
-      console.log('Get your API key from: https://console.anthropic.com/settings/keys');
+      console.log('To get an API key:');
+      console.log('  1. Go to https://console.anthropic.com');
+      console.log('  2. Sign up or log in');
+      console.log('  3. Navigate to Settings → API Keys');
+      console.log('  4. Create a new key');
+      console.log('');
       apiKey = await askSecret(rl, 'Enter your Anthropic API key: ');
-    } else {
-      printSuccess(`Using API key from environment: ${apiKey.slice(0, 12)}...`);
     }
-
-    console.log('');
-    model = await select(rl, 'Which Claude model?', [
-      { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4', description: 'Fast & capable', recommended: true },
-      { value: 'claude-opus-4-20250514', label: 'Claude Opus 4', description: 'Most capable, slower' },
-    ]);
-
-  } else if (provider === 'openai') {
-    apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey) {
-      console.log('');
-      console.log('Get your API key from: https://platform.openai.com/api-keys');
-      apiKey = await askSecret(rl, 'Enter your OpenAI API key: ');
-    }
-
-    console.log('');
-    model = await select(rl, 'Which GPT model?', [
-      { value: 'gpt-4o', label: 'GPT-4o', description: 'Latest multimodal', recommended: true },
-      { value: 'gpt-4-turbo', label: 'GPT-4 Turbo', description: 'Fast & capable' },
-    ]);
-
-  } else if (provider === 'ollama') {
-    console.log('');
-    console.log('Make sure Ollama is running: ollama serve');
-    model = await ask(rl, 'Which model? (e.g., llama3, codellama, mistral): ');
-    if (!model) model = 'llama3';
   }
+
+  console.log('');
+  const model = await select(rl, 'Which Claude model for the CEO Brain?', [
+    { value: 'claude-sonnet-4-20250514', label: 'Claude Sonnet 4', description: 'Fast & capable', recommended: true },
+    { value: 'claude-opus-4-20250514', label: 'Claude Opus 4', description: 'Most capable, slower' },
+  ]);
+
+  console.log('');
+  printInfo('Model hierarchy for 44 brains:');
+  printInfo('  CEO Brain: ' + (model.includes('opus') ? 'Opus' : 'Sonnet') + ' (strategic decisions)');
+  printInfo('  Specialist Brains: Sonnet (execution)');
+  printInfo('  Verification Brains: Haiku (simple checks)');
 
   return {
-    provider: provider as 'claude-code' | 'anthropic' | 'openai' | 'ollama' | 'auto',
     model,
-    useOAuth,
     apiKey,
   };
 }
@@ -599,20 +512,9 @@ async function summaryStep(
 ): Promise<boolean> {
   printHeader('CONFIGURATION SUMMARY');
 
-  const providerDesc = config.provider === 'claude-code'
-    ? 'Claude Code CLI (Your Subscription)'
-    : config.provider === 'auto'
-    ? 'Auto-Detect (Best Available)'
-    : `${config.provider.charAt(0).toUpperCase() + config.provider.slice(1)} API`;
-
-  const authDesc = config.provider === 'claude-code'
-    ? 'Your Claude Pro/Max Subscription'
-    : config.provider === 'auto'
-    ? 'Auto (Subscription → API Key)'
-    : 'API Key';
-
-  console.log(`  AI Provider:     ${providerDesc}`);
-  console.log(`  Authentication:  ${authDesc}`);
+  console.log(`  AI Provider:     ${config.provider}`);
+  console.log(`  Model:           ${config.model}`);
+  console.log(`  Authentication:  API Key`);
   console.log(`  Autonomy Level:  ${config.trustLevel}`);
   console.log(`  Gateway Port:    ${config.port}`);
   console.log(`  Auto-Start:      ${config.autoStart ? 'Yes' : 'No'}`);
@@ -770,7 +672,6 @@ export async function runOnboardingWizard(): Promise<X2000Config | null> {
     // Build config
     const config: X2000Config = {
       port: gatewayConfig.port,
-      provider: providerConfig.provider,
       model: providerConfig.model,
       apiKey: providerConfig.apiKey,
       channels: {
@@ -785,9 +686,9 @@ export async function runOnboardingWizard(): Promise<X2000Config | null> {
 
     // Show summary and confirm
     const confirmed = await summaryStep(rl, {
-      provider: config.provider,
+      provider: 'Claude Agent SDK',
       model: config.model,
-      useOAuth: config.provider === 'claude-code',
+      useOAuth: false,
       channels: config.channels,
       trustLevel: config.trustLevel,
       port: config.port,
@@ -813,11 +714,7 @@ export async function runOnboardingWizard(): Promise<X2000Config | null> {
     // Save credentials separately (more secure)
     const creds: Credentials = {};
     if (providerConfig.apiKey) {
-      if (providerConfig.provider === 'anthropic') {
-        creds.anthropic = { apiKey: providerConfig.apiKey };
-      } else if (providerConfig.provider === 'openai') {
-        creds.openai = { apiKey: providerConfig.apiKey };
-      }
+      creds.anthropic = { apiKey: providerConfig.apiKey };
     }
     if (channels.telegram) {
       creds.telegram = channels.telegram;
@@ -834,11 +731,10 @@ export async function runOnboardingWizard(): Promise<X2000Config | null> {
       printSuccess('Credentials saved securely!');
     }
 
-    // Save API key to .env for backward compatibility
-    if (providerConfig.apiKey && providerConfig.provider !== 'ollama') {
+    // Save API key to .env
+    if (providerConfig.apiKey) {
       const envPath = join(X2000_DIR, '.env');
-      const envVar = providerConfig.provider === 'anthropic' ? 'ANTHROPIC_API_KEY' : 'OPENAI_API_KEY';
-      writeFileSync(envPath, `${envVar}=${providerConfig.apiKey}\n`, { mode: 0o600 });
+      writeFileSync(envPath, `ANTHROPIC_API_KEY=${providerConfig.apiKey}\n`, { mode: 0o600 });
     }
 
     // Install daemon if requested
@@ -866,10 +762,8 @@ export async function runOnboardingWizard(): Promise<X2000Config | null> {
 // ============================================================================
 
 export async function quickSetup(options: Partial<X2000Config>): Promise<X2000Config> {
-  // Default to 'auto' which prioritizes Claude Code CLI
   const config: X2000Config = {
     port: options.port || 3000,
-    provider: options.provider || 'auto',
     model: options.model || 'claude-sonnet-4-20250514',
     apiKey: options.apiKey || process.env.ANTHROPIC_API_KEY,
     channels: options.channels || {},

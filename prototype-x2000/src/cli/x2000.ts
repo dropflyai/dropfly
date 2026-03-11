@@ -64,6 +64,7 @@ Commands:
   status             Check system status
   message, msg       Send a message to X2000
   channels           Manage communication channels
+  brains             List all specialized AI brains
   help               Show this help message
 
 Quick Task (Legacy):
@@ -225,6 +226,45 @@ async function cmdChannels(): Promise<void> {
   console.log('');
 }
 
+async function cmdBrains(): Promise<void> {
+  const { brainFactory } = await import('../brains/factory.js');
+  const brains = brainFactory.getAvailableBrains();
+
+  console.log('\n╔═══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║                        X2000 SPECIALIZED BRAINS                           ║');
+  console.log('╚═══════════════════════════════════════════════════════════════════════════╝\n');
+
+  console.log(`Total: ${brains.length} specialized brains\n`);
+
+  // Group brains by category
+  const categories: Record<string, string[]> = {
+    'Leadership': ['ceo', 'operations', 'mba'],
+    'Engineering': ['engineering', 'frontend', 'backend', 'database', 'devops', 'architecture', 'mobile', 'qa', 'testing', 'debugger', 'optimize'],
+    'Data & AI': ['data', 'ai', 'analytics', 'automation'],
+    'Product & Design': ['product', 'design', 'game-design', 'innovation'],
+    'Business': ['finance', 'sales', 'marketing', 'growth', 'pricing', 'options-trading', 'investor'],
+    'People & Legal': ['hr', 'legal', 'partnership'],
+    'Content & Comms': ['content', 'branding', 'social-media', 'video', 'email', 'localization', 'devrel', 'community'],
+    'Support': ['support', 'customer-success'],
+    'Infrastructure': ['cloud', 'security', 'research'],
+  };
+
+  for (const [category, categoryBrains] of Object.entries(categories)) {
+    const available = categoryBrains.filter(b => brains.includes(b));
+    if (available.length > 0) {
+      console.log(`${category}:`);
+      for (const brain of available) {
+        const formatted = brain
+          .split('-')
+          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
+          .join(' ');
+        console.log(`  • ${formatted}`);
+      }
+      console.log('');
+    }
+  }
+}
+
 // Legacy: Direct task execution
 async function cmdLegacyTask(task: string, verbose = false): Promise<void> {
   const { providerManager } = await import('../ai/providers/index.js');
@@ -362,6 +402,10 @@ async function main(): Promise<void> {
       } else {
         await cmdChannels();
       }
+      break;
+
+    case 'brains':
+      await cmdBrains();
       break;
 
     default:
