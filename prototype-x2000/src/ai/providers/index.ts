@@ -9,14 +9,16 @@ import { LLMProvider, type LLMProviderConfig, type Message, type ToolDefinition,
 import { AnthropicProvider } from './anthropic.js';
 import { OpenAIProvider } from './openai.js';
 import { OllamaProvider } from './ollama.js';
+import { ClaudeCodeProvider } from './claude-code.js';
 
-export type ProviderType = 'anthropic' | 'openai' | 'ollama' | 'auto';
+export type ProviderType = 'anthropic' | 'openai' | 'ollama' | 'claude-code' | 'auto';
 
 export interface ProviderManagerConfig {
   preferredProvider?: ProviderType;
   anthropic?: Partial<LLMProviderConfig>;
   openai?: Partial<LLMProviderConfig>;
   ollama?: Partial<LLMProviderConfig>;
+  claudeCode?: Partial<LLMProviderConfig> & { cliPath?: string };
 }
 
 class ProviderManager {
@@ -33,7 +35,13 @@ class ProviderManager {
     console.log('[X2000] Detecting available LLM providers...');
 
     // Try to initialize each provider
+    // Priority: claude-code (Max subscription) > anthropic (API) > openai > ollama
     const providerConfigs: Array<{ type: string; Provider: new (config: any) => LLMProvider; config: any }> = [
+      {
+        type: 'claude-code',
+        Provider: ClaudeCodeProvider,
+        config: config.claudeCode || {},
+      },
       {
         type: 'anthropic',
         Provider: AnthropicProvider,
@@ -78,8 +86,8 @@ class ProviderManager {
 
     // Auto-select if no preference or preferred not available
     if (!this.activeProvider) {
-      // Priority: anthropic > openai > ollama
-      for (const type of ['anthropic', 'openai', 'ollama']) {
+      // Priority: claude-code (Max subscription) > anthropic (API) > openai > ollama
+      for (const type of ['claude-code', 'anthropic', 'openai', 'ollama']) {
         const provider = this.providers.get(type);
         if (provider) {
           this.activeProvider = provider;
@@ -114,7 +122,7 @@ class ProviderManager {
   switchTo(type: ProviderType): void {
     if (type === 'auto') {
       // Re-run auto selection
-      for (const t of ['anthropic', 'openai', 'ollama']) {
+      for (const t of ['claude-code', 'anthropic', 'openai', 'ollama']) {
         const provider = this.providers.get(t);
         if (provider) {
           this.activeProvider = provider;
@@ -172,3 +180,4 @@ export { LLMProvider, type LLMProviderConfig, type Message, type ToolDefinition,
 export { AnthropicProvider } from './anthropic.js';
 export { OpenAIProvider } from './openai.js';
 export { OllamaProvider } from './ollama.js';
+export { ClaudeCodeProvider } from './claude-code.js';

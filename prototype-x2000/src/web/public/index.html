@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>X2000 - Autonomous AI Fleet</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-primary: #0a0a0f;
+      --bg-secondary: #12121a;
+      --bg-tertiary: #1a1a25;
+      --text-primary: #ffffff;
+      --text-secondary: #a0a0b0;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --success: #22c55e;
+      --error: #ef4444;
+      --warning: #f59e0b;
+      --border: #2a2a3a;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo h1 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .logo span {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .status-bar {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .status-dot.offline {
+      background: var(--error);
+    }
+
+    /* Main Layout */
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 280px;
+      background: var(--bg-secondary);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .sidebar-section {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .sidebar-section h3 {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-secondary);
+      margin-bottom: 0.75rem;
+    }
+
+    .brain-list {
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .brain-item {
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .brain-item:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .brain-item.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    .brain-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 4px;
+      background: var(--bg-tertiary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+    }
+
+    /* Chat Area */
+    .chat-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .messages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .message {
+      max-width: 80%;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .message.user {
+      align-self: flex-end;
+    }
+
+    .message.assistant {
+      align-self: flex-start;
+    }
+
+    .message-content {
+      padding: 1rem 1.25rem;
+      border-radius: 12px;
+      line-height: 1.5;
+    }
+
+    .message.user .message-content {
+      background: var(--accent);
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.assistant .message-content {
+      background: var(--bg-tertiary);
+      border-bottom-left-radius: 4px;
+    }
+
+    .message-meta {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      padding: 0 0.5rem;
+    }
+
+    /* Iteration Progress */
+    .iteration-progress {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin: 1rem 2rem;
+    }
+
+    .iteration-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+
+    .iteration-title {
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .iteration-count {
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+    }
+
+    .iteration-thought {
+      font-size: 0.875rem;
+      color: var(--text-secondary);
+      padding: 0.75rem;
+      background: var(--bg-tertiary);
+      border-radius: 6px;
+      margin-bottom: 0.5rem;
+    }
+
+    .iteration-action {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .iteration-action.success {
+      color: var(--success);
+    }
+
+    .iteration-action.error {
+      color: var(--error);
+    }
+
+    /* Input Area */
+    .input-area {
+      padding: 1.5rem 2rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border);
+    }
+
+    .input-wrapper {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .input-field {
+      flex: 1;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      color: var(--text-primary);
+      font-size: 1rem;
+      resize: none;
+      min-height: 56px;
+      max-height: 200px;
+      font-family: inherit;
+    }
+
+    .input-field:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .input-field::placeholder {
+      color: var(--text-secondary);
+    }
+
+    .send-button {
+      background: var(--accent);
+      color: white;
+      border: none;
+      border-radius: 12px;
+      padding: 1rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .send-button:hover {
+      background: var(--accent-hover);
+    }
+
+    .send-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .stop-button {
+      background: var(--error);
+    }
+
+    .stop-button:hover {
+      background: #dc2626;
+    }
+
+    /* Welcome Screen */
+    .welcome {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .welcome h2 {
+      font-size: 2rem;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .welcome p {
+      color: var(--text-secondary);
+      max-width: 500px;
+      line-height: 1.6;
+      margin-bottom: 2rem;
+    }
+
+    .quick-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      justify-content: center;
+    }
+
+    .quick-action {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.75rem 1.25rem;
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .quick-action:hover {
+      border-color: var(--accent);
+      background: var(--bg-secondary);
+    }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-secondary);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border);
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--text-secondary);
+    }
+
+    /* Code blocks */
+    pre {
+      background: var(--bg-primary);
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-x: auto;
+      margin: 0.5rem 0;
+    }
+
+    code {
+      font-family: 'SF Mono', Menlo, Monaco, monospace;
+      font-size: 0.875rem;
+    }
+
+    /* Connection status */
+    .connection-banner {
+      background: var(--error);
+      color: white;
+      padding: 0.75rem;
+      text-align: center;
+      font-size: 0.875rem;
+      display: none;
+    }
+
+    .connection-banner.visible {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="connection-banner" id="connectionBanner">
+    Disconnected from X2000. Attempting to reconnect...
+  </div>
+
+  <header>
+    <div class="logo">
+      <h1>X2000</h1>
+      <span>Autonomous AI Fleet</span>
+    </div>
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="status-dot" id="statusDot"></span>
+        <span id="providerName">Connecting...</span>
+      </div>
+      <div class="status-item">
+        <span id="brainCount">46</span> Brains
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <h3>Active Brains</h3>
+        <div class="brain-list" id="brainList">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+      <div class="sidebar-section">
+        <h3>Memory</h3>
+        <div class="status-item" style="margin-bottom: 0.5rem;">
+          <span>Patterns:</span>
+          <span id="patternCount">0</span>
+        </div>
+        <div class="status-item" style="margin-bottom: 0.5rem;">
+          <span>Learnings:</span>
+          <span id="learningCount">0</span>
+        </div>
+        <div class="status-item">
+          <span>Skills:</span>
+          <span id="skillCount">0</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="chat-container">
+      <div class="messages" id="messages">
+        <div class="welcome" id="welcome">
+          <h2>Welcome to X2000</h2>
+          <p>
+            I'm an autonomous AI fleet with 46 specialized brains.
+            Give me a task and I'll orchestrate the right brains to accomplish it.
+            I learn from every task and remember across sessions.
+          </p>
+          <div class="quick-actions">
+            <button class="quick-action" onclick="sendQuickAction('Build a REST API for user management')">
+              Build an API
+            </button>
+            <button class="quick-action" onclick="sendQuickAction('Research my competitors and create a report')">
+              Research competitors
+            </button>
+            <button class="quick-action" onclick="sendQuickAction('Design a landing page for a SaaS product')">
+              Design a landing page
+            </button>
+            <button class="quick-action" onclick="sendQuickAction('Create a financial model for a startup')">
+              Financial model
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="iteration-progress" id="iterationProgress" style="display: none;">
+        <div class="iteration-header">
+          <span class="iteration-title" id="iterationTitle">CEO Brain Working...</span>
+          <span class="iteration-count" id="iterationCount">Iteration 0</span>
+        </div>
+        <div class="iteration-thought" id="iterationThought"></div>
+        <div class="iteration-action" id="iterationAction"></div>
+        <div class="stream-output" id="streamOutput" style="max-height: 300px; overflow-y: auto; margin-top: 0.75rem; padding: 0.75rem; background: var(--bg-primary); border-radius: 6px; font-family: 'SF Mono', Menlo, Monaco, monospace; font-size: 0.8rem; white-space: pre-wrap; display: none;"></div>
+      </div>
+
+      <div class="input-area">
+        <div class="input-wrapper">
+          <textarea
+            class="input-field"
+            id="taskInput"
+            placeholder="Give X2000 a task..."
+            rows="1"
+            onkeydown="handleKeyDown(event)"
+          ></textarea>
+          <button class="send-button" id="sendButton" onclick="sendTask()">
+            Send
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // WebSocket connection
+    let ws = null;
+    let isRunning = false;
+    let reconnectAttempts = 0;
+
+    const brains = [
+      'ceo', 'engineering', 'product', 'design', 'research', 'qa',
+      'finance', 'marketing', 'sales', 'operations', 'legal', 'hr',
+      'security', 'data', 'cloud', 'mobile', 'ai', 'automation',
+      'analytics', 'devrel', 'branding', 'email', 'social-media',
+      'video', 'community', 'support', 'investor', 'pricing',
+      'innovation', 'content', 'localization', 'game-design',
+      'partnership', 'customer-success', 'growth', 'mba',
+      'options-trading', 'frontend', 'backend', 'database',
+      'debugger', 'devops', 'architecture', 'optimize', 'testing', 'performance'
+    ];
+
+    function connect() {
+      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      ws = new WebSocket(`${protocol}//${window.location.host}`);
+
+      ws.onopen = () => {
+        console.log('Connected to X2000');
+        document.getElementById('connectionBanner').classList.remove('visible');
+        reconnectAttempts = 0;
+      };
+
+      ws.onclose = () => {
+        console.log('Disconnected from X2000');
+        document.getElementById('connectionBanner').classList.add('visible');
+        document.getElementById('statusDot').classList.add('offline');
+
+        // Reconnect with backoff
+        const delay = Math.min(1000 * Math.pow(2, reconnectAttempts), 30000);
+        reconnectAttempts++;
+        setTimeout(connect, delay);
+      };
+
+      ws.onmessage = (event) => {
+        const message = JSON.parse(event.data);
+        handleServerMessage(message);
+      };
+    }
+
+    let streamBuffer = '';
+
+    function handleServerMessage(message) {
+      switch (message.type) {
+        case 'init':
+          document.getElementById('providerName').textContent = message.data.provider || 'Connected';
+          document.getElementById('statusDot').classList.remove('offline');
+          populateBrainList();
+          break;
+
+        case 'task_started':
+          isRunning = true;
+          streamBuffer = '';
+          updateUI();
+          document.getElementById('welcome').style.display = 'none';
+          document.getElementById('iterationProgress').style.display = 'block';
+          document.getElementById('streamOutput').style.display = 'block';
+          document.getElementById('streamOutput').textContent = '';
+          document.getElementById('iterationTitle').textContent = 'Claude Code Working...';
+          document.getElementById('iterationCount').textContent = 'Autonomous';
+          break;
+
+        case 'iteration':
+          updateIteration(message.data);
+          break;
+
+        case 'stream':
+          // Real-time streaming text from Claude Code
+          if (message.data.content) {
+            streamBuffer += message.data.content;
+            const streamEl = document.getElementById('streamOutput');
+            streamEl.textContent = streamBuffer.slice(-5000); // Keep last 5000 chars
+            streamEl.scrollTop = streamEl.scrollHeight;
+          }
+          break;
+
+        case 'tool_use':
+          // Claude Code is using a tool
+          const actionEl = document.getElementById('iterationAction');
+          actionEl.className = 'iteration-action';
+          actionEl.innerHTML = `🔧 Using tool: <strong>${message.data.tool}</strong>`;
+          break;
+
+        case 'tool_result':
+          // Tool completed
+          break;
+
+        case 'agent_done':
+          document.getElementById('iterationTitle').textContent = 'Task Complete';
+          break;
+
+        case 'task_completed':
+          isRunning = false;
+          updateUI();
+          document.getElementById('iterationProgress').style.display = 'none';
+          // Include the stream buffer in the output if we have it
+          const output = streamBuffer || message.data.output;
+          addMessage('assistant', formatOutput({ ...message.data, output }));
+          streamBuffer = '';
+          break;
+
+        case 'task_error':
+          isRunning = false;
+          updateUI();
+          document.getElementById('iterationProgress').style.display = 'none';
+          addMessage('assistant', `Error: ${message.data.message}\n\n${streamBuffer}`);
+          streamBuffer = '';
+          break;
+
+        case 'error':
+          console.error('Server error:', message.data.message);
+          break;
+      }
+    }
+
+    function populateBrainList() {
+      const list = document.getElementById('brainList');
+      list.innerHTML = brains.slice(0, 15).map(brain => `
+        <div class="brain-item">
+          <div class="brain-icon">${brain[0].toUpperCase()}</div>
+          <span>${formatBrainName(brain)}</span>
+        </div>
+      `).join('') + `
+        <div class="brain-item" style="color: var(--text-secondary);">
+          +${brains.length - 15} more brains
+        </div>
+      `;
+    }
+
+    function formatBrainName(name) {
+      return name.split('-').map(w => w[0].toUpperCase() + w.slice(1)).join(' ');
+    }
+
+    function updateIteration(data) {
+      document.getElementById('iterationCount').textContent = `Iteration ${data.iteration}`;
+      document.getElementById('iterationThought').textContent =
+        data.thought ? data.thought.slice(0, 200) + (data.thought.length > 200 ? '...' : '') : '';
+
+      if (data.action) {
+        const actionEl = document.getElementById('iterationAction');
+        actionEl.className = `iteration-action ${data.action.success ? 'success' : 'error'}`;
+        actionEl.textContent = `${data.action.success ? '✓' : '✗'} ${data.action.tool}`;
+      }
+    }
+
+    function formatOutput(data) {
+      let output = '';
+
+      if (data.success) {
+        output += '✅ Task completed\n\n';
+      } else {
+        output += '⚠️ Task finished with issues\n\n';
+      }
+
+      if (data.output) {
+        if (typeof data.output === 'string') {
+          output += data.output;
+        } else {
+          output += '```json\n' + JSON.stringify(data.output, null, 2) + '\n```';
+        }
+      }
+
+      output += `\n\n---\nIterations: ${data.iterations} | Tool calls: ${data.toolCalls} | Duration: ${(data.duration / 1000).toFixed(1)}s`;
+
+      if (data.learnings && data.learnings.length > 0) {
+        output += '\n\nLearnings:\n' + data.learnings.map(l => `• ${l}`).join('\n');
+      }
+
+      return output;
+    }
+
+    function addMessage(role, content) {
+      const messages = document.getElementById('messages');
+      const time = new Date().toLocaleTimeString();
+
+      const messageEl = document.createElement('div');
+      messageEl.className = `message ${role}`;
+      messageEl.innerHTML = `
+        <div class="message-content">${formatContent(content)}</div>
+        <div class="message-meta">${role === 'user' ? 'You' : 'X2000'} · ${time}</div>
+      `;
+
+      messages.appendChild(messageEl);
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function formatContent(content) {
+      // Basic markdown-like formatting
+      return content
+        .replace(/```(\w*)\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>');
+    }
+
+    function sendTask() {
+      const input = document.getElementById('taskInput');
+      const content = input.value.trim();
+
+      if (!content || isRunning) return;
+
+      addMessage('user', content);
+      input.value = '';
+      autoResize(input);
+
+      ws.send(JSON.stringify({
+        type: 'task',
+        data: { content }
+      }));
+    }
+
+    function sendQuickAction(content) {
+      document.getElementById('taskInput').value = content;
+      sendTask();
+    }
+
+    function stopTask() {
+      ws.send(JSON.stringify({ type: 'stop' }));
+    }
+
+    function updateUI() {
+      const sendButton = document.getElementById('sendButton');
+      if (isRunning) {
+        sendButton.textContent = 'Stop';
+        sendButton.className = 'send-button stop-button';
+        sendButton.onclick = stopTask;
+      } else {
+        sendButton.textContent = 'Send';
+        sendButton.className = 'send-button';
+        sendButton.onclick = sendTask;
+      }
+    }
+
+    function handleKeyDown(event) {
+      if (event.key === 'Enter' && !event.shiftKey) {
+        event.preventDefault();
+        if (!isRunning) sendTask();
+      }
+    }
+
+    function autoResize(el) {
+      el.style.height = 'auto';
+      el.style.height = Math.min(el.scrollHeight, 200) + 'px';
+    }
+
+    // Auto-resize textarea
+    document.getElementById('taskInput').addEventListener('input', function() {
+      autoResize(this);
+    });
+
+    // Connect on load
+    connect();
+  </script>
+</body>
+</html>

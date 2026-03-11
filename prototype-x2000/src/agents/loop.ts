@@ -2,6 +2,7 @@
  * X2000 Agent Loop
  *
  * Autonomous execution loop for AI agents.
+ * Works with ANY LLM provider (Claude, GPT, Ollama, etc.)
  */
 
 import { config } from 'dotenv';
@@ -10,7 +11,7 @@ import { resolve } from 'path';
 // Load .env file from project root
 config({ path: resolve(process.cwd(), '.env') });
 
-import Anthropic from '@anthropic-ai/sdk';
+import { providerManager, type Message, type ToolDefinition } from '../ai/providers/index.js';
 import { toolRegistry, getToolDefinitions, executeTool, type ToolContext } from '../tools/index.js';
 import { memoryManager } from '../memory/manager.js';
 import type { Task, BrainType, TrustLevel } from '../types/index.js';
@@ -58,7 +59,6 @@ export interface AgentLoopResult {
 
 export class AgentLoop {
   private config: Required<AgentLoopConfig>;
-  private client: Anthropic;
 
   constructor(config: AgentLoopConfig) {
     this.config = {
@@ -72,8 +72,6 @@ export class AgentLoop {
       onIteration: () => {},
       ...config,
     };
-
-    this.client = new Anthropic();
   }
 
   async run(task: Task): Promise<AgentLoopResult> {
@@ -85,17 +83,24 @@ export class AgentLoop {
     // Initialize tools
     await toolRegistry.initialize();
 
+    const provider = providerManager.currentProvider;
     console.log(`[AgentLoop] Starting autonomous execution for: ${task.subject}`);
+    console.log(`[AgentLoop] Using provider: ${provider}`);
     console.log(`[AgentLoop] Config: max ${this.config.maxIterations} iterations, ${this.config.timeoutMs}ms timeout`);
 
-    const messages: Anthropic.Messages.MessageParam[] = [
+    // Build content - avoid duplication if subject and description are the same
+    const taskContent = task.subject === task.description
+      ? task.description
+      : `${task.subject}\n\n${task.description}`;
+
+    const messages: Message[] = [
       {
         role: 'user',
-        content: `${task.subject}\n\n${task.description}`,
+        content: taskContent,
       },
     ];
 
-    const tools = getToolDefinitions(this.config.trustLevel);
+    const tools = getToolDefinitions(this.config.trustLevel) as ToolDefinition[];
 
     let iteration = 0;
     let completed = false;
@@ -112,12 +117,10 @@ export class AgentLoop {
       console.log(`[AgentLoop] Iteration ${iteration}/${this.config.maxIterations}`);
 
       try {
-        const response = await this.client.messages.create({
-          model: 'claude-sonnet-4-20250514',
-          max_tokens: 4096,
-          system: this.buildSystemPrompt(),
-          messages,
-          tools: tools as Anthropic.Messages.Tool[],
+        // Use the provider manager to chat with any available LLM
+        const response = await providerManager.chat(messages, {
+          tools,
+          systemPrompt: this.buildSystemPrompt(),
         });
 
         const result = await this.processResponse(response, messages, toolCalls);
@@ -183,8 +186,8 @@ When you have completed the task, provide a clear summary of what was accomplish
   }
 
   private async processResponse(
-    response: Anthropic.Messages.Message,
-    messages: Anthropic.Messages.MessageParam[],
+    response: { content: string; toolCalls: Array<{ id: string; name: string; input: Record<string, unknown> }>; stopReason: string },
+    messages: Message[],
     toolCalls: Array<{ tool: string; params: unknown; result: unknown }>
   ): Promise<{
     thought: string;
@@ -192,33 +195,22 @@ When you have completed the task, provide a clear summary of what was accomplish
     completed: boolean;
     learnings?: string[];
   }> {
-    let thought = '';
+    const thought = response.content;
     let completed = false;
     let action: IterationResult['action'] | undefined;
     const learnings: string[] = [];
 
-    // Extract text content
-    for (const block of response.content) {
-      if (block.type === 'text') {
-        thought += block.text;
-      }
-    }
-
     // Check for tool use
-    const toolUseBlocks = response.content.filter(
-      (block): block is Anthropic.Messages.ToolUseBlock => block.type === 'tool_use'
-    );
-
-    if (toolUseBlocks.length === 0) {
+    if (!response.toolCalls || response.toolCalls.length === 0) {
       // No tool calls - task might be complete
       completed = true;
       return { thought, completed, learnings };
     }
 
     // Process tool calls
-    const toolResults: Anthropic.Messages.ToolResultBlockParam[] = [];
+    const toolResults: Array<{ id: string; result: string }> = [];
 
-    for (const toolUse of toolUseBlocks) {
+    for (const toolUse of response.toolCalls) {
       console.log(`[AgentLoop] Executing tool: ${toolUse.name}`);
 
       const context: ToolContext = {
@@ -229,7 +221,7 @@ When you have completed the task, provide a clear summary of what was accomplish
         approved: true,
       };
 
-      const result = await executeTool(toolUse.name, toolUse.input as Record<string, unknown>, context);
+      const result = await executeTool(toolUse.name, toolUse.input, context);
 
       toolCalls.push({
         tool: toolUse.name,
@@ -239,26 +231,27 @@ When you have completed the task, provide a clear summary of what was accomplish
 
       action = {
         tool: toolUse.name,
-        params: toolUse.input as Record<string, unknown>,
+        params: toolUse.input,
         result,
       };
 
       toolResults.push({
-        type: 'tool_result',
-        tool_use_id: toolUse.id,
-        content: JSON.stringify(result),
+        id: toolUse.id,
+        result: JSON.stringify(result),
       });
     }
 
     // Add assistant message and tool results to conversation
     messages.push({
       role: 'assistant',
-      content: response.content,
+      content: thought,
     });
 
+    // Add tool results as user message
+    const toolResultText = toolResults.map(r => `Tool ${r.id} result: ${r.result}`).join('\n\n');
     messages.push({
       role: 'user',
-      content: toolResults,
+      content: toolResultText,
     });
 
     return { thought, action, completed, learnings };

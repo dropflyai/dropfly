@@ -71,16 +71,9 @@ export class AnthropicProvider extends LLMProvider {
   }
 
   async isAvailable(): Promise<boolean> {
-    try {
-      await this.client.messages.create({
-        model: 'claude-3-haiku-20240307',
-        max_tokens: 10,
-        messages: [{ role: 'user', content: 'hi' }],
-      });
-      return true;
-    } catch {
-      return false;
-    }
+    // Check if API key is configured (don't make a test call - it wastes tokens)
+    const apiKey = this.config.apiKey || process.env.ANTHROPIC_API_KEY;
+    return Boolean(apiKey && apiKey.length > 10);
   }
 }
 

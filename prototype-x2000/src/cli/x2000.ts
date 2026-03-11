@@ -2,107 +2,87 @@
 /**
  * X2000 CLI
  *
- * Simple command-line interface for the autonomous AI fleet.
- * Works with any LLM provider.
+ * Main entry point for the X2000 autonomous AI fleet.
+ * Like OpenClaw - runs as a daemon service with channel support.
  *
  * Usage:
- *   x2000 "build me an app"
- *   x2000 --provider ollama "research competitors"
- *   x2000 --interactive
+ *   x2000 setup          - Interactive setup wizard
+ *   x2000 gateway        - Start the gateway server (foreground)
+ *   x2000 daemon [cmd]   - Manage background service
+ *   x2000 status         - Check system status
+ *   x2000 message "..."  - Send a message directly
+ *   x2000 "task"         - Quick task execution (legacy mode)
  */
 
 import { config } from 'dotenv';
-import { resolve, dirname } from 'path';
+import { resolve, dirname, join } from 'path';
 import { fileURLToPath } from 'url';
 import { readFileSync, existsSync } from 'fs';
-import * as readline from 'readline';
+import { homedir } from 'os';
 
 // Load environment
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const rootDir = resolve(__dirname, '../..');
+const X2000_DIR = join(homedir(), '.x2000');
+const CONFIG_PATH = join(X2000_DIR, 'config.json');
+
+config({ path: join(X2000_DIR, '.env') });
 config({ path: resolve(rootDir, '.env') });
 
-import { providerManager, type ProviderType } from '../ai/providers/index.js';
-import { AgentLoop } from '../agents/loop.js';
-import { memoryManager } from '../memory/manager.js';
-import type { Task } from '../types/index.js';
-import { v4 as uuidv4 } from 'uuid';
-
 // ============================================================================
-// CLI Configuration
+// Helpers
 // ============================================================================
 
-interface CLIOptions {
-  provider: ProviderType;
-  interactive: boolean;
-  verbose: boolean;
-  maxIterations: number;
-}
-
-function parseArgs(): { task: string | null; options: CLIOptions } {
-  const args = process.argv.slice(2);
-  const options: CLIOptions = {
-    provider: 'auto',
-    interactive: false,
-    verbose: false,
-    maxIterations: 50,
-  };
-
-  let task: string | null = null;
-  let i = 0;
-
-  while (i < args.length) {
-    const arg = args[i];
-
-    if (arg === '--provider' || arg === '-p') {
-      options.provider = args[++i] as ProviderType;
-    } else if (arg === '--interactive' || arg === '-i') {
-      options.interactive = true;
-    } else if (arg === '--verbose' || arg === '-v') {
-      options.verbose = true;
-    } else if (arg === '--max-iterations' || arg === '-m') {
-      options.maxIterations = parseInt(args[++i]);
-    } else if (arg === '--help' || arg === '-h') {
-      printHelp();
-      process.exit(0);
-    } else if (arg === '--version') {
-      printVersion();
-      process.exit(0);
-    } else if (!arg.startsWith('-')) {
-      task = arg;
-    }
-
-    i++;
-  }
-
-  return { task, options };
+function printBanner(): void {
+  console.log(`
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                                                                             ║
+║   ██╗  ██╗██████╗  ██████╗  ██████╗  ██████╗                               ║
+║   ╚██╗██╔╝╚════██╗██╔═████╗██╔═████╗██╔═████╗                              ║
+║    ╚███╔╝  █████╔╝██║██╔██║██║██╔██║██║██╔██║                              ║
+║    ██╔██╗ ██╔═══╝ ████╔╝██║████╔╝██║████╔╝██║                              ║
+║   ██╔╝ ██╗███████╗╚██████╔╝╚██████╔╝╚██████╔╝                              ║
+║   ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝  ╚═════╝                               ║
+║                                                                             ║
+║   Autonomous AI Fleet · 46 Specialized Brains · Forever Learning           ║
+║                                                                             ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+`);
 }
 
 function printHelp(): void {
   console.log(`
 X2000 - Autonomous AI Fleet
 
-Usage:
-  x2000 [options] "your task here"
+Commands:
+  login              Authenticate with your Claude subscription
+  logout             Remove stored credentials
+  setup, onboard     Interactive setup wizard
+  gateway, start     Start the gateway server (foreground)
+  daemon <action>    Manage background service
+                     Actions: install, uninstall, start, stop, restart, status, logs
+  status             Check system status
+  message, msg       Send a message to X2000
+  channels           Manage communication channels
+  help               Show this help message
+
+Quick Task (Legacy):
+  x2000 "your task"  Execute a task directly (uses existing provider setup)
 
 Options:
-  -p, --provider <type>     LLM provider (anthropic, openai, ollama, auto)
-  -i, --interactive         Interactive mode (continuous conversation)
-  -v, --verbose             Show detailed output
-  -m, --max-iterations <n>  Maximum iterations per task (default: 50)
-  -h, --help                Show this help message
-  --version                 Show version
+  -p, --provider     LLM provider (anthropic, openai, ollama)
+  -v, --verbose      Show detailed output
+  -h, --help         Show this help message
+  --version          Show version
 
 Examples:
-  x2000 "build a REST API for user management"
-  x2000 --provider ollama "analyze this codebase"
-  x2000 -i  # Start interactive mode
+  x2000 login                    # Connect to your Claude subscription
+  x2000 setup                    # First-time setup
+  x2000 gateway                  # Start server
+  x2000 daemon install           # Install as background service
+  x2000 msg "build an API"       # Send a task
 
-Environment Variables:
-  ANTHROPIC_API_KEY   - For Claude (Anthropic)
-  OPENAI_API_KEY      - For GPT-4 (OpenAI)
-
-For local models, run: ollama serve
+For more info: https://github.com/x2000
 `);
 }
 
@@ -111,148 +91,201 @@ function printVersion(): void {
     const pkg = JSON.parse(readFileSync(resolve(rootDir, 'package.json'), 'utf-8'));
     console.log(`X2000 v${pkg.version}`);
   } catch {
-    console.log('X2000 v0.1.0');
+    console.log('X2000 v2.0.0');
   }
 }
 
-function printBanner(): void {
-  console.log(`
-╔═══════════════════════════════════════════════════════════════════════════╗
-║                                                                           ║
-║   ██╗  ██╗██████╗  ██████╗  ██████╗  ██████╗                             ║
-║   ╚██╗██╔╝╚════██╗██╔═████╗██╔═████╗██╔═████╗                            ║
-║    ╚███╔╝  █████╔╝██║██╔██║██║██╔██║██║██╔██║                            ║
-║    ██╔██╗ ██╔═══╝ ████╔╝██║████╔╝██║████╔╝██║                            ║
-║   ██╔╝ ██╗███████╗╚██████╔╝╚██████╔╝╚██████╔╝                            ║
-║   ╚═╝  ╚═╝╚══════╝ ╚═════╝  ╚═════╝  ╚═════╝                             ║
-║                                                                           ║
-║   Autonomous AI Fleet · 46 Specialized Brains · Forever Learning         ║
-║                                                                           ║
-╚═══════════════════════════════════════════════════════════════════════════╝
-`);
+// ============================================================================
+// Commands
+// ============================================================================
+
+async function cmdSetup(): Promise<void> {
+  const { runOnboardingWizard } = await import('../onboarding/wizard.js');
+  await runOnboardingWizard();
 }
 
-// ============================================================================
-// Task Execution
-// ============================================================================
+async function cmdGateway(): Promise<void> {
+  // Check if configured
+  if (!existsSync(CONFIG_PATH)) {
+    console.log('X2000 is not configured. Running setup wizard...\n');
+    const { runOnboardingWizard } = await import('../onboarding/wizard.js');
+    const config = await runOnboardingWizard();
+    if (!config) {
+      process.exit(1);
+    }
+  }
 
-async function executeTask(taskDescription: string, options: CLIOptions): Promise<void> {
-  const task: Task = {
+  const { startGateway } = await import('../gateway/index.js');
+  await startGateway();
+}
+
+async function cmdDaemon(action: string, args: string[]): Promise<void> {
+  const { runDaemonCommand } = await import('../daemon/index.js');
+  await runDaemonCommand(action, args);
+}
+
+async function cmdStatus(): Promise<void> {
+  const { status } = await import('../daemon/index.js');
+  const daemonStatus = await status();
+
+  console.log('\n╔═══════════════════════════════════════════════════════════════════════════╗');
+  console.log('║                           X2000 STATUS                                     ║');
+  console.log('╚═══════════════════════════════════════════════════════════════════════════╝\n');
+
+  // Config
+  if (existsSync(CONFIG_PATH)) {
+    const config = JSON.parse(readFileSync(CONFIG_PATH, 'utf-8'));
+    console.log('Configuration:');
+    console.log(`  Provider:    ${config.provider}`);
+    console.log(`  Model:       ${config.model}`);
+    console.log(`  Trust Level: ${config.trustLevel}`);
+    console.log(`  Port:        ${config.port}`);
+  } else {
+    console.log('Configuration: Not set up');
+    console.log('  Run "x2000 setup" to configure');
+  }
+
+  console.log('');
+
+  // Daemon
+  console.log('Daemon Service:');
+  console.log(`  Installed:   ${daemonStatus.installed ? 'Yes' : 'No'}`);
+  console.log(`  Running:     ${daemonStatus.running ? 'Yes' : 'No'}`);
+  if (daemonStatus.pid) {
+    console.log(`  PID:         ${daemonStatus.pid}`);
+  }
+
+  console.log('');
+
+  // Gateway check
+  try {
+    const response = await fetch('http://localhost:3000/health');
+    if (response.ok) {
+      console.log('Gateway:');
+      console.log('  Status:      Running');
+      console.log('  URL:         http://localhost:3000');
+    }
+  } catch {
+    if (!daemonStatus.running) {
+      console.log('Gateway:       Not running');
+      console.log('  Run "x2000 gateway" or "x2000 daemon start"');
+    }
+  }
+
+  console.log('');
+}
+
+async function cmdMessage(content: string, sessionKey = 'default'): Promise<void> {
+  try {
+    const response = await fetch('http://localhost:3000/api/message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        content,
+        sessionKey,
+        channel: 'cli',
+      }),
+    });
+
+    const result = await response.json();
+
+    if (result.success) {
+      console.log('\n' + result.result);
+      if (result.toolCalls > 0) {
+        console.log(`\n[${result.toolCalls} tool calls]`);
+      }
+    } else {
+      console.error('Error:', result.error);
+    }
+  } catch {
+    console.error('Failed to connect to X2000 gateway.');
+    console.error('Make sure the gateway is running: x2000 gateway');
+  }
+}
+
+async function cmdChannels(): Promise<void> {
+  if (!existsSync(CONFIG_PATH)) {
+    console.log('X2000 is not configured. Run "x2000 setup" first.');
+    return;
+  }
+
+  const config = JSON.parse(readFileSync(CONFIG_PATH, 'utf-8'));
+
+  console.log('\nConfigured Channels:');
+  if (config.channels?.telegram?.enabled) {
+    console.log('  • Telegram: Enabled');
+  }
+  if (config.channels?.imessage?.enabled) {
+    console.log('  • iMessage: Enabled');
+  }
+  if (!config.channels || Object.keys(config.channels).length === 0) {
+    console.log('  No channels configured');
+    console.log('  Run "x2000 setup" to add channels');
+  }
+  console.log('');
+}
+
+// Legacy: Direct task execution
+async function cmdLegacyTask(task: string, verbose = false): Promise<void> {
+  const { providerManager } = await import('../ai/providers/index.js');
+  const { AgentLoop } = await import('../agents/loop.js');
+  const { memoryManager } = await import('../memory/manager.js');
+  const { v4: uuidv4 } = await import('uuid');
+
+  // Initialize
+  await providerManager.initialize({ preferredProvider: 'auto' });
+
+  if (providerManager.listAvailable().length === 0) {
+    console.error('\n❌ No LLM providers available.');
+    console.error('   Run "x2000 setup" to configure, or set ANTHROPIC_API_KEY');
+    process.exit(1);
+  }
+
+  try {
+    await memoryManager.initialize();
+  } catch {
+    // Memory offline is OK
+  }
+
+  console.log(`\n🚀 Task: ${task.slice(0, 60)}...`);
+  console.log(`📡 Provider: ${providerManager.currentProvider}\n`);
+
+  const taskObj = {
     id: uuidv4(),
     subject: 'CLI Task',
-    description: taskDescription,
-    status: 'in_progress',
-    priority: 'high',
+    description: task,
+    status: 'in_progress' as const,
+    priority: 'high' as const,
     subtaskIds: [],
     blockedBy: [],
     blocks: [],
     createdAt: new Date(),
     updatedAt: new Date(),
-    metadata: { source: 'cli', provider: providerManager.currentProvider },
+    metadata: { source: 'cli' },
   };
-
-  console.log(`\n🚀 Starting task: ${taskDescription.slice(0, 60)}...`);
-  console.log(`📡 Using provider: ${providerManager.currentProvider}`);
-  console.log('');
 
   const loop = new AgentLoop({
     brainType: 'ceo',
     trustLevel: 4,
-    maxIterations: options.maxIterations,
-    maxToolCalls: options.maxIterations * 3,
-    timeoutMs: 600000,
-    retryOnError: true,
-    selfCorrect: true,
+    maxIterations: 50,
     onIteration: (iter) => {
-      if (options.verbose) {
-        console.log(`\n[Iteration ${iter.iteration}]`);
-        console.log(`Thought: ${iter.thought.slice(0, 200)}...`);
-        if (iter.action) {
-          const status = iter.action.result.success ? '✓' : '✗';
-          console.log(`Action: ${iter.action.tool} ${status}`);
-        }
+      if (verbose) {
+        console.log(`[${iter.iteration}] ${iter.thought.slice(0, 100)}...`);
       } else {
         process.stdout.write('.');
       }
     },
   });
 
-  const result = await loop.run(task);
+  const result = await loop.run(taskObj);
 
-  console.log('\n');
-  console.log('═'.repeat(70));
-  console.log(`\n✅ Task ${result.success ? 'completed' : 'finished with issues'}`);
-  console.log(`   Iterations: ${result.iterations.length}`);
-  console.log(`   Tool calls: ${result.toolCalls.length}`);
-  console.log(`   Duration: ${(result.totalDuration / 1000).toFixed(1)}s`);
+  console.log('\n\n' + '═'.repeat(70));
+  console.log(`✅ ${result.success ? 'Completed' : 'Finished'}`);
+  console.log(`   Iterations: ${result.iterations.length} | Tools: ${result.toolCalls.length}`);
 
   if (result.output) {
-    console.log('\n📋 Output:');
-    console.log(typeof result.output === 'string' ? result.output : JSON.stringify(result.output, null, 2));
+    console.log('\n' + (typeof result.output === 'string' ? result.output : JSON.stringify(result.output, null, 2)));
   }
-
-  if (result.learnings.length > 0) {
-    console.log('\n💡 Learnings:');
-    result.learnings.forEach(l => console.log(`   - ${l}`));
-  }
-}
-
-// ============================================================================
-// Interactive Mode
-// ============================================================================
-
-async function interactiveMode(options: CLIOptions): Promise<void> {
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-
-  console.log('\n🤖 X2000 Interactive Mode');
-  console.log('   Type your task and press Enter. Type "exit" to quit.\n');
-
-  const prompt = (): void => {
-    rl.question('x2000> ', async (input) => {
-      const trimmed = input.trim();
-
-      if (trimmed.toLowerCase() === 'exit' || trimmed.toLowerCase() === 'quit') {
-        console.log('\n👋 Goodbye!\n');
-        rl.close();
-        process.exit(0);
-      }
-
-      if (trimmed.toLowerCase() === 'status') {
-        console.log(`\n📊 Status:`);
-        console.log(`   Provider: ${providerManager.currentProvider}`);
-        console.log(`   Available: ${providerManager.listAvailable().join(', ')}`);
-        prompt();
-        return;
-      }
-
-      if (trimmed.toLowerCase().startsWith('switch ')) {
-        const provider = trimmed.slice(7).trim() as ProviderType;
-        try {
-          providerManager.switchTo(provider);
-          console.log(`\n✓ Switched to ${provider}`);
-        } catch (e) {
-          console.log(`\n✗ ${e}`);
-        }
-        prompt();
-        return;
-      }
-
-      if (trimmed) {
-        try {
-          await executeTask(trimmed, options);
-        } catch (error) {
-          console.error(`\n❌ Error: ${error}`);
-        }
-      }
-
-      prompt();
-    });
-  };
-
-  prompt();
 }
 
 // ============================================================================
@@ -260,34 +293,87 @@ async function interactiveMode(options: CLIOptions): Promise<void> {
 // ============================================================================
 
 async function main(): Promise<void> {
-  const { task, options } = parseArgs();
+  const args = process.argv.slice(2);
 
-  printBanner();
-
-  // Initialize providers
-  await providerManager.initialize({
-    preferredProvider: options.provider,
-  });
-
-  if (providerManager.listAvailable().length === 0) {
-    console.error('\n❌ No LLM providers available.');
-    console.error('   Set ANTHROPIC_API_KEY, OPENAI_API_KEY, or run Ollama locally.');
-    process.exit(1);
+  if (args.length === 0) {
+    printBanner();
+    printHelp();
+    return;
   }
 
-  // Initialize memory
-  try {
-    await memoryManager.initialize();
-    console.log('[X2000] ✓ Memory system initialized');
-  } catch {
-    console.log('[X2000] ⚠️  Memory system offline');
+  const cmd = args[0];
+
+  // Handle flags
+  if (cmd === '-h' || cmd === '--help' || cmd === 'help') {
+    printHelp();
+    return;
   }
 
-  // Run in appropriate mode
-  if (options.interactive || !task) {
-    await interactiveMode(options);
-  } else {
-    await executeTask(task, options);
+  if (cmd === '--version') {
+    printVersion();
+    return;
+  }
+
+  // Handle commands
+  switch (cmd) {
+    case 'login': {
+      const { login } = await import('../auth/oauth.js');
+      await login();
+      break;
+    }
+
+    case 'logout': {
+      const { logout } = await import('../auth/oauth.js');
+      logout();
+      break;
+    }
+
+    case 'setup':
+    case 'onboard':
+      await cmdSetup();
+      break;
+
+    case 'gateway':
+    case 'start':
+      await cmdGateway();
+      break;
+
+    case 'daemon':
+      await cmdDaemon(args[1] || 'help', args.slice(2));
+      break;
+
+    case 'status':
+      await cmdStatus();
+      break;
+
+    case 'message':
+    case 'msg':
+      if (!args[1]) {
+        console.error('Usage: x2000 message "your message"');
+        process.exit(1);
+      }
+      await cmdMessage(args[1], args[2]);
+      break;
+
+    case 'channels':
+      if (args[1] === 'add' && args[2]) {
+        const { addChannel } = await import('../onboarding/wizard.js');
+        await addChannel(args[2]);
+      } else {
+        await cmdChannels();
+      }
+      break;
+
+    default:
+      // Legacy: treat as direct task
+      if (!cmd.startsWith('-')) {
+        printBanner();
+        await cmdLegacyTask(cmd, args.includes('-v') || args.includes('--verbose'));
+      } else {
+        console.error(`Unknown command: ${cmd}`);
+        printHelp();
+        process.exit(1);
+      }
   }
 }
 

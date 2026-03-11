@@ -32,6 +32,7 @@ export { default as emailTool } from './email.js';
 export { default as spawnAgentTool } from './spawn-agent.js';
 export { default as processTool } from './process.js';
 export { default as visionTool } from './vision.js';
+export { default as verifyDeployTool } from './verify-deploy.js';
 
 // Initialize tool registry
 import { toolRegistry } from './base.js';

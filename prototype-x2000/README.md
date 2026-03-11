@@ -2,129 +2,166 @@
 
 > Autonomous AI Fleet · 46 Specialized Brains · Forever Learning
 
-X2000 is an autonomous AI system that builds billion-dollar businesses. It works with **any LLM** (Claude, GPT-4, Llama, local models) and runs on **any platform** (Mac, Linux, Windows, Raspberry Pi).
+X2000 is an autonomous AI that works while you sleep. Better than OpenClaw.
 
-## Quick Install
+## Quick Start (Mac Mini / Mac)
 
 ```bash
-# Clone and install
-git clone https://github.com/YOUR_REPO/x2000.git
-cd x2000
-./install.sh
-```
+# 1. Clone
+git clone https://github.com/YOUR_REPO/prototype-x2000.git
+cd prototype-x2000
 
-Or manually:
-```bash
+# 2. Install & Build
 npm install
 npm run build
+
+# 3. Run Setup Wizard
+npm start setup
 ```
 
-## Usage
+**That's it.** The wizard walks you through everything in about 5 minutes:
+- AI provider (Claude subscription, API key, or local)
+- Communication channels (Telegram, WhatsApp, iMessage, Discord, Email)
+- Autonomy level (how much freedom X2000 has)
+- Background service installation
 
-```bash
-# Run a task
-npm run x2000 "build a REST API for user management"
+---
 
-# Interactive mode
-npm run x2000 -- -i
+## What X2000 Does
 
-# Use a specific provider
-npm run x2000 -- --provider ollama "analyze this codebase"
+X2000 runs as a background service. You can message it via:
+- **Telegram** - "Deploy my app to production"
+- **WhatsApp** - "Build me an API for user auth"
+- **iMessage** - "Research competitors in the SaaS space"
+- **Email** - Send tasks, get responses
+- **CLI** - `npm start msg "your task here"`
 
-# Verbose output
-npm run x2000 -- -v "research competitors"
-```
+X2000 will:
+- Complete tasks autonomously
+- Verify deployments actually work
+- Fix errors without asking
+- Learn and improve over time
 
-If installed globally (`npm link`):
-```bash
-x2000 "your task here"
-x2000 -i  # Interactive mode
-```
-
-## LLM Providers
-
-X2000 works with any of these providers:
-
-### Anthropic (Claude) - Recommended
-```bash
-export ANTHROPIC_API_KEY=sk-ant-...
-```
-
-### OpenAI (GPT-4)
-```bash
-export OPENAI_API_KEY=sk-...
-```
-
-### Ollama (Local, Free)
-```bash
-# Install Ollama
-brew install ollama  # macOS
-# or: curl -fsSL https://ollama.ai/install.sh | sh
-
-# Pull a model
-ollama pull llama3.2
-
-# Start the server
-ollama serve
-```
-
-X2000 will auto-detect available providers and use the best one.
-
-## Features
-
-### 46 Specialized Brains
-- **CEO Brain** - Orchestration and delegation
-- **Engineering Brain** - Code, architecture, DevOps
-- **Product Brain** - Requirements, roadmaps
-- **Design Brain** - UI/UX, prototyping
-- **Research Brain** - Market analysis
-- **Finance Brain** - Financial modeling
-- **Marketing Brain** - Growth, branding
-- **QA Brain** - Testing, quality gates
-- And 38 more domain experts...
-
-### Forever Learning
-- Extracts patterns from every task
-- Stores learnings for future use
-- Improves decision-making over time
-
-### Brain Tension Protocol
-- Brains debate and challenge each other
-- Better decisions through structured debate
-- CEO resolves conflicts
-
-### Tools
-- File operations (read, write, edit)
-- Shell commands
-- Web fetching
-- Git operations
-- Browser automation
+---
 
 ## Commands
 
 ```bash
-npm run x2000           # Run X2000 CLI
-npm run autonomous      # Autonomous audit mode
-npm run self-improve    # Self-improvement mode
-npm run improve-to-97   # Improve until 97/100 score
+# Setup wizard (first time)
+npm start setup
+
+# Start gateway (foreground)
+npm start gateway
+
+# Background service
+npm start daemon install    # Install & auto-start on login
+npm start daemon start      # Start
+npm start daemon stop       # Stop
+npm start daemon logs       # View logs
+npm start daemon uninstall  # Remove
+
+# Send tasks
+npm start msg "your task here"
+
+# Check status
+npm start status
+
+# Manage channels
+npm start channels
+npm start channels add telegram
+npm start channels add email
+
+# Login with Claude subscription
+npm start login
+
+# Help
+npm start help
 ```
 
-## Configuration
+---
 
-Create a `.env` file:
-```env
-# LLM Provider (at least one required)
-ANTHROPIC_API_KEY=sk-ant-...
-OPENAI_API_KEY=sk-...
+## Setup Wizard Steps
 
-# Memory persistence (optional)
-SUPABASE_URL=https://...
-SUPABASE_ANON_KEY=...
+### Step 1: Dependencies
+Checks Node.js and Git are installed.
 
-# Settings
-NODE_ENV=development
-LOG_LEVEL=info
+### Step 2: AI Provider
+- **Claude Pro/Max Subscription** - Use your existing subscription (recommended)
+- **API Key** - Pay-per-use credits
+- **Ollama** - Free, local models
+
+### Step 3: Communication Channels
+Set up any combination:
+- **Telegram** - Create bot via @BotFather
+- **WhatsApp** - Scan QR code on first start
+- **iMessage** - macOS only, needs Accessibility permissions
+- **Discord** - Create bot in developer portal
+- **Email** - Gmail, Outlook, or custom SMTP
+
+### Step 4: Autonomy Level
+| Level | What X2000 Can Do |
+|-------|-------------------|
+| 1 | Read files, analyze, answer questions |
+| 2 | + Write/edit files |
+| 3 | + Run shell commands, git |
+| 4 | Full autonomy (recommended) |
+
+### Step 5: Gateway Settings
+- Port (default 3000)
+- Auto-start on login
+
+---
+
+## Why X2000 > OpenClaw
+
+| Feature | OpenClaw | X2000 |
+|---------|----------|-------|
+| Setup time | 30+ minutes | 5 minutes |
+| Credential storage | 6+ scattered locations | One unified location |
+| Auth options | 15+ confusing choices | 3 clear options |
+| Channel setup | Complex, error-prone | Step-by-step guided |
+| Error handling | Reports and waits | Fixes automatically |
+| Deployment verification | None | Built-in |
+| Documentation | 7 separate guides | One clear README |
+
+---
+
+## Configuration Files
+
+All stored in `~/.x2000/`:
+
 ```
+~/.x2000/
+├── config.json       # Main config
+├── credentials.json  # All secrets (mode 600)
+├── .env              # Environment variables
+└── logs/
+    ├── gateway.log     # Output
+    └── gateway.err.log # Errors
+```
+
+---
+
+## API
+
+Gateway runs at `localhost:3000`:
+
+```bash
+# Health check
+curl http://localhost:3000/health
+
+# Status
+curl http://localhost:3000/api/status
+
+# Send task
+curl -X POST http://localhost:3000/api/message \
+  -H "Content-Type: application/json" \
+  -d '{"content": "What time is it?"}'
+```
+
+WebSocket available for streaming at `ws://localhost:3000`.
+
+---
 
 ## Architecture
 
@@ -144,8 +181,8 @@ LOG_LEVEL=info
 │  └──────────────┘    └──────────────┘    └──────────────┘              │
 │                                                                          │
 │  ┌────────────────────────────────────────────────────────────────┐     │
-│  │                    LLM PROVIDERS                                │     │
-│  │         Anthropic │ OpenAI │ Ollama │ Any Compatible           │     │
+│  │                      CHANNELS                                   │     │
+│  │    Telegram │ WhatsApp │ iMessage │ Discord │ Email │ CLI      │     │
 │  └────────────────────────────────────────────────────────────────┘     │
 │                                                                          │
 │  ┌────────────────────────────────────────────────────────────────┐     │
@@ -155,15 +192,35 @@ LOG_LEVEL=info
 └─────────────────────────────────────────────────────────────────────────┘
 ```
 
-## Platform Support
+---
 
-| Platform | Status |
-|----------|--------|
-| macOS | ✅ Full support |
-| Linux | ✅ Full support |
-| Windows | ✅ Full support |
-| Raspberry Pi | ✅ With Ollama |
-| Docker | ✅ Coming soon |
+## Troubleshooting
+
+### Gateway won't start
+
+```bash
+# Check what's using port 3000
+lsof -i :3000
+
+# View logs
+cat ~/.x2000/logs/gateway.log
+cat ~/.x2000/logs/gateway.err.log
+```
+
+### Telegram not working
+
+1. Message your bot directly (not in group first)
+2. Check token: `cat ~/.x2000/credentials.json`
+3. Restart: `npm start daemon restart`
+
+### Reset everything
+
+```bash
+rm -rf ~/.x2000
+npm start setup
+```
+
+---
 
 ## License
 

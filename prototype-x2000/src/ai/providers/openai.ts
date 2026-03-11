@@ -106,17 +106,9 @@ export class OpenAIProvider extends LLMProvider {
   }
 
   async isAvailable(): Promise<boolean> {
-    try {
-      const apiKey = this.config.apiKey || process.env.OPENAI_API_KEY;
-      if (!apiKey) return false;
-
-      const response = await fetch(`${this.config.baseUrl}/models`, {
-        headers: { 'Authorization': `Bearer ${apiKey}` },
-      });
-      return response.ok;
-    } catch {
-      return false;
-    }
+    // Check if API key is configured (don't make a test call)
+    const apiKey = this.config.apiKey || process.env.OPENAI_API_KEY;
+    return Boolean(apiKey && apiKey.startsWith('sk-'));
   }
 }
 
