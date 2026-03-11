@@ -227,42 +227,45 @@ async function cmdChannels(): Promise<void> {
 }
 
 async function cmdBrains(): Promise<void> {
-  const { brainFactory } = await import('../brains/factory.js');
-  const brains = brainFactory.getAvailableBrains();
+  const { brainDefinitions, brainsByTier } = await import('../sdk/brain-definitions.js');
 
   console.log('\n╔═══════════════════════════════════════════════════════════════════════════╗');
   console.log('║                        X2000 SPECIALIZED BRAINS                           ║');
   console.log('╚═══════════════════════════════════════════════════════════════════════════╝\n');
 
-  console.log(`Total: ${brains.length} specialized brains\n`);
+  const totalBrains = Object.keys(brainDefinitions).length;
+  const opusCount = Object.values(brainDefinitions).filter(b => b.model === 'opus').length;
+  const sonnetCount = Object.values(brainDefinitions).filter(b => b.model === 'sonnet').length;
+  const haikuCount = Object.values(brainDefinitions).filter(b => b.model === 'haiku').length;
 
-  // Group brains by category
-  const categories: Record<string, string[]> = {
-    'Leadership': ['ceo', 'operations', 'mba'],
-    'Engineering': ['engineering', 'frontend', 'backend', 'database', 'devops', 'architecture', 'mobile', 'qa', 'testing', 'debugger', 'optimize'],
-    'Data & AI': ['data', 'ai', 'analytics', 'automation'],
-    'Product & Design': ['product', 'design', 'game-design', 'innovation'],
-    'Business': ['finance', 'sales', 'marketing', 'growth', 'pricing', 'options-trading', 'investor'],
-    'People & Legal': ['hr', 'legal', 'partnership'],
-    'Content & Comms': ['content', 'branding', 'social-media', 'video', 'email', 'localization', 'devrel', 'community'],
-    'Support': ['support', 'customer-success'],
-    'Infrastructure': ['cloud', 'security', 'research'],
+  console.log(`Total: ${totalBrains} specialized brains`);
+  console.log(`Models: ${opusCount} Opus (technical) · ${sonnetCount} Sonnet (business) · ${haikuCount} Haiku (support)\n`);
+
+  // Display by tier with model info
+  const tierNames: Record<string, string> = {
+    core: '🧠 Core Brains (Opus)',
+    technical: '⚙️  Technical Specialists (Opus)',
+    business: '💼 Business & Strategy (Sonnet)',
+    marketing: '📈 Marketing & Growth (Sonnet)',
+    support: '🛠️  Support Functions (Haiku)',
   };
 
-  for (const [category, categoryBrains] of Object.entries(categories)) {
-    const available = categoryBrains.filter(b => brains.includes(b));
-    if (available.length > 0) {
-      console.log(`${category}:`);
-      for (const brain of available) {
-        const formatted = brain
-          .split('-')
-          .map(w => w.charAt(0).toUpperCase() + w.slice(1))
-          .join(' ');
-        console.log(`  • ${formatted}`);
+  for (const [tier, brainIds] of Object.entries(brainsByTier)) {
+    const tierName = tierNames[tier] || tier;
+    console.log(`${tierName}:`);
+
+    for (const brainId of brainIds) {
+      const brain = brainDefinitions[brainId];
+      if (brain) {
+        const name = brain.name.replace(' Brain', '');
+        const modelBadge = brain.model === 'opus' ? '◆' : brain.model === 'sonnet' ? '○' : '·';
+        console.log(`  ${modelBadge} ${name}`);
       }
-      console.log('');
     }
+    console.log('');
   }
+
+  console.log('Legend: ◆ Opus (most capable) · ○ Sonnet (balanced) · · Haiku (fast)');
 }
 
 // Legacy: Direct task execution
